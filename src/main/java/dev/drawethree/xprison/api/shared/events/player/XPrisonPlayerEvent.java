@@ -4,15 +4,19 @@ import dev.drawethree.xprison.api.shared.events.XPrisonEvent;
 import lombok.Getter;
 import org.bukkit.OfflinePlayer;
 
+/**
+ * Abstract base class for XPrison events related to a player.
+ * Stores an OfflinePlayer reference.
+ */
+@Getter
 public abstract class XPrisonPlayerEvent extends XPrisonEvent {
 
-	@Getter
 	protected OfflinePlayer player;
 
 	/**
-	 * Abstract XPrisonPlayerEvent
+	 * Constructs a new player-related event.
 	 *
-	 * @param player Player
+	 * @param player the OfflinePlayer involved in this event
 	 */
 	public XPrisonPlayerEvent(OfflinePlayer player) {
 		this.player = player;

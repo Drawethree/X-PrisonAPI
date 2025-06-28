@@ -1,6 +1,5 @@
 package dev.drawethree.xprison.api.prestiges.events;
 
-
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;
@@ -9,24 +8,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+@Getter
 public final class PlayerPrestigeEvent extends XPrisonPlayerEvent implements Cancellable {
-
 
 	private static final HandlerList handlers = new HandlerList();
 
-	@Getter
 	private final Prestige oldPrestige;
 
-	@Getter
 	@Setter
 	private Prestige newPrestige;
 
-	@Getter
 	@Setter
 	private boolean cancelled;
 
 	/**
-	 * Called when player receive gems
+	 * Called when player changes prestige
 	 *
 	 * @param player      Player
 	 * @param oldPrestige old prestige
@@ -46,5 +42,4 @@ public final class PlayerPrestigeEvent extends XPrisonPlayerEvent implements Can
 	public HandlerList getHandlers() {
 		return handlers;
 	}
-
 }

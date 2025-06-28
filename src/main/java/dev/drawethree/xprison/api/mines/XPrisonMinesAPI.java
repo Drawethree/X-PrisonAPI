@@ -4,40 +4,48 @@ import dev.drawethree.xprison.api.mines.model.Mine;
 import dev.drawethree.xprison.api.mines.model.MineSelection;
 import org.bukkit.Location;
 
+/**
+ * API for interacting with mines in the XPrison plugin.
+ */
 public interface XPrisonMinesAPI {
 
 	/**
-	 * Gets a mine by name
+	 * Gets a mine by its name.
 	 *
-	 * @param name String
-	 * @return Mine.class
+	 * @param name The name of the mine
+	 * @return The {@link Mine} instance matching the given name, or null if no such mine exists
 	 */
 	Mine getMineByName(String name);
 
 	/**
-	 * Gets a mine by location
+	 * Gets the mine located at a specific location.
 	 *
-	 * @param loc Location
-	 * @return Mine.class
+	 * @param loc The {@link Location} to check
+	 * @return The {@link Mine} containing the given location, or null if none is found
 	 */
 	Mine getMineAtLocation(Location loc);
 
 	/**
-	 * Creates a mine with given mine selection positions and name
-	 * @param mineSelection
-	 * @param name
+	 * Creates a new mine with the specified selection boundaries and name.
+	 *
+	 * @param mineSelection The {@link MineSelection} defining the mine boundaries
+	 * @param name          The name of the new mine
+	 * @return The created {@link Mine} instance
 	 */
 	Mine createMine(MineSelection mineSelection, String name);
 
 	/**
-	 * Deletes a mine
-	 * @param mine Mine
+	 * Deletes the specified mine.
+	 *
+	 * @param mine The {@link Mine} to delete
+	 * @return true if the mine was successfully deleted, false otherwise
 	 */
 	boolean deleteMine(Mine mine);
 
 	/**
-	 * Resets a mine
-	 * @param mine Mine
+	 * Resets the contents of the given mine.
+	 *
+	 * @param mine The {@link Mine} to reset
 	 */
 	void resetMine(Mine mine);
 }

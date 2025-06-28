@@ -6,54 +6,58 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Optional;
 
+/**
+ * API for managing pickaxe levels in XPrison.
+ */
 public interface XPrisonPickaxeLevelsAPI {
 
 	/**
-	 * Method to get PickaxeLevel of itemstack
+	 * Gets the pickaxe level associated with the given item stack.
 	 *
-	 * @param item ItemStack
-	 * @return instance of PickaxeLevel
+	 * @param item the ItemStack to check
+	 * @return an Optional containing the PickaxeLevel if present, otherwise empty
 	 */
 	Optional<PickaxeLevel> getPickaxeLevel(ItemStack item);
 
 	/**
-	 * Method to get PickaxeLevel of Player
+	 * Gets the pickaxe level of a specific player.
 	 *
-	 * @param player Player
-	 * @return instance of PickaxeLevel
+	 * @param player the player whose pickaxe level to get
+	 * @return an Optional containing the PickaxeLevel if present, otherwise empty
 	 */
 	Optional<PickaxeLevel> getPickaxeLevel(Player player);
 
 	/**
-	 * Method to get PickaxeLevel by specific level
+	 * Gets the pickaxe level by its numeric level.
 	 *
-	 * @param level level
-	 * @return instance of PickaxeLevel
+	 * @param level the level to retrieve
+	 * @return an Optional containing the PickaxeLevel if found, otherwise empty
 	 */
 	Optional<PickaxeLevel> getPickaxeLevel(int level);
 
 	/**
-	 * Method to set PickaxeLevel of itemstack
+	 * Sets the pickaxe level on an item stack for a player.
 	 *
-	 * @param player Player
-	 * @param item   ItemStack to change
-	 * @param level  PickaxeLevel to set
+	 * @param player the player owning the item
+	 * @param item the ItemStack to modify
+	 * @param level the PickaxeLevel to set
 	 */
 	void setPickaxeLevel(Player player, ItemStack item, PickaxeLevel level);
 
 	/**
-	 * Method to set PickaxeLevel of itemstack
+	 * Sets the pickaxe level on an item stack for a player by level number.
 	 *
-	 * @param player Player
-	 * @param item   ItemStack to change
-	 * @param level  level to set
+	 * @param player the player owning the item
+	 * @param item the ItemStack to modify
+	 * @param level the numeric level to set
 	 */
 	void setPickaxeLevel(Player player, ItemStack item, int level);
 
 	/**
-	 * Method to get progress bar of PickaxeLevel progress for given player
+	 * Gets the progress bar string representing the player's pickaxe level progress.
 	 *
-	 * @param player Player
+	 * @param player the player to get the progress bar for
+	 * @return a string representing the progress bar
 	 */
 	String getProgressBar(Player player);
 

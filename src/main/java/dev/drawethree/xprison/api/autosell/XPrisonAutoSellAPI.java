@@ -9,60 +9,65 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * API interface for the AutoSell feature.
+ * Provides methods for managing selling blocks, pricing, and player earnings.
+ */
 public interface XPrisonAutoSellAPI {
 
 	/**
-	 * Method to get current earnings of player
+	 * Gets the current total earnings of a player from auto-selling.
 	 *
-	 * @param player Player
-	 * @return Current earnings
+	 * @param player the player whose earnings to retrieve
+	 * @return the current earnings of the player
 	 */
 	double getCurrentEarnings(Player player);
 
 	/**
-	 * Method to get price for ItemStack in specified mine region
+	 * Gets the price of a specific item in a given sell region.
 	 *
-	 * @param region SellRegion
-	 * @param item   ItemStack
-	 * @return Price for item
+	 * @param region the sell region to check pricing in
+	 * @param item   the item to get the price for
+	 * @return the price of the item in the specified region
 	 */
 	double getPriceForItem(SellRegion region, ItemStack item);
 
 	/**
-	 * Method to get price for Block
+	 * Gets the price for a given block.
 	 *
-	 * @param block Block
-	 * @return Price for block
+	 * @param block the block to get the price for
+	 * @return the price of the block
 	 */
 	double getPriceForBlock(Block block);
 
 	/**
-	 * Sells the given blocks
+	 * Sells the specified list of blocks on behalf of the player.
 	 *
-	 * @param player Player
-	 * @param blocks List of blocks
+	 * @param player the player selling the blocks
+	 * @param blocks the list of blocks to sell
 	 */
 	void sellBlocks(Player player, List<Block> blocks);
 
 	/**
-	 * Method to get if player has autosell enabled
+	 * Checks if a player has auto-sell enabled.
 	 *
-	 * @param p Player
-	 * @return true if player has autosell enabled, otherwise false
+	 * @param p the player to check
+	 * @return {@code true} if auto-sell is enabled for the player, {@code false} otherwise
 	 */
 	boolean hasAutoSellEnabled(Player p);
 
 	/**
-	 * Method to get all sell regions
+	 * Gets a collection of all loaded and active sell regions.
 	 *
-	 * @return Collection of all loaded and active Sell Regions
+	 * @return a collection of all sell regions
 	 */
 	Collection<SellRegion> getSellRegions();
 
 	/**
-	 * Method to get SellRegion at specified location
+	 * Gets the sell region at a specified location.
 	 *
-	 * @return Sell Region at given location or null if not present.
+	 * @param location the location to check
+	 * @return the sell region at the given location, or {@code null} if none exists there
 	 */
 	SellRegion getSellRegionAtLocation(Location location);
 }

@@ -3,47 +3,49 @@ package dev.drawethree.xprison.api.prestiges;
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
 import org.bukkit.entity.Player;
 
+/**
+ * API interface for handling prestige-related operations in XPrison.
+ */
 public interface XPrisonPrestigesAPI {
 
 	/**
-	 * Method to get  Prestige by id
+	 * Retrieves a Prestige by its unique ID.
 	 *
-	 * @param id Prestige id
-	 * @return Prestige
+	 * @param id the Prestige ID
+	 * @return the Prestige instance matching the given ID
 	 */
 	Prestige getPrestigeById(long id);
 
 	/**
-	 * Method to get player Prestige
+	 * Gets the current Prestige of a player.
 	 *
-	 * @param p Player
-	 * @return Prestige
+	 * @param p the player whose prestige is to be retrieved
+	 * @return the Prestige instance of the player
 	 */
 	Prestige getPlayerPrestige(Player p);
 
 	/**
-	 * Sets a prestige to online player
+	 * Sets the Prestige level of an online player.
 	 *
-	 * @param player   Player
-	 * @param prestige Prestige
+	 * @param player   the player whose prestige is to be set
+	 * @param prestige the Prestige instance to assign
 	 */
 	void setPlayerPrestige(Player player, Prestige prestige);
 
 	/**
-	 * Sets a prestige to online player
+	 * Sets the Prestige level of an online player by prestige ID.
 	 *
-	 * @param player   Player
-	 * @param prestigeId Prestige level
+	 * @param player     the player whose prestige is to be set
+	 * @param prestigeId the ID of the prestige level to assign
 	 */
 	void setPlayerPrestige(Player player, long prestigeId);
 
-
 	/**
-	 * Returns true if a player is on max prestige, otherwise false
+	 * Checks if a player has reached the maximum prestige level.
 	 *
-	 * @param player   Player
+	 * @param player the player to check
+	 * @return true if the player is at max prestige, false otherwise
 	 */
 	boolean isMaxPrestige(Player player);
-
 
 }

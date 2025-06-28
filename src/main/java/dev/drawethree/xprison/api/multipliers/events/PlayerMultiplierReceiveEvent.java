@@ -9,29 +9,30 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Event called when a player receives a multiplier.
+ */
+@Getter
 public final class PlayerMultiplierReceiveEvent extends XPrisonPlayerEvent {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	@Getter
 	private final double multiplier;
 
-	@Getter
 	private final TimeUnit timeUnit;
 
-	@Getter
 	private final long duration;
 
-	@Getter
 	private final MultiplierType type;
 
 	/**
-	 * Called when player receive multiplier
+	 * Constructs a new PlayerMultiplierReceiveEvent.
 	 *
-	 * @param player     Player
-	 * @param multiplier multiplier
-	 * @param duration   duration
-	 * @param timeUnit   TimeUnit
+	 * @param player     the player receiving the multiplier
+	 * @param multiplier the multiplier value
+	 * @param timeUnit   the unit of time for the multiplier duration
+	 * @param duration   the duration of the multiplier
+	 * @param type       the type of multiplier (e.g., SELL, TOKENS)
 	 */
 	public PlayerMultiplierReceiveEvent(Player player, double multiplier, TimeUnit timeUnit, long duration, MultiplierType type) {
 		super(player);
@@ -41,6 +42,11 @@ public final class PlayerMultiplierReceiveEvent extends XPrisonPlayerEvent {
 		this.type = type;
 	}
 
+	/**
+	 * Gets the list of handlers listening to this event.
+	 *
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
@@ -49,5 +55,4 @@ public final class PlayerMultiplierReceiveEvent extends XPrisonPlayerEvent {
 	public @NotNull HandlerList getHandlers() {
 		return handlers;
 	}
-
 }

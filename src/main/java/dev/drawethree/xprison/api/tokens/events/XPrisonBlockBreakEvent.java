@@ -10,21 +10,35 @@ import org.bukkit.event.HandlerList;
 
 import java.util.List;
 
+/**
+ * Event fired when a player breaks blocks within a mine, potentially with custom enchantments.
+ */
 @Getter
 @Setter
 public final class XPrisonBlockBreakEvent extends XPrisonPlayerEvent implements Cancellable {
 
 	private static final HandlerList handlers = new HandlerList();
 
+	/**
+	 * The player who broke the blocks.
+	 */
 	private Player player;
+
+	/**
+	 * The list of blocks that were broken.
+	 */
 	private List<Block> blocks;
+
+	/**
+	 * Whether the event is cancelled.
+	 */
 	private boolean cancelled;
 
 	/**
-	 * Called when player mines blocks within mine with or without custom enchants.
+	 * Constructs a new XPrisonBlockBreakEvent.
 	 *
-	 * @param player Player
-	 * @param blocks List of blocks that were affected
+	 * @param player the player who broke the blocks
+	 * @param blocks the list of blocks that were broken
 	 */
 	public XPrisonBlockBreakEvent(Player player, List<Block> blocks) {
 		super(player);
@@ -32,10 +46,20 @@ public final class XPrisonBlockBreakEvent extends XPrisonPlayerEvent implements 
 		this.blocks = blocks;
 	}
 
+	/**
+	 * Returns the static handler list for this event.
+	 *
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
+	/**
+	 * Returns the handler list for this event instance.
+	 *
+	 * @return the handler list
+	 */
 	@Override
 	public HandlerList getHandlers() {
 		return handlers;

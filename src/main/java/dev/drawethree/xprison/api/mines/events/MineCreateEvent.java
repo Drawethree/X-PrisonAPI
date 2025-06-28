@@ -10,35 +10,48 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Event fired when a mine is created.
+ * <p>
+ * This event is cancellable; cancelling it will prevent the mine creation.
+ */
+@Getter
 public final class MineCreateEvent extends XPrisonEvent implements Cancellable {
 
 	private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-	@Getter
 	@Setter
 	private boolean cancelled;
 
-	@Getter
-	private CommandSender creator;
+	private final CommandSender creator;
 
-	@Getter
-	private Mine mine;
+	private final Mine mine;
 
 	/**
-	 * Fired when mine is created
+	 * Constructs a new MineCreateEvent.
 	 *
-	 * @param creator CommandSender who created the mine
-	 * @param mine    Mine
+	 * @param creator the {@link CommandSender} who created the mine
+	 * @param mine    the {@link Mine} that was created
 	 */
 	public MineCreateEvent(Player creator, Mine mine) {
 		this.creator = creator;
 		this.mine = mine;
 	}
 
+	/**
+	 * Gets the handler list for this event.
+	 *
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return HANDLERS_LIST;
 	}
 
+	/**
+	 * Gets the handlers for this event.
+	 *
+	 * @return the handler list
+	 */
 	@NotNull
 	@Override
 	public HandlerList getHandlers() {

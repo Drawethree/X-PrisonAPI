@@ -6,28 +6,31 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * API interface for AutoMiner feature.
+ */
 public interface XPrisonAutoMinerAPI {
 
     /**
-     * Returns true if player is in autominer region, otherwise return false
+     * Checks if a player is currently inside an AutoMiner region.
      *
-     * @param player Player
-     * @return returns true if player is in autominer region, otherwise return false
+     * @param player The player to check
+     * @return true if the player is in an AutoMiner region, false otherwise
      */
     boolean isInAutoMinerRegion(Player player);
 
     /**
-     * Returns remaining autominer time in seconds for specific player
+     * Gets the remaining AutoMiner time for the specified player.
      *
-     * @param player Player
-     * @return time in seconds left for specific player autominer
+     * @param player The player whose AutoMiner time to get
+     * @return Remaining AutoMiner time in seconds
      */
     int getAutoMinerTime(Player player);
 
     /**
-     * Returns Collection of all autominer regions
+     * Retrieves a collection of all loaded AutoMiner regions.
      *
-     * @return Collection of all autominer regions
+     * @return A collection containing all AutoMiner regions
      */
     Collection<AutoMinerRegion> getAutoMinerRegions();
 }

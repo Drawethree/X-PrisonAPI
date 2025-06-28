@@ -1,6 +1,5 @@
 package dev.drawethree.xprison.api.ranks;
 
-
 import dev.drawethree.xprison.api.ranks.model.Rank;
 import org.bukkit.entity.Player;
 
@@ -8,59 +7,58 @@ import java.util.Optional;
 
 public interface XPrisonRanksAPI {
 
-
 	/**
-	 * Method to get player Rank
+	 * Gets a rank by its unique ID.
 	 *
-	 * @param id Rank Id
-	 * @return Rank
+	 * @param id the ID of the rank
+	 * @return the Rank corresponding to the given ID
 	 */
 	Rank getRankById(int id);
 
 	/**
-	 * Method to get player Rank
+	 * Gets the current rank of a player.
 	 *
-	 * @param p Player
-	 * @return Rank
+	 * @param p the player whose rank is requested
+	 * @return the player's current Rank
 	 */
 	Rank getPlayerRank(Player p);
 
 	/**
-	 * Method to get next player rank
+	 * Gets the next rank a player can achieve.
 	 *
-	 * @param player Player
-	 * @return null if he has max rank, otherwise next Rank
+	 * @param player the player whose next rank is requested
+	 * @return an Optional containing the next Rank, or empty if the player has the max rank
 	 */
 	Optional<Rank> getNextPlayerRank(Player player);
 
 	/**
-	 * Method to get player's rankup progress
+	 * Gets the player's progress towards ranking up, as a percentage.
 	 *
-	 * @param player Player
-	 * @return int 0-100 percentage
+	 * @param player the player whose rankup progress is requested
+	 * @return an integer between 0 and 100 representing the percentage of rankup progress
 	 */
 	int getRankupProgress(Player player);
 
 	/**
-	 * Sets a rank to online player
+	 * Sets a player's rank to the specified Rank.
 	 *
-	 * @param player Player
-	 * @param rank   Rank
+	 * @param player the player whose rank is to be set
+	 * @param rank   the Rank to assign to the player
 	 */
 	void setPlayerRank(Player player, Rank rank);
 
 	/**
-	 * Resets player rank to default one
+	 * Resets a player's rank to the default rank.
 	 *
-	 * @param player Player
+	 * @param player the player whose rank will be reset
 	 */
 	void resetPlayerRank(Player player);
 
 	/**
-	 * Returns true if player has a max rank available
+	 * Checks if a player currently holds the maximum possible rank.
 	 *
-	 * @param player Player
+	 * @param player the player to check
+	 * @return true if the player has the max rank, false otherwise
 	 */
 	boolean isMaxRank(Player player);
-
 }

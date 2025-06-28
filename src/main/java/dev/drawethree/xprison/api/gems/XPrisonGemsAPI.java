@@ -1,51 +1,21 @@
 package dev.drawethree.xprison.api.gems;
 
-import dev.drawethree.xprison.api.shared.currency.enums.ReceiveCause;
+import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
 import org.bukkit.OfflinePlayer;
 
-public interface XPrisonGemsAPI {
+/**
+ * API interface for interacting with the Gems system in the XPrison plugin.
+ * Provides methods to get, add, remove, and set gems for players, as well as to check gem balances.
+ */
+public interface XPrisonGemsAPI extends XPrisonCurrency {
 
 	/**
-	 * Method to get player gems
+	 * Checks if the specified player has at least the given amount of gems.
 	 *
-	 * @param p Player
-	 * @return Player gems amount
+	 * @param player the {@link OfflinePlayer} to check
+	 * @param amount the minimum amount of gems required
+	 * @return {@code true} if the player has at least the specified amount of gems, {@code false} otherwise
 	 */
-	long getPlayerGems(OfflinePlayer p);
-
-	/**
-	 * Method to check if player has more or equal gems than specified amount
-	 *
-	 * @param p      Player
-	 * @param amount amount
-	 * @return true if player has more or equal gems
-	 */
-	boolean hasEnough(OfflinePlayer p, long amount);
-
-	/**
-	 * Method to remove gems from player
-	 *
-	 * @param p      Player
-	 * @param amount amount
-	 */
-	void removeGems(OfflinePlayer p, long amount);
-
-	/**
-	 * Method to add gems to player
-	 *
-	 * @param p      Player
-	 * @param amount amount
-	 * @param cause  - Represents why player get these gemes
-	 */
-	void addGems(OfflinePlayer p, long amount, ReceiveCause cause);
-
-	/**
-	 * Method to set gems to player
-	 *
-	 * @param p      Player
-	 * @param newAmount new amount
-	 */
-	void setGems(OfflinePlayer p, long newAmount);
-
+	boolean hasEnough(OfflinePlayer player, long amount);
 
 }

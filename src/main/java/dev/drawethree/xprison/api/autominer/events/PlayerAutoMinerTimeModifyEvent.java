@@ -9,24 +9,31 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Event called when a player's AutoMiner time is modified.
+ */
+@Setter
+@Getter
 public final class PlayerAutoMinerTimeModifyEvent extends XPrisonPlayerEvent {
 
 	private static final HandlerList handlers = new HandlerList();
 
-	@Getter
-	@Setter
+	/**
+	 * Unit of time for the duration modification (e.g., seconds, minutes).
+	 */
 	private final TimeUnit timeUnit;
 
-	@Getter
-	@Setter
+	/**
+	 * Duration to modify the AutoMiner time by. Can be negative to reduce time.
+	 */
 	private final long duration;
 
 	/**
-	 * Called when player received autominer time
+	 * Constructs a new PlayerAutoMinerTimeModifyEvent.
 	 *
-	 * @param player   Player
-	 * @param unit     TimeUnit
-	 * @param duration duration, can be negative
+	 * @param player   The player whose AutoMiner time is being modified
+	 * @param unit     The unit of time for the modification
+	 * @param duration The amount of time to add or subtract (can be negative)
 	 */
 	public PlayerAutoMinerTimeModifyEvent(Player player, TimeUnit unit, long duration) {
 		super(player);
@@ -34,13 +41,22 @@ public final class PlayerAutoMinerTimeModifyEvent extends XPrisonPlayerEvent {
 		this.duration = duration;
 	}
 
+	/**
+	 * Gets the handler list for this event.
+	 *
+	 * @return The HandlerList for this event.
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}
 
+	/**
+	 * Gets the handler list for this event instance.
+	 *
+	 * @return The HandlerList for this event.
+	 */
 	@Override
 	public @NotNull HandlerList getHandlers() {
 		return handlers;
 	}
-
 }

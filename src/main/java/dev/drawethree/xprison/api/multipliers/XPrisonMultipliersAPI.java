@@ -5,66 +5,67 @@ import dev.drawethree.xprison.api.multipliers.model.MultiplierType;
 import dev.drawethree.xprison.api.multipliers.model.PlayerMultiplier;
 import org.bukkit.entity.Player;
 
+/**
+ * API interface for managing multipliers related to sell amounts and tokens.
+ */
 public interface XPrisonMultipliersAPI {
 
-
 	/**
-	 * Method to get current global sell multiplier
+	 * Gets the current global sell multiplier.
 	 *
-	 * @return GlobalMultiplier
+	 * @return the global sell {@link Multiplier}
 	 */
 	Multiplier getGlobalSellMultiplier();
 
 	/**
-	 * Method to get current global token multiplier
+	 * Gets the current global token multiplier.
 	 *
-	 * @return GlobalMultiplier
+	 * @return the global token {@link Multiplier}
 	 */
 	Multiplier getGlobalTokenMultiplier();
 
 	/**
-	 * Method to get player's sell multiplier
+	 * Gets the player's sell multiplier.
 	 *
-	 * @param p Player
-	 * @return PlayerMultiplier
+	 * @param p the player
+	 * @return the {@link PlayerMultiplier} for selling
 	 */
 	PlayerMultiplier getSellMultiplier(Player p);
 
 	/**
-	 * Method to get player's token multiplier
+	 * Gets the player's token multiplier.
 	 *
-	 * @param p Player
-	 * @return PlayerMultiplier
+	 * @param p the player
+	 * @return the {@link PlayerMultiplier} for tokens
 	 */
 	PlayerMultiplier getTokenMultiplier(Player p);
 
 	/**
-	 * Method to get player's rank multiplier
+	 * Gets the player's rank multiplier.
 	 *
-	 * @param p Player
-	 * @return Multiplier
+	 * @param p the player
+	 * @return the {@link PlayerMultiplier} for the player's rank
 	 */
 	PlayerMultiplier getRankMultiplier(Player p);
 
 	/**
-	 * Method to get overall player's multiplier based on multiplier type (SELL / TOKENS)
+	 * Gets the overall multiplier for a player based on the specified multiplier type.
 	 *
-	 * @param p              Player
-	 * @param multiplierType MultiplierType
-	 * @return overall player's multiplier
+	 * @param p              the player
+	 * @param multiplierType the type of multiplier (SELL / TOKENS)
+	 * @return the overall multiplier as a double
 	 */
 	double getPlayerMultiplier(Player p, MultiplierType multiplierType);
 
 	/**
-	 * Method to calculate total amount to deposit (tokens / money )
+	 * Calculates the total amount to deposit after applying the player's multiplier.
 	 *
-	 * @param p       Player
-	 * @param deposit original amount to deposit
-	 * @param type    MultiplierType
-	 * @return new amount to deposit
+	 * @param p       the player
+	 * @param deposit the original amount to deposit
+	 * @param type    the multiplier type (tokens or money)
+	 * @return the new amount to deposit after applying multiplier
 	 */
 	default double getTotalToDeposit(Player p, double deposit, MultiplierType type) {
 		return deposit * (1.0 + this.getPlayerMultiplier(p, type));
 	}
-
 }

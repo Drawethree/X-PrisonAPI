@@ -11,7 +11,9 @@ import org.bukkit.event.HandlerList;
 
 import java.util.Map;
 
-
+/**
+ * Event called when a player uses the /sellall command to sell multiple items at once.
+ */
 @Getter
 public final class XPrisonSellAllEvent extends XPrisonPlayerEvent implements Cancellable {
 
@@ -24,16 +26,16 @@ public final class XPrisonSellAllEvent extends XPrisonPlayerEvent implements Can
 	@Setter
 	private Map<AutoSellItemStack, Double> itemsToSell;
 
-    @Getter
-    @Setter
-    private boolean cancelled;
+	@Getter
+	@Setter
+	private boolean cancelled;
 
 	/**
-	 * Called when mined blocks are automatically sold
+	 * Constructs a new sell-all event.
 	 *
-	 * @param player      Player
-	 * @param reg         SellRegion where block was mined
-	 * @param itemsToSell Map of items to sell with prices as values
+	 * @param player      The player performing the sell-all
+	 * @param reg         The sell region where the blocks were mined
+	 * @param itemsToSell A map of items to sell and their respective prices
 	 */
 	public XPrisonSellAllEvent(Player player, SellRegion reg, Map<AutoSellItemStack, Double> itemsToSell) {
 		super(player);
@@ -42,12 +44,17 @@ public final class XPrisonSellAllEvent extends XPrisonPlayerEvent implements Can
 		this.itemsToSell = itemsToSell;
 	}
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
+	/**
+	 * Gets the list of event handlers.
+	 *
+	 * @return the handler list
+	 */
+	public static HandlerList getHandlerList() {
+		return handlers;
+	}
 
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
+	@Override
+	public HandlerList getHandlers() {
+		return handlers;
+	}
 }
