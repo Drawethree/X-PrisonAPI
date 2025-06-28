@@ -6,7 +6,7 @@ Official API for X-Prison plugin.
 - [Discord (Support)](https://discord.gg/ZeSkmEC6mG)
 - [Wiki (Documentation)](https://github.com/Drawethree/X-Prison/wiki)
 
-## API [![](https://jitpack.io/v/drawethree/X-PrisonAPI.svg)](https://jitpack.io/#drawerthree/X-PrisonAPI)
+## API [![](https://jitpack.io/v/drawethree/X-PrisonAPI.svg)](https://jitpack.io/#drawethree/X-PrisonAPI)
 How to get X-Prison API into your project:
 
 ### Gradle:
