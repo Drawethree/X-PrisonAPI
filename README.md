@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'dev.drawethree.xprison:X-PrisonAPI:1.0'
+    compileOnly 'com.github.drawethree:X-PrisonAPI:1.0'
 }
 ```
 
