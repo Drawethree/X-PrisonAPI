@@ -1,5 +1,5 @@
-# AdvancedKits
-Unleash the Power of Customization with AdvancedKits - The most advanced kits plugin ever made.
+# X-PRISON API
+Official API for X-Prison plugin.
 
 **Links:**
 - [SpigotMC (Download)](https://www.spigotmc.org/resources/86845/)
