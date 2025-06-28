@@ -1,6 +1,5 @@
 package dev.drawethree.xprison.api.gangs.model;
 
-import dev.drawethree.xprison.api.gangs.enums.GangLeaveReason;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -15,10 +14,6 @@ public interface Gang {
 
     boolean isOwner(OfflinePlayer player);
 
-    boolean addPlayer(OfflinePlayer player);
-
-    boolean leavePlayer(OfflinePlayer player, GangLeaveReason reason);
-
     boolean isInGang(OfflinePlayer player);
 
     Collection<GangInvitation> getPendingInvites();
@@ -28,8 +23,6 @@ public interface Gang {
     Collection<Player> getOnlineMembers();
 
     Collection<OfflinePlayer> getAllMembers();
-
-    void disband();
 
     GangInvitation invitePlayer(OfflinePlayer player);
 

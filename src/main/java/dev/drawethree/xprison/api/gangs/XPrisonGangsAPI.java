@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.gangs;
 import dev.drawethree.xprison.api.gangs.model.Gang;
 import dev.drawethree.xprison.api.gangs.enums.GangCreateResult;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -37,13 +38,12 @@ public interface XPrisonGangsAPI {
 	 *
 	 * @return result of gang creation
 	 */
-	GangCreateResult createGang(String name, OfflinePlayer gangLeader);
+	GangCreateResult createGang(String name, Player gangLeader);
 
 	/**
 	 * Disbands a gang, if exists
 	 */
 	void disbandGang(Gang gang);
-
 
 
 

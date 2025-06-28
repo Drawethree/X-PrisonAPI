@@ -15,41 +15,35 @@ public interface XPrisonEnchantment {
 
     String getName();
 
-    String getGuiName();
-
-    String getBase64();
-
-    String getAuthor();
-
-    Material getMaterial();
-
-    Collection<String> getDescription();
-
-    boolean isEnabled();
+    String getNameWithoutColor();
 
     int getGuiSlot();
 
+    Material getGuiMaterial();
+
+    String getGuiName();
+
+    String getGuiBase64();
+
+    String getAuthor();
+
+    Collection<String> getGuiDescription();
+
+    boolean isEnabled();
+
     int getMaxLevel();
 
-    long getCost();
+    long getBaseCost();
 
     long getIncreaseCost();
 
     int getRequiredPickaxeLevel();
-
-    boolean isMessagesEnabled();
 
     boolean isRefundEnabled();
 
     int getRefundGuiSlot();
 
     double getRefundPercentage();
-
-    void onEquip(Player p, ItemStack pickAxe, int enchantLevel);
-
-    void onUnequip(Player p, ItemStack pickAxe, int enchantLevel);
-
-    void onBlockBreak(BlockBreakEvent e, int enchantLevel);
 
     void reload();
 }

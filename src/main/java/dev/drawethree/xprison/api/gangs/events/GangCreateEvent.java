@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.gangs.events;
 import dev.drawethree.xprison.api.gangs.model.Gang;
 import dev.drawethree.xprison.api.shared.events.XPrisonEvent;
 import lombok.Getter;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -14,7 +15,7 @@ public final class GangCreateEvent extends XPrisonEvent implements Cancellable {
 	private boolean cancelled;
 
 	@Getter
-	private final CommandSender creator;
+	private final OfflinePlayer gangLeader;
 
 	@Getter
 	private final Gang gang;
@@ -22,11 +23,11 @@ public final class GangCreateEvent extends XPrisonEvent implements Cancellable {
 	/**
 	 * Fired when gang is created
 	 *
-	 * @param creator CommandSender who created the gang
+	 * @param gangLeader Leader of the gang
 	 * @param gang    Gang
 	 */
-	public GangCreateEvent(CommandSender creator, Gang gang) {
-		this.creator = creator;
+	public GangCreateEvent(OfflinePlayer gangLeader, Gang gang) {
+		this.gangLeader = gangLeader;
 		this.gang = gang;
 	}
 
