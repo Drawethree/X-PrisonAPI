@@ -31,7 +31,7 @@ dependencies {
 
 <dependencies>
     <dependency>
-	<groupId>dev.drawethree.xprison</groupId>
+	<groupId>com.github.drawethree</groupId>
         <artifactId>X-PrisonAPI</artifactId>
         <version>1.0</version>
         <scope>provided</scope>
