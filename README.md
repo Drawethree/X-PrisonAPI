@@ -38,3 +38,9 @@ dependencies {
     </dependency>
 </dependencies>
 ```
+
+## API Examples
+
+### Custom Enchants
+https://github.com/Drawethree/X-PrisonAPI-CustomEnchants
+
