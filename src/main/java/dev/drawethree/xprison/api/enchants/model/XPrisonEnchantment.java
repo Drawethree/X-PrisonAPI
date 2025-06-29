@@ -1,12 +1,5 @@
 package dev.drawethree.xprison.api.enchants.model;
 
-import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeLevel;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.Collection;
 
 /**
  * Represents a custom enchantment in the XPrison system.
@@ -41,42 +34,7 @@ public interface XPrisonEnchantment {
      */
     String getNameWithoutColor();
 
-    /**
-     * Gets the slot number in the enchanting GUI where this enchantment is displayed.
-     *
-     * @return The GUI slot index.
-     */
-    int getGuiSlot();
-
-    /**
-     * Gets the material type of the GUI item representing this enchantment.
-     *
-     * @return The material used in the GUI.
-     */
-    Material getGuiMaterial();
-
-    /**
-     * Gets the display name of the GUI item representing this enchantment.
-     * May contain color codes.
-     *
-     * @return The GUI item name.
-     */
-    String getGuiName();
-
-    /**
-     * Gets the lore (description) of the GUI item for this enchantment.
-     * May contain color codes.
-     *
-     * @return A collection of lore strings.
-     */
-    Collection<String> getGuiDescription();
-
-    /**
-     * Gets the Base64 texture data for the GUI item, useful if using a custom player head.
-     *
-     * @return The Base64 string for the GUI item texture, or null/empty if not applicable.
-     */
-    String getGuiBase64();
+    XPrisonEnchantmentGuiProperties getGuiProperties();
 
     /**
      * Gets the author of this enchantment.
@@ -114,14 +72,13 @@ public interface XPrisonEnchantment {
     long getIncreaseCost();
 
     /**
-     * Gets the required pickaxe level before this enchantment can be applied.
-     *
-     * @return The required pickaxe level.
+     * Loads or initializes the enchantment from its configuration or internal state.
+     * Called when the enchantment is first created or reloaded.
      */
-    int getRequiredPickaxeLevel();
+    void load();
 
     /**
-     * Reloads this enchantment's configuration or data.
+     * Unloads or disables the enchantment, freeing resources or unregistering listeners.
      */
-    void reload();
+    void unload();
 }

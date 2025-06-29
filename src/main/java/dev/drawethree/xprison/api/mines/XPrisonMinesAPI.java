@@ -4,10 +4,20 @@ import dev.drawethree.xprison.api.mines.model.Mine;
 import dev.drawethree.xprison.api.mines.model.MineSelection;
 import org.bukkit.Location;
 
+import java.util.Collection;
+
 /**
  * API for interacting with mines in the XPrison plugin.
  */
 public interface XPrisonMinesAPI {
+
+
+	/**
+	 * Gets all mines
+	 *
+	 * @return The collection of {@link Mine}
+	 */
+	Collection<Mine> getMines();
 
 	/**
 	 * Gets a mine by its name.
