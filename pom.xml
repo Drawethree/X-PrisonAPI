@@ -4,7 +4,7 @@
 
   <groupId>dev.drawethree.xprison</groupId>
   <artifactId>X-PrisonAPI</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>X-PrisonAPI</name>
@@ -93,6 +93,23 @@
   </dependencies>
 
   <build>
+    <defaultGoal>clean install</defaultGoal>
+    <finalName>X-PrisonAPI ${project.version}</finalName>
+
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+    </testResources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
