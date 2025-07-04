@@ -1,8 +1,8 @@
 package dev.drawethree.xprison.api.gangs;
 
+import dev.drawethree.xprison.api.gangs.enums.GangCreateResult;
 import dev.drawethree.xprison.api.gangs.enums.GangNameCheckResult;
 import dev.drawethree.xprison.api.gangs.model.Gang;
-import dev.drawethree.xprison.api.gangs.enums.GangCreateResult;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 

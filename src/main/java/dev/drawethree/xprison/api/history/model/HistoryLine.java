@@ -1,7 +1,8 @@
 package dev.drawethree.xprison.api.history.model;
 
-import java.util.Date;
 import org.bukkit.OfflinePlayer;
+
+import java.util.Date;
 
 /**
  * Represents a historical record line related to a specific module and context

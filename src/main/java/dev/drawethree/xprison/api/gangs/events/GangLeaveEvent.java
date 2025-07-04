@@ -1,7 +1,7 @@
 package dev.drawethree.xprison.api.gangs.events;
 
-import dev.drawethree.xprison.api.gangs.model.Gang;
 import dev.drawethree.xprison.api.gangs.enums.GangLeaveReason;
+import dev.drawethree.xprison.api.gangs.model.Gang;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;
 import org.bukkit.OfflinePlayer;

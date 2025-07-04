@@ -4,7 +4,6 @@ import dev.drawethree.xprison.api.autominer.model.AutoMinerRegion;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * API interface for AutoMiner feature.
