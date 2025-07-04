@@ -5,7 +5,7 @@ Official API for X-Prison plugin.
 - [SpigotMC (Download)](https://www.spigotmc.org/resources/86845/)
 - [Discord (Support)](https://discord.gg/ZeSkmEC6mG)
 - [Wiki (Documentation)](https://github.com/Drawethree/X-Prison/wiki)
-
+- [Javadocs](https://www.drawethree.dev/plugins/x-prison/javadoc/index.html)
 ## API [![](https://jitpack.io/v/drawethree/X-PrisonAPI.svg)](https://jitpack.io/#drawethree/X-PrisonAPI)
 How to get X-Prison API into your project:
 
