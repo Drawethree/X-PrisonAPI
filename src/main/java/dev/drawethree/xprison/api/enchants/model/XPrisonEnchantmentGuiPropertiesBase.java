@@ -41,4 +41,9 @@ class XPrisonEnchantmentGuiPropertiesBase implements XPrisonEnchantmentGuiProper
      */
     private List<String> guiDescription;
 
+    /**
+     * Custom model data of the item (MC 1.14 and above)
+     */
+    private int customModelData;
+
 }

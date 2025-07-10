@@ -42,4 +42,11 @@ public interface XPrisonEnchantmentGuiProperties {
      * @return The Base64 string for the GUI item texture, or null/empty if not applicable.
      */
     String getGuiBase64();
+
+    /**
+     * Gets the custom model data for the GUI item
+     *
+     * @return Custom Model Data of GUI item
+     */
+    int getCustomModelData();
 }

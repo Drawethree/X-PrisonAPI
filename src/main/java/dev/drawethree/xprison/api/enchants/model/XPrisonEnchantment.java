@@ -1,8 +1,10 @@
 package dev.drawethree.xprison.api.enchants.model;
 
+import dev.drawethree.xprison.api.currency.CurrencyType;
 
 /**
  * Represents a custom enchantment in the XPrison system.
+ * Each enchantment has a unique ID, name, configuration, and purchasing behavior.
  */
 public interface XPrisonEnchantment {
 
@@ -34,51 +36,62 @@ public interface XPrisonEnchantment {
      */
     String getNameWithoutColor();
 
+    /**
+     * Gets the GUI properties of this enchantment, such as material, slot, and description.
+     *
+     * @return The GUI properties of the enchantment.
+     */
     XPrisonEnchantmentGuiProperties getGuiProperties();
 
     /**
-     * Gets the author of this enchantment.
+     * Gets the name of the developer or plugin author who created this enchantment.
      *
      * @return The author name.
      */
     String getAuthor();
 
     /**
-     * Checks whether this enchantment is currently enabled.
+     * Checks whether this enchantment is currently enabled in the system.
      *
      * @return True if the enchantment is enabled, false otherwise.
      */
     boolean isEnabled();
 
     /**
-     * Gets the maximum enchantment level that can be applied.
+     * Gets the maximum level this enchantment can be upgraded to.
      *
-     * @return The maximum allowed level.
+     * @return The maximum allowed enchantment level.
      */
     int getMaxLevel();
 
     /**
-     * Gets the base cost of applying this enchantment.
+     * Gets the base cost of the enchantment, used as the starting cost for level 1.
      *
-     * @return The base cost.
+     * @return The base cost of applying the enchantment.
      */
     long getBaseCost();
 
     /**
-     * Gets the incremental cost added per level of this enchantment.
+     * Gets the amount by which the cost increases per level.
      *
-     * @return The increase in cost per level.
+     * @return The incremental cost per enchantment level.
      */
     long getIncreaseCost();
 
     /**
-     * Loads or initializes the enchantment from its configuration or internal state.
-     * Called when the enchantment is first created or reloaded.
+     * Initializes or loads this enchantment. Called during plugin load or reload.
      */
     void load();
 
     /**
-     * Unloads or disables the enchantment, freeing resources or unregistering listeners.
+     * Cleans up or unloads this enchantment. Called during plugin shutdown or reload.
      */
     void unload();
+
+    /**
+     * Gets the type of currency used to purchase this enchantment.
+     *
+     * @return The currency type (e.g., TOKENS, GEMS, VAULT).
+     */
+    CurrencyType getCurrencyType();
 }

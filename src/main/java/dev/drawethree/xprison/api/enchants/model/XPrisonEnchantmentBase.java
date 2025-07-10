@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.enchants.model;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.drawethree.xprison.api.currency.CurrencyType;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -33,6 +34,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
     protected long baseCost;
     protected long increaseCost;
     protected XPrisonEnchantmentGuiProperties guiProperties;
+    protected CurrencyType currencyType;
 
     /**
      * Constructs a new enchantment with the given config file.
@@ -72,6 +74,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
         this.maxLevel = config.get("maxLevel").getAsInt();
         this.baseCost = config.get("initialCost").getAsLong();
         this.increaseCost = config.get("increaseCostBy").getAsLong();
+        this.currencyType = CurrencyType.valueOf(config.get("currency").getAsString());
     }
 
     /**
@@ -91,7 +94,9 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
                 .map(s -> ChatColor.translateAlternateColorCodes('&', s))
                 .toList();
 
-        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc);
+        int customModelData = gui.get("customModelData").getAsInt();
+
+        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc,customModelData);
     }
 
     /**
