@@ -1,7 +1,6 @@
 package dev.drawethree.xprison.api.autosell.events;
 
 import dev.drawethree.xprison.api.autosell.model.AutoSellItemStack;
-import dev.drawethree.xprison.api.autosell.model.SellRegion;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +19,6 @@ public final class XPrisonAutoSellEvent extends XPrisonPlayerEvent implements Ca
     private static final HandlerList handlers = new HandlerList();
 
     private final Player player;
-    private final SellRegion region;
 
     @Setter
     private Map<AutoSellItemStack, Double> itemsToSell;
@@ -32,13 +30,11 @@ public final class XPrisonAutoSellEvent extends XPrisonPlayerEvent implements Ca
      * Constructs a new auto-sell event.
      *
      * @param player      The player who mined the blocks and triggered auto-sell
-     * @param reg         The sell region where the blocks were mined
      * @param itemsToSell A map of items to be sold with their respective prices
      */
-    public XPrisonAutoSellEvent(Player player, SellRegion reg, Map<AutoSellItemStack, Double> itemsToSell) {
+    public XPrisonAutoSellEvent(Player player, Map<AutoSellItemStack, Double> itemsToSell) {
         super(player);
         this.player = player;
-        this.region = reg;
         this.itemsToSell = itemsToSell;
     }
 

@@ -1,12 +1,10 @@
 package dev.drawethree.xprison.api.autosell;
 
-import dev.drawethree.xprison.api.autosell.model.SellRegion;
-import org.bukkit.Location;
+import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,13 +22,12 @@ public interface XPrisonAutoSellAPI {
 	double getCurrentEarnings(Player player);
 
 	/**
-	 * Gets the price of a specific item in a given sell region.
+	 * Gets the price of a specific item
 	 *
-	 * @param region the sell region to check pricing in
 	 * @param item   the item to get the price for
-	 * @return the price of the item in the specified region
+	 * @return the price of the item
 	 */
-	double getPriceForItem(SellRegion region, ItemStack item);
+	double getPriceForItem(ItemStack item);
 
 	/**
 	 * Gets the price for a given block.
@@ -57,17 +54,25 @@ public interface XPrisonAutoSellAPI {
 	boolean hasAutoSellEnabled(Player p);
 
 	/**
-	 * Gets a collection of all loaded and active sell regions.
+	 * Adds or updates the sell price for a specific material
 	 *
-	 * @return a collection of all sell regions
+	 * @param material the material to set the sell price for
+	 * @param price    the price at which the material will be sold
 	 */
-	Collection<SellRegion> getSellRegions();
+	void addSellPrice(XMaterial material, double price);
 
 	/**
-	 * Gets the sell region at a specified location.
+	 * Removes a material from being sellable in this region.
 	 *
-	 * @param location the location to check
-	 * @return the sell region at the given location, or {@code null} if none exists there
+	 * @param material the material to remove from the sell price list
 	 */
-	SellRegion getSellRegionAtLocation(Location location);
+	void removeSellPrice(XMaterial material);
+
+	/**
+	 * Gets the sell price for a specific material in this region.
+	 *
+	 * @param material the material to get the price for
+	 * @return the sell price of the material, or 0 if not sellable
+	 */
+	double getSellPriceForMaterial(XMaterial material);
 }
