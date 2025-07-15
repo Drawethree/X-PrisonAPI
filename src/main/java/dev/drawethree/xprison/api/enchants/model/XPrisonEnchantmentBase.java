@@ -1,9 +1,9 @@
 package dev.drawethree.xprison.api.enchants.model;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.drawethree.xprison.api.currency.CurrencyType;
+import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -66,15 +66,15 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
     }
 
     private void loadBaseProperties(JsonObject config) {
-        this.id = config.get("id").getAsInt();
-        this.rawName = config.get("rawName").getAsString();
-        this.name = ChatColor.translateAlternateColorCodes('&', config.get("name").getAsString());
+        this.id = JsonUtils.getRequiredInt(config,"id");
+        this.rawName = JsonUtils.getRequiredString(config, "rawName");
+        this.name = ChatColor.translateAlternateColorCodes('&', JsonUtils.getRequiredString(config,"name"));
         this.nameWithoutColor = name.replaceAll("§.", "");
-        this.enabled = config.get("enabled").getAsBoolean();
-        this.maxLevel = config.get("maxLevel").getAsInt();
-        this.baseCost = config.get("initialCost").getAsLong();
-        this.increaseCost = config.get("increaseCostBy").getAsLong();
-        this.currencyType = CurrencyType.valueOf(config.get("currency").getAsString());
+        this.enabled = JsonUtils.getRequiredBoolean(config,"enabled");
+        this.maxLevel = JsonUtils.getRequiredInt(config,"maxLevel");
+        this.baseCost = JsonUtils.getRequiredLong(config, "initialCost");
+        this.increaseCost = JsonUtils.getRequiredLong(config,"increaseCostBy");
+        this.currencyType = CurrencyType.valueOf(JsonUtils.getOptionalString(config,"currency", CurrencyType.TOKENS.name()));
     }
 
     /**
@@ -83,20 +83,21 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
      * @param config The root JSON object containing the "gui" section.
      */
     private void loadGuiProperties(JsonObject config) {
-        JsonObject gui = config.getAsJsonObject("gui");
-        int slot = gui.get("slot").getAsInt();
-        String guiName = ChatColor.translateAlternateColorCodes('&', gui.get("name").getAsString());
-        Material mat = Material.valueOf(gui.get("material").getAsString());
-        String base64 = gui.has("base64") ? gui.get("base64").getAsString() : null;
+        JsonObject gui = JsonUtils.getRequiredObject(config, "gui");
 
-        List<String> desc = new Gson().fromJson(gui.get("description"), List.class);
+        int slot = JsonUtils.getRequiredInt(gui, "slot");
+        String guiName = ChatColor.translateAlternateColorCodes('&', JsonUtils.getRequiredString(gui, "name"));
+        Material mat = Material.valueOf(JsonUtils.getRequiredString(gui, "material"));
+        String base64 = JsonUtils.getOptionalString(gui, "base64", null);
+
+        List<String> desc = JsonUtils.getRequiredStringList(gui, "description");
         desc = desc.stream()
                 .map(s -> ChatColor.translateAlternateColorCodes('&', s))
                 .toList();
 
-        int customModelData = gui.get("customModelData").getAsInt();
+        int customModelData = JsonUtils.getOptionalInt(gui, "customModelData", 0);
 
-        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc,customModelData);
+        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc, customModelData);
     }
 
     /**
