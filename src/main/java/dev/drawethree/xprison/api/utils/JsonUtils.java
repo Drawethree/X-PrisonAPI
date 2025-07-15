@@ -23,6 +23,13 @@ public class JsonUtils {
         return obj.get(key).getAsInt();
     }
 
+    public static double getRequiredDouble(JsonObject obj, String key) {
+        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+            throw new IllegalArgumentException("Missing or null key in enchantment config: \"" + key + "\"");
+        }
+        return obj.get(key).getAsDouble();
+    }
+
     public static long getRequiredLong(JsonObject obj, String key) {
         if (!obj.has(key) || obj.get(key).isJsonNull()) {
             throw new IllegalArgumentException("Missing or null key in enchantment config: \"" + key + "\"");

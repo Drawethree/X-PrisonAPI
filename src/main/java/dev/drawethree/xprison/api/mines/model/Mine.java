@@ -3,11 +3,13 @@ package dev.drawethree.xprison.api.mines.model;
 import me.lucko.helper.serialize.Point;
 import me.lucko.helper.serialize.Region;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Represents a mine area with associated properties and behaviors.
@@ -106,4 +108,11 @@ public interface Mine {
      * @param potionEffectType the type of potion effect to remove
      */
     void removeEffect(PotionEffectType potionEffectType);
+
+    /**
+     * Handles breaking of blocks inside a mine. This method should be called if there are some blocks in the mine that were mined / destroyed by enchant
+     *
+     * @param blocks list of blocks
+     */
+    void handleBlockBreak(List<Block> blocks);
 }

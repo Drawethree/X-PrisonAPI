@@ -19,7 +19,7 @@ import java.util.List;
  * Handles common properties and configuration loading from JSON files.
  */
 @Getter
-public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
+public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, RefundableEnchant {
 
     /** The configuration file for this enchantment */
     @Setter
@@ -35,6 +35,9 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
     protected long increaseCost;
     protected XPrisonEnchantmentGuiProperties guiProperties;
     protected CurrencyType currencyType;
+    protected boolean refundEnabled;
+    protected int refundGuiSlot;
+    protected double refundPercentage;
 
     /**
      * Constructs a new enchantment with the given config file.
@@ -75,6 +78,11 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment {
         this.baseCost = JsonUtils.getRequiredLong(config, "initialCost");
         this.increaseCost = JsonUtils.getRequiredLong(config,"increaseCostBy");
         this.currencyType = CurrencyType.valueOf(JsonUtils.getOptionalString(config,"currency", CurrencyType.TOKENS.name()));
+
+        JsonObject refundObject = JsonUtils.getRequiredObject(config,"refund");
+        this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");
+        this.refundGuiSlot = JsonUtils.getRequiredInt(refundObject,"guiSlot");
+        this.refundPercentage = JsonUtils.getRequiredDouble(refundObject, "percentage");
     }
 
     /**
