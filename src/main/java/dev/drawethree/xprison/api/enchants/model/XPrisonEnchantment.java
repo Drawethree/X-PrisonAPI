@@ -1,6 +1,6 @@
 package dev.drawethree.xprison.api.enchants.model;
 
-import dev.drawethree.xprison.api.currency.CurrencyType;
+import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
 
 /**
  * Represents a custom enchantment in the XPrison system.
@@ -89,9 +89,12 @@ public interface XPrisonEnchantment {
     void unload();
 
     /**
-     * Gets the type of currency used to purchase this enchantment.
+     * Gets the currency used to purchase or upgrade this enchantment.
+     * <p>
+     * This defines which type of currency (e.g., Tokens, Gems, Vault/Money)
+     * will be consumed when a player interacts with this enchant.
      *
-     * @return The currency type (e.g., TOKENS, GEMS, VAULT).
+     * @return The {@link XPrisonCurrency} implementation representing the currency type.
      */
-    CurrencyType getCurrencyType();
+    XPrisonCurrency getCurrency();
 }

@@ -2,7 +2,8 @@ package dev.drawethree.xprison.api.enchants.model;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.drawethree.xprison.api.currency.CurrencyType;
+import dev.drawethree.xprison.api.XPrisonAPI;
+import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
 import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     protected long baseCost;
     protected long increaseCost;
     protected XPrisonEnchantmentGuiProperties guiProperties;
-    protected CurrencyType currencyType;
+    protected XPrisonCurrency currencyType;
     protected boolean refundEnabled;
     protected int refundGuiSlot;
     protected double refundPercentage;
@@ -77,7 +78,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         this.maxLevel = JsonUtils.getRequiredInt(config,"maxLevel");
         this.baseCost = JsonUtils.getRequiredLong(config, "initialCost");
         this.increaseCost = JsonUtils.getRequiredLong(config,"increaseCostBy");
-        this.currencyType = CurrencyType.valueOf(JsonUtils.getOptionalString(config,"currency", CurrencyType.TOKENS.name()));
+        this.currencyType = XPrisonAPI.getInstance().getCurrencyApi().getCurrency(JsonUtils.getOptionalString(config,"currency", "Tokens"));
 
         JsonObject refundObject = JsonUtils.getRequiredObject(config,"refund");
         this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");

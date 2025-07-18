@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api;
 import dev.drawethree.xprison.api.autominer.XPrisonAutoMinerAPI;
 import dev.drawethree.xprison.api.autosell.XPrisonAutoSellAPI;
 import dev.drawethree.xprison.api.bombs.XPrisonBombsAPI;
+import dev.drawethree.xprison.api.currency.XPrisonCurrencyAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.gems.XPrisonGemsAPI;
@@ -123,6 +124,14 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonBombsAPI getBombsApi();
+
+    /**
+     * Gets the currency API.
+     *
+     * @return the Currency API instance
+     */
+    @NotNull
+    XPrisonCurrencyAPI getCurrencyApi();
 
     /**
      * Gets the singleton instance of the XPrisonAPI.
