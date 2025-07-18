@@ -6,14 +6,12 @@ import dev.drawethree.xprison.api.bombs.XPrisonBombsAPI;
 import dev.drawethree.xprison.api.currency.XPrisonCurrencyAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
-import dev.drawethree.xprison.api.gems.XPrisonGemsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
 import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
 import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
-import dev.drawethree.xprison.api.tokens.XPrisonTokensAPI;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,14 +50,6 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonGangsAPI getGangsApi();
-
-    /**
-     * Gets the Gems module API.
-     *
-     * @return the Gems API instance
-     */
-    @NotNull
-    XPrisonGemsAPI getGemsApi();
 
     /**
      * Gets the History module API.
@@ -108,14 +98,6 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonRanksAPI getRanksApi();
-
-    /**
-     * Gets the Tokens module API.
-     *
-     * @return the Tokens API instance
-     */
-    @NotNull
-    XPrisonTokensAPI getTokensApi();
 
     /**
      * Gets the Bombs module API.
