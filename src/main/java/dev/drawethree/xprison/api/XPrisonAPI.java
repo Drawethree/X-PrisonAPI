@@ -8,6 +8,7 @@ import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
 import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
+import dev.drawethree.xprison.api.miningstats.XPrisonMiningStatsAPI;
 import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
@@ -114,6 +115,14 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonCurrencyAPI getCurrencyApi();
+
+    /**
+     * Gets the mining stats API.
+     *
+     * @return the Mining Stats API instance
+     */
+    @NotNull
+    XPrisonMiningStatsAPI getMiningStatsApi();
 
     /**
      * Gets the singleton instance of the XPrisonAPI.

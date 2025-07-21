@@ -13,13 +13,6 @@ import java.util.List;
  */
 public interface XPrisonAutoSellAPI {
 
-	/**
-	 * Gets the current total earnings of a player from auto-selling.
-	 *
-	 * @param player the player whose earnings to retrieve
-	 * @return the current earnings of the player
-	 */
-	double getCurrentEarnings(Player player);
 
 	/**
 	 * Gets the price of a specific item

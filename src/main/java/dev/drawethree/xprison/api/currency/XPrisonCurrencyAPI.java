@@ -1,6 +1,6 @@
 package dev.drawethree.xprison.api.currency;
 
-import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 
 import java.util.Collection;
 

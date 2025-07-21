@@ -1,4 +1,4 @@
-package dev.drawethree.xprison.api.shared.currency.enums;
+package dev.drawethree.xprison.api.currency.enums;
 
 /**
  * Enum representing various causes for a player receiving Gems or Tokens.
@@ -38,6 +38,11 @@ public enum ReceiveCause {
 	/**
 	 * Player received currency by mining from other players.
 	 */
-	MINING_OTHERS
+	MINING_OTHERS,
+
+	/**
+	 * Unknown reason.
+	 */
+	UNKNOWN;
 
 }

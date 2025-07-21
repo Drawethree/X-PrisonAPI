@@ -1,5 +1,7 @@
-package dev.drawethree.xprison.api.shared.currency.enums;
+package dev.drawethree.xprison.api.currency.model;
 
+import dev.drawethree.xprison.api.currency.enums.LostCause;
+import dev.drawethree.xprison.api.currency.enums.ReceiveCause;
 import org.bukkit.OfflinePlayer;
 
 /**
@@ -37,18 +39,20 @@ public interface XPrisonCurrency {
      *
      * @param player The player to add currency to.
      * @param amount The amount of currency to add.
+     * @param receiveCause Why currency was added
      * @return true if the currency was successfully added, false otherwise.
      */
-    boolean addBalance(OfflinePlayer player, double amount);
+    boolean addBalance(OfflinePlayer player, double amount, ReceiveCause receiveCause);
 
     /**
      * Removes a specified amount of currency from the player's balance.
      *
      * @param player The player to remove currency from.
      * @param amount The amount of currency to remove.
+     * @param lostCause Why currency was lost
      * @return true if the currency was successfully removed, false (e.g., insufficient funds) otherwise.
      */
-    boolean removeBalance(OfflinePlayer player, double amount);
+    boolean removeBalance(OfflinePlayer player, double amount, LostCause lostCause);
 
     /**
      * Sets the player's currency balance to a new specified amount.

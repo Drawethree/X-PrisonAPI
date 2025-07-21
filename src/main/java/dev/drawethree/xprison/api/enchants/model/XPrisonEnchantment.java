@@ -1,6 +1,6 @@
 package dev.drawethree.xprison.api.enchants.model;
 
-import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 
 /**
  * Represents a custom enchantment in the XPrison system.

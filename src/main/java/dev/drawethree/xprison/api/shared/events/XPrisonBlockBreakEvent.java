@@ -1,4 +1,4 @@
-package dev.drawethree.xprison.api.tokens.events;
+package dev.drawethree.xprison.api.shared.events;
 
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;

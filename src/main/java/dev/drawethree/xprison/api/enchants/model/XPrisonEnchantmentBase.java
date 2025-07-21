@@ -3,7 +3,7 @@ package dev.drawethree.xprison.api.enchants.model;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.drawethree.xprison.api.XPrisonAPI;
-import dev.drawethree.xprison.api.shared.currency.enums.XPrisonCurrency;
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;

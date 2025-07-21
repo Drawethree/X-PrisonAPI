@@ -1,4 +1,4 @@
-package dev.drawethree.xprison.api.shared.currency.enums;
+package dev.drawethree.xprison.api.currency.enums;
 
 /**
  * Enum representing various reasons why a player might lose currency.
@@ -34,5 +34,10 @@ public enum LostCause {
 	 * Player lost currency by withdrawing it to physical form.
 	 */
 	WITHDRAW,
+
+	/**
+	 * Unknown reason.
+	 */
+	UNKNOWN;
 
 }
