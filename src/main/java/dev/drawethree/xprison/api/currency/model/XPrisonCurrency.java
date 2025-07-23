@@ -1,74 +1,63 @@
 package dev.drawethree.xprison.api.currency.model;
 
-import dev.drawethree.xprison.api.currency.enums.LostCause;
-import dev.drawethree.xprison.api.currency.enums.ReceiveCause;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.inventory.ItemStack;
 
 /**
- * Represents a generic currency system in the XPrison API.
+ * Represents the metadata and formatting configuration of a currency in the XPrison API.
+ * This includes display name, format rules, symbol settings, and optional icon.
  * <p>
- * This interface abstracts common currency operations such as querying,
- * adding, removing, and setting balances for players. Implementations
- * could represent different currency types like Tokens, Gems, Money, etc.
- * <p>
- * Methods that modify balances return a boolean indicating whether the
- * operation was successful (e.g., not blocked, not insufficient funds, etc.).
+ * Currency balance operations are handled by a separate CurrencyService.
  */
 public interface XPrisonCurrency {
 
     /**
-     * Gets the name of this currency.
-     * <p>
-     * This is typically used for display purposes, configuration keys,
-     * or to distinguish between multiple currency types (e.g., "Tokens", "Gems", "Money").
+     * Gets the internal ID or key of the currency (e.g., "money", "tokens").
      *
-     * @return The name of the currency.
+     * @return The unique name of this currency.
      */
     String getName();
 
     /**
-     * Gets the current amount of this currency for the specified player.
+     * Gets the starting amount of a currency
      *
-     * @param player The player (offline or online) whose balance to retrieve.
-     * @return The amount of currency the player currently has.
+     * @return The amount each player will have on first join
      */
-    double getBalance(OfflinePlayer player);
+    double getStartingAmount();
 
     /**
-     * Adds a specified amount of currency to the player's balance.
+     * Gets the display name of the currency (e.g., "Money", "Tokens").
      *
-     * @param player The player to add currency to.
-     * @param amount The amount of currency to add.
-     * @param receiveCause Why currency was added
-     * @return true if the currency was successfully added, false otherwise.
+     * @return The friendly display name of the currency.
      */
-    boolean addBalance(OfflinePlayer player, double amount, ReceiveCause receiveCause);
+    String getDisplayName();
 
     /**
-     * Removes a specified amount of currency from the player's balance.
+     * Gets the prefix of the currency (e.g., "$").
      *
-     * @param player The player to remove currency from.
-     * @param amount The amount of currency to remove.
-     * @param lostCause Why currency was lost
-     * @return true if the currency was successfully removed, false (e.g., insufficient funds) otherwise.
+     * @return The friendly display name of the currency.
      */
-    boolean removeBalance(OfflinePlayer player, double amount, LostCause lostCause);
+    String getPrefix();
 
     /**
-     * Sets the player's currency balance to a new specified amount.
+     * Gets the suffix of the currency.
      *
-     * @param player The player whose balance to set.
-     * @param amount The new amount to set.
-     * @return true if the balance was successfully set, false otherwise.
+     * @return The friendly display name of the currency.
      */
-    boolean setBalance(OfflinePlayer player, double amount);
+    String getSuffix();
 
     /**
-     * Checks if the specified player has at least the given amount of this currency.
+     * Formats a raw double value according to the currency's configuration.
      *
-     * @param player The player whose balance to check.
-     * @param amount The minimum amount to verify.
-     * @return true if the player has at least the specified amount, false otherwise.
+     * @param amount The amount to format.
+     * @return The formatted currency string (e.g., "$1.2k", "$3,000").
      */
-    boolean has(OfflinePlayer player, double amount);
+    String format(double amount);
+
+    /**
+     * Gets the configured physical item for this currency, if any.
+     * This can be used in GUIs or displays to represent the currency visually.
+     *
+     * @return The {@link ItemStack} used as the item, or null if not set.
+     */
+    ItemStack getPhysicalItem();
 }
