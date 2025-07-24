@@ -18,6 +18,14 @@ public interface XPrisonCurrencyAPI {
     void registerCurrency(XPrisonCurrency currency);
 
     /**
+     * Unregisters a currency from the system.
+     * Player balances and related data for the currency may be removed or archived.
+     *
+     * @param currency The {@link XPrisonCurrency} implementation to unregister.
+     */
+    void unregisterCurrency(XPrisonCurrency currency);
+
+    /**
      * Retrieves a currency by its name.
      *
      * @param name The name of the currency (case-insensitive).

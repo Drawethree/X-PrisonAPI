@@ -67,4 +67,18 @@ public interface XPrisonCurrency {
      * @return The {@link ItemStack} used as the item, or null if not set.
      */
     ItemStack getPhysicalItem();
+
+    /**
+     * Retrieves the custom {@link XPrisonCurrencyHandler} responsible for managing balance operations
+     * for this currency. If this method returns {@code null}, the currency is assumed to be managed
+     * internally by XPrison's default currency system.
+     * <p>
+     * Developers can override this method to provide custom handling logic, such as integration with
+     * external economy plugins or databases.
+     *
+     * @return The {@link XPrisonCurrencyHandler} for this currency, or {@code null} if handled internally.
+     */
+    default XPrisonCurrencyHandler getHandler() {
+        return null;
+    }
 }
