@@ -25,6 +25,13 @@ public interface XPrisonCurrency {
     double getStartingAmount();
 
     /**
+     * Gets the maximum amount of a currency player can have
+     *
+     * @return maximum amount (cap) of a currency for player
+     */
+    double getMaxAmount();
+
+    /**
      * Gets the display name of the currency (e.g., "Money", "Tokens").
      *
      * @return The friendly display name of the currency.

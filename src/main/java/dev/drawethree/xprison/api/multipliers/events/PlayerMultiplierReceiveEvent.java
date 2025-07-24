@@ -1,6 +1,6 @@
 package dev.drawethree.xprison.api.multipliers.events;
 
-import dev.drawethree.xprison.api.multipliers.model.MultiplierType;
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;
 import org.bukkit.entity.Player;
@@ -17,13 +17,14 @@ public final class PlayerMultiplierReceiveEvent extends XPrisonPlayerEvent {
 
 	private static final HandlerList handlers = new HandlerList();
 
+	private final XPrisonCurrency currency;
+
 	private final double multiplier;
 
 	private final TimeUnit timeUnit;
 
 	private final long duration;
 
-	private final MultiplierType type;
 
 	/**
 	 * Constructs a new PlayerMultiplierReceiveEvent.
@@ -32,14 +33,14 @@ public final class PlayerMultiplierReceiveEvent extends XPrisonPlayerEvent {
 	 * @param multiplier the multiplier value
 	 * @param timeUnit   the unit of time for the multiplier duration
 	 * @param duration   the duration of the multiplier
-	 * @param type       the type of multiplier (e.g., SELL, TOKENS)
+	 * @param currency       the currency affected
 	 */
-	public PlayerMultiplierReceiveEvent(Player player, double multiplier, TimeUnit timeUnit, long duration, MultiplierType type) {
+	public PlayerMultiplierReceiveEvent(Player player, XPrisonCurrency currency, double multiplier, TimeUnit timeUnit, long duration) {
 		super(player);
-		this.multiplier = multiplier;
+        this.currency = currency;
+        this.multiplier = multiplier;
 		this.timeUnit = timeUnit;
 		this.duration = duration;
-		this.type = type;
 	}
 
 	/**
