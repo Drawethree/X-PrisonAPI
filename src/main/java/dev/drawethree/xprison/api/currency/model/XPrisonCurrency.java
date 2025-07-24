@@ -1,7 +1,5 @@
 package dev.drawethree.xprison.api.currency.model;
 
-import org.bukkit.inventory.ItemStack;
-
 /**
  * Represents the metadata and formatting configuration of a currency in the XPrison API.
  * This includes display name, format rules, symbol settings, and optional icon.
@@ -16,13 +14,6 @@ public interface XPrisonCurrency {
      * @return The unique name of this currency.
      */
     String getName();
-
-    /**
-     * Gets the starting amount of a currency
-     *
-     * @return The amount each player will have on first join
-     */
-    double getStartingAmount();
 
     /**
      * Gets the maximum amount of a currency player can have
@@ -59,14 +50,6 @@ public interface XPrisonCurrency {
      * @return The formatted currency string (e.g., "$1.2k", "$3,000").
      */
     String format(double amount);
-
-    /**
-     * Gets the configured physical item for this currency, if any.
-     * This can be used in GUIs or displays to represent the currency visually.
-     *
-     * @return The {@link ItemStack} used as the item, or null if not set.
-     */
-    ItemStack getPhysicalItem();
 
     /**
      * Retrieves the custom {@link XPrisonCurrencyHandler} responsible for managing balance operations

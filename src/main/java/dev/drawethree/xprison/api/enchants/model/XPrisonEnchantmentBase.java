@@ -35,7 +35,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     protected long baseCost;
     protected long increaseCost;
     protected XPrisonEnchantmentGuiProperties guiProperties;
-    protected XPrisonCurrency currency;
+    protected String currencyName;
     protected boolean refundEnabled;
     protected int refundGuiSlot;
     protected double refundPercentage;
@@ -78,7 +78,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         this.maxLevel = JsonUtils.getRequiredInt(config,"maxLevel");
         this.baseCost = JsonUtils.getRequiredLong(config, "initialCost");
         this.increaseCost = JsonUtils.getRequiredLong(config,"increaseCostBy");
-        this.currency = XPrisonAPI.getInstance().getCurrencyApi().getCurrency(JsonUtils.getOptionalString(config,"currency", "Tokens"));
+        this.currencyName = JsonUtils.getOptionalString(config,"currency", "Tokens");
 
         JsonObject refundObject = JsonUtils.getRequiredObject(config,"refund");
         this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");

@@ -1,5 +1,6 @@
 package dev.drawethree.xprison.api.enchants.model;
 
+import dev.drawethree.xprison.api.XPrisonAPI;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 
 /**
@@ -89,12 +90,26 @@ public interface XPrisonEnchantment {
     void unload();
 
     /**
-     * Gets the currency used to purchase or upgrade this enchantment.
+     * Gets the name of the currency used to purchase or upgrade this enchantment.
      * <p>
-     * This defines which type of currency (e.g., Tokens, Gems, Vault/Money)
-     * will be consumed when a player interacts with this enchant.
+     * This defines which type of currency (e.g., "Tokens", "Gems", "Vault") will be consumed
+     * when a player interacts with this enchant. The name should match a registered currency
+     * in the XPrison currency system.
      *
-     * @return The {@link XPrisonCurrency} implementation representing the currency type.
+     * @return The name of the currency used for this enchantment.
      */
-    XPrisonCurrency getCurrency();
+    String getCurrencyName();
+
+    /**
+     * Retrieves the {@link XPrisonCurrency} instance associated with the currency name returned by {@link #getCurrencyName()}.
+     * <p>
+     * This is a convenience method to directly access the currency object via the XPrison API,
+     * typically used to format amounts, apply caps, or access metadata like display name or symbol.
+     *
+     * @return The {@link XPrisonCurrency} instance, or {@code null} if the currency is not registered.
+     */
+    default XPrisonCurrency getCurrency() {
+        return XPrisonAPI.getInstance().getCurrencyApi().getCurrency(getCurrencyName());
+    }
+
 }
