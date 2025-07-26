@@ -4,7 +4,7 @@
 
   <groupId>dev.drawethree.xprison</groupId>
   <artifactId>X-PrisonAPI</artifactId>
-  <version>1.2</version>
+  <version>1.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>X-PrisonAPI</name>
