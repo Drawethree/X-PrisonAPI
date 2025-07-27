@@ -11,6 +11,7 @@ import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
 import dev.drawethree.xprison.api.miningstats.XPrisonMiningStatsAPI;
 import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
+import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import org.jetbrains.annotations.NotNull;
@@ -123,6 +124,14 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonMiningStatsAPI getMiningStatsApi();
+
+    /**
+     * Gets the pickaxe skins API
+     *
+     * @return the Pickaxe Skins API instance
+     */
+    @NotNull
+    XPrisonPickaxeSkinsAPI getPickaxeSkinsApi();
 
     /**
      * Gets the singleton instance of the XPrisonAPI.
