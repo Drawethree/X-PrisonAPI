@@ -25,20 +25,4 @@ public interface XPrisonMultipliersAPI {
 	 */
 	PlayerMultiplier getPlayerMultiplier(Player p, XPrisonCurrency currency);
 
-
-	/**
-	 * Calculates the total amount to deposit after applying the player's multiplier.
-	 *
-	 * @param p       the player
-	 * @param deposit the original amount to deposit
-	 * @param currency    the currency affected
-	 * @return the new amount to deposit after applying multiplier
-	 */
-	default double getTotalToDeposit(Player p, double deposit, XPrisonCurrency currency) {
-		PlayerMultiplier multiplier = this.getPlayerMultiplier(p, currency);
-		if (multiplier == null) {
-			return deposit;
-		}
-		return deposit * (1.0 + multiplier.getMultiplier());
-	}
 }

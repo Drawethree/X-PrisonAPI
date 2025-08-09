@@ -52,7 +52,7 @@ public final class PlayerCurrencyReceiveEvent extends XPrisonPlayerEvent impleme
 	 * @param player the {@link OfflinePlayer} receiving the currency
 	 * @param amount the amount of currency to be received
 	 */
-	public PlayerCurrencyReceiveEvent(XPrisonCurrency currency, ReceiveCause cause, OfflinePlayer player, long amount) {
+	public PlayerCurrencyReceiveEvent(XPrisonCurrency currency, ReceiveCause cause, OfflinePlayer player, double amount) {
 		super(player);
 		this.currency = currency;
 		this.cause = cause;

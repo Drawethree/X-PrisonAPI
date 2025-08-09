@@ -14,6 +14,7 @@ import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
 import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
+import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -132,6 +133,14 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonPickaxeSkinsAPI getPickaxeSkinsApi();
+
+    /**
+     * Gets the Rebirth API
+     *
+     * @return the Rebirth API instance
+     */
+    @NotNull
+    XPrisonRebirthAPI getRebirthApi();
 
     /**
      * Gets the singleton instance of the XPrisonAPI.

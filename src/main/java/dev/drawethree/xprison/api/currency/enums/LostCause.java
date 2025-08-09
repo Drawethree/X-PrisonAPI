@@ -26,6 +26,11 @@ public enum LostCause {
 	RANKUP,
 
 	/**
+	 * Player lost currency by rebirth.
+	 */
+	REBIRTH,
+
+	/**
 	 * Player lost currency by an admin running a command affecting currency.
 	 */
 	ADMIN,

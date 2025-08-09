@@ -48,4 +48,11 @@ public interface XPrisonPrestigesAPI {
 	 */
 	boolean isMaxPrestige(Player player);
 
+	/**
+	 * Resets a player's prestige to 0.
+	 *
+	 * @param player the player whose prestige will be reset
+	 */
+	void resetPlayerPrestige(Player player);
+
 }
