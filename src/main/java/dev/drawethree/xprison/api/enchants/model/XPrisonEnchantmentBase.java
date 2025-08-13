@@ -1,12 +1,14 @@
 package dev.drawethree.xprison.api.enchants.model;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.drawethree.xprison.api.XPrisonAPI;
-import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
+import com.google.gson.JsonPrimitive;
 import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
@@ -25,6 +27,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     /** The configuration file for this enchantment */
     @Setter
     private File configFile;
+    private Expression compiledExpression;
 
     protected int id;
     protected String rawName;
@@ -33,7 +36,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     protected boolean enabled;
     protected int maxLevel;
     protected long baseCost;
-    protected long increaseCost;
+    protected String costFormula;
     protected XPrisonEnchantmentGuiProperties guiProperties;
     protected String currencyName;
     protected boolean refundEnabled;
@@ -77,8 +80,25 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         this.enabled = JsonUtils.getRequiredBoolean(config,"enabled");
         this.maxLevel = JsonUtils.getRequiredInt(config,"maxLevel");
         this.baseCost = JsonUtils.getRequiredLong(config, "initialCost");
-        this.increaseCost = JsonUtils.getRequiredLong(config,"increaseCostBy");
         this.currencyName = JsonUtils.getOptionalString(config,"currency", "Tokens");
+
+        JsonElement increaseCostElement = config.get("increaseCostBy");
+        if (increaseCostElement != null && increaseCostElement.isJsonPrimitive()) {
+            JsonPrimitive primitive = increaseCostElement.getAsJsonPrimitive();
+            if (primitive.isNumber()) {
+                this.costFormula = primitive.getAsString();
+            } else if (primitive.isString()) {
+                this.costFormula = primitive.getAsString();
+            }
+        } else {
+            this.costFormula = "0";
+        }
+
+        if (!costFormula.matches("\\d+")) {
+            compiledExpression = new ExpressionBuilder(costFormula)
+                    .variables("baseCost", "level")
+                    .build();
+        }
 
         JsonObject refundObject = JsonUtils.getRequiredObject(config,"refund");
         this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");
@@ -107,6 +127,32 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         int customModelData = JsonUtils.getOptionalInt(gui, "customModelData", 0);
 
         this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc, customModelData);
+    }
+
+    /**
+     * Calculate the cost for this enchantment at a specific level.
+     * Supports formulas with variables: baseCost, level.
+     *
+     * @param level The enchantment level.
+     * @return The calculated cost at this level.
+     */
+    @Override
+    public long getCostAtLevel(int level) {
+        if (level == 0) {
+            return baseCost;
+        }
+        if (compiledExpression == null) {
+            long increaseCost = Long.parseLong(costFormula);
+            return baseCost + (level * increaseCost);
+        }
+        try {
+            compiledExpression
+                    .setVariable("baseCost", getBaseCost())
+                    .setVariable("level", level);
+            return Math.round(compiledExpression.evaluate());
+        } catch (Exception ex) {
+            return 0;
+        }
     }
 
     /**

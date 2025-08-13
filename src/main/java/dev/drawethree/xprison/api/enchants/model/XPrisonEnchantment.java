@@ -73,11 +73,12 @@ public interface XPrisonEnchantment {
     long getBaseCost();
 
     /**
-     * Gets the amount by which the cost increases per level.
+     * Gets the cost of this enchantment at the specified level.
      *
-     * @return The incremental cost per enchantment level.
+     * @param level The enchantment level.
+     * @return The cost at that level.
      */
-    long getIncreaseCost();
+    long getCostAtLevel(int level);
 
     /**
      * Initializes or loads this enchantment. Called during plugin load or reload.
