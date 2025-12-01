@@ -54,6 +54,15 @@ public interface XPrisonEnchantsAPI {
 	 */
 	int getEnchantLevel(ItemStack item, XPrisonEnchantment enchantment);
 
+    /**
+     * Retrieves the number of activations for a specific enchantment on the given item.
+     *
+     * @param item        The {@link ItemStack} to check for the enchantment's activations.
+     * @param enchantment The {@link XPrisonEnchantment} whose activations are to be determined.
+     * @return The total number of times the specified enchantment has been activated on the item.
+     */
+    long getAmountOfActivations(ItemStack item, XPrisonEnchantment enchantment);
+
 	/**
 	 * Sets or updates a specific enchantment with a defined level on an item.
 	 *
