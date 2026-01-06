@@ -113,6 +113,7 @@ public interface Mine {
      * Handles breaking of blocks inside a mine. This method should be called if there are some blocks in the mine that were mined / destroyed by enchant
      *
      * @param blocks list of blocks
+     * @param setBlocksToAir set blocks to air
      */
-    void handleBlockBreak(List<Block> blocks);
+    void handleBlockBreak(List<Block> blocks, boolean setBlocksToAir);
 }
