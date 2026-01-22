@@ -40,6 +40,14 @@ public interface XPrisonPrestigesAPI {
 	 */
 	void setPlayerPrestige(Player player, long prestigeId);
 
+    /**
+     * Gets the player's progress towards prestiging up, as a percentage.
+     *
+     * @param player the player whose prestige progress is requested
+     * @return double between 0.0 and 100.0 representing the percentage of prestige progress
+     */
+    double getPrestigeProgress(Player player);
+
 	/**
 	 * Checks if a player has reached the maximum prestige level.
 	 *

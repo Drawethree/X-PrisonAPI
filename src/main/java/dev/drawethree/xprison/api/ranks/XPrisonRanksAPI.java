@@ -35,9 +35,9 @@ public interface XPrisonRanksAPI {
 	 * Gets the player's progress towards ranking up, as a percentage.
 	 *
 	 * @param player the player whose rankup progress is requested
-	 * @return an integer between 0 and 100 representing the percentage of rankup progress
+	 * @return double between 0.0 and 100.0 representing the percentage of rankup progress
 	 */
-	int getRankupProgress(Player player);
+	double getRankupProgress(Player player);
 
 	/**
 	 * Sets a player's rank to the specified Rank.
