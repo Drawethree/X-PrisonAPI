@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.bombs.events;
 
 import dev.drawethree.xprison.api.bombs.model.Bomb;
+import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -44,7 +45,7 @@ import java.util.*;
  *       ignore cancelled explosions.</li>
  * </ul>
  */
-public final class BombExplodeEvent extends Event implements Cancellable {
+public final class BombExplodeEvent extends XPrisonPlayerEvent implements Cancellable {
 
     /** Required Bukkit handler list for all custom events. */
     private static final HandlerList handlers = new HandlerList();
@@ -90,6 +91,7 @@ public final class BombExplodeEvent extends Event implements Cancellable {
      *                       by the explosion before listener filtering
      */
     public BombExplodeEvent(Bomb bomb, Player player, Location location, List<Block> affectedBlocks) {
+        super(player);
         this.bomb = bomb;
         this.player = player;
         this.location = location;
