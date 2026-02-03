@@ -1,10 +1,13 @@
 package dev.drawethree.xprison.api.autosell;
 
 import com.cryptomorin.xseries.XMaterial;
+import dev.drawethree.xprison.api.autosell.model.SellRegion;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,7 +18,7 @@ public interface XPrisonAutoSellAPI {
 
 
 	/**
-	 * Gets the price of a specific item
+	 * Gets the global price of a specific item
 	 *
 	 * @param item   the item to get the price for
 	 * @return the price of the item
@@ -23,7 +26,7 @@ public interface XPrisonAutoSellAPI {
 	double getPriceForItem(ItemStack item);
 
 	/**
-	 * Gets the price for a given block.
+	 * Gets the global price for a given block.
 	 *
 	 * @param block the block to get the price for
 	 * @return the price of the block
@@ -47,7 +50,7 @@ public interface XPrisonAutoSellAPI {
 	boolean hasAutoSellEnabled(Player p);
 
 	/**
-	 * Adds or updates the sell price for a specific material
+	 * Adds or updates the global sell price for a specific material
 	 *
 	 * @param material the material to set the sell price for
 	 * @param price    the price at which the material will be sold
@@ -55,17 +58,41 @@ public interface XPrisonAutoSellAPI {
 	void addSellPrice(XMaterial material, double price);
 
 	/**
-	 * Removes a material from being sellable in this region.
+	 * Removes a material from being sellable globally.
 	 *
 	 * @param material the material to remove from the sell price list
 	 */
 	void removeSellPrice(XMaterial material);
 
 	/**
-	 * Gets the sell price for a specific material in this region.
+	 * Gets the global sell price for a specific material.
 	 *
 	 * @param material the material to get the price for
 	 * @return the sell price of the material, or 0 if not sellable
 	 */
 	double getSellPriceForMaterial(XMaterial material);
+
+    /**
+     * Gets the price of a specific item in a given sell region.
+     *
+     * @param region the sell region to check pricing in
+     * @param item   the item to get the price for
+     * @return the price of the item in the specified region
+     */
+    double getPriceForItem(SellRegion region, ItemStack item);
+
+    /**
+     * Gets a collection of all loaded and active sell regions.
+     *
+     * @return a collection of all sell regions
+     */
+    Collection<SellRegion> getSellRegions();
+
+    /**
+     * Gets the sell region at a specified location.
+     *
+     * @param location the location to check
+     * @return the sell region at the given location, or {@code null} if none exists there
+     */
+    SellRegion getSellRegionAtLocation(Location location);
 }
