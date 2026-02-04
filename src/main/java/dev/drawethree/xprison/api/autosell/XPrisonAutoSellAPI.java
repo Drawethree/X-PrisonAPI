@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * API interface for the AutoSell feature.
@@ -95,4 +96,12 @@ public interface XPrisonAutoSellAPI {
      * @return the sell region at the given location, or {@code null} if none exists there
      */
     SellRegion getSellRegionAtLocation(Location location);
+
+	/**
+	 * Gets the sell region by its name.
+	 *
+	 * @param name the name of the region to get
+	 * @return the region with the given name, or {@code null} if no such region exists
+	 */
+	Optional<SellRegion> getSellRegionByName(String name);
 }
