@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.bombs;
 import dev.drawethree.xprison.api.bombs.model.Bomb;
 import org.bukkit.entity.Player;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -28,5 +29,17 @@ public interface XPrisonBombsAPI {
      * @return an {@link Optional} containing the found bomb, or empty if not found
      */
     Optional<Bomb> getBombByName(String name);
+
+	/**
+	 * Retrieves all registered {@link Bomb} instances within the XPrison plugin.
+	 *
+	 * <p>This method returns a collection of all bombs that are currently defined
+	 * and available for use, regardless of whether they have been given to any
+	 * player or not.</p>
+	 *
+	 * @return a {@link Collection} containing all registered {@link Bomb} instances;
+	 *         the collection will be empty if no bombs are registered
+	 */
+	Collection<Bomb> getAllBombs();
 
 }

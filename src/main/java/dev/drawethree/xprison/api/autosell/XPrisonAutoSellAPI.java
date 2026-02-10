@@ -1,7 +1,7 @@
 package dev.drawethree.xprison.api.autosell;
 
-import com.cryptomorin.xseries.XMaterial;
 import dev.drawethree.xprison.api.autosell.model.SellRegion;
+import dev.drawethree.xprison.api.blocks.MineBlock;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -13,21 +13,23 @@ import java.util.Optional;
 
 /**
  * API interface for the AutoSell feature.
- * Provides methods for managing selling blocks, pricing, and player earnings.
+ * Provides methods for managing the selling of blocks and items,
+ * setting global and regional prices, and checking player earnings.
+ * <p>
+ * Supports both vanilla Minecraft blocks and custom blocks/items via {@link MineBlock}.
  */
 public interface XPrisonAutoSellAPI {
 
-
 	/**
-	 * Gets the global price of a specific item
+	 * Gets the global sell price of a specific {@link ItemStack}.
 	 *
-	 * @param item   the item to get the price for
+	 * @param item the item to get the price for
 	 * @return the price of the item
 	 */
 	double getPriceForItem(ItemStack item);
 
 	/**
-	 * Gets the global price for a given block.
+	 * Gets the global sell price for a specific {@link Block}.
 	 *
 	 * @param block the block to get the price for
 	 * @return the price of the block
@@ -35,73 +37,76 @@ public interface XPrisonAutoSellAPI {
 	double getPriceForBlock(Block block);
 
 	/**
-	 * Sells the specified list of blocks on behalf of the player.
+	 * Sells the specified list of blocks on behalf of a player.
 	 *
 	 * @param player the player selling the blocks
 	 * @param blocks the list of blocks to sell
+	 * @return the total amount of currency earned from selling the blocks
 	 */
-	void sellBlocks(Player player, List<Block> blocks);
+	double sellBlocks(Player player, List<Block> blocks);
 
 	/**
-	 * Checks if a player has auto-sell enabled.
+	 * Checks whether a player has auto-sell enabled.
 	 *
-	 * @param p the player to check
+	 * @param player the player to check
 	 * @return {@code true} if auto-sell is enabled for the player, {@code false} otherwise
 	 */
-	boolean hasAutoSellEnabled(Player p);
+	boolean hasAutoSellEnabled(Player player);
 
 	/**
-	 * Adds or updates the global sell price for a specific material
+	 * Adds or updates the global sell price for a specific block type.
+	 * <p>
+	 * The block can be either vanilla or a custom block represented by {@link MineBlock}.
 	 *
-	 * @param material the material to set the sell price for
-	 * @param price    the price at which the material will be sold
+	 * @param mineBlock the block to set the sell price for
+	 * @param price     the price at which the block will be sold
 	 */
-	void addSellPrice(XMaterial material, double price);
+	void addSellPrice(MineBlock mineBlock, double price);
 
 	/**
-	 * Removes a material from being sellable globally.
+	 * Removes a block from the global sell list.
 	 *
-	 * @param material the material to remove from the sell price list
+	 * @param mineBlock the block to remove
 	 */
-	void removeSellPrice(XMaterial material);
+	void removeSellPrice(MineBlock mineBlock);
 
 	/**
-	 * Gets the global sell price for a specific material.
+	 * Gets the global sell price for a specific block type.
 	 *
-	 * @param material the material to get the price for
-	 * @return the sell price of the material, or 0 if not sellable
+	 * @param mineBlock the block to check
+	 * @return the sell price, or 0 if the block is not sellable
 	 */
-	double getSellPriceForMaterial(XMaterial material);
-
-    /**
-     * Gets the price of a specific item in a given sell region.
-     *
-     * @param region the sell region to check pricing in
-     * @param item   the item to get the price for
-     * @return the price of the item in the specified region
-     */
-    double getPriceForItem(SellRegion region, ItemStack item);
-
-    /**
-     * Gets a collection of all loaded and active sell regions.
-     *
-     * @return a collection of all sell regions
-     */
-    Collection<SellRegion> getSellRegions();
-
-    /**
-     * Gets the sell region at a specified location.
-     *
-     * @param location the location to check
-     * @return the sell region at the given location, or {@code null} if none exists there
-     */
-    SellRegion getSellRegionAtLocation(Location location);
+	double getSellPrice(MineBlock mineBlock);
 
 	/**
-	 * Gets the sell region by its name.
+	 * Gets the sell price of a specific {@link ItemStack} in a particular {@link SellRegion}.
 	 *
-	 * @param name the name of the region to get
-	 * @return the region with the given name, or {@code null} if no such region exists
+	 * @param region the sell region to check pricing in
+	 * @param item   the item to get the price for
+	 * @return the price of the item in the specified region
+	 */
+	double getPriceForItem(SellRegion region, ItemStack item);
+
+	/**
+	 * Gets a collection of all currently loaded and active {@link SellRegion}s.
+	 *
+	 * @return a collection of all sell regions
+	 */
+	Collection<SellRegion> getSellRegions();
+
+	/**
+	 * Gets the sell region located at the specified {@link Location}.
+	 *
+	 * @param location the location to check
+	 * @return the sell region at the location, or {@code null} if none exists there
+	 */
+	SellRegion getSellRegionAtLocation(Location location);
+
+	/**
+	 * Gets a sell region by its unique name.
+	 *
+	 * @param name the name of the region
+	 * @return an {@link Optional} containing the sell region if found, or empty if no such region exists
 	 */
 	Optional<SellRegion> getSellRegionByName(String name);
 }

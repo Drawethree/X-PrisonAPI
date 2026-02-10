@@ -1,6 +1,6 @@
 package dev.drawethree.xprison.api.autosell.model;
 
-import com.cryptomorin.xseries.XMaterial;
+import dev.drawethree.xprison.api.blocks.MineBlock;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -9,67 +9,72 @@ import org.codemc.worldguardwrapper.region.IWrappedRegion;
 /**
  * Represents a region where auto-selling blocks or items is allowed.
  * Contains methods to manage sell prices and permissions within the region.
+ * <p>
+ * Supports both vanilla and custom blocks via {@link MineBlock}.
  */
 public interface SellRegion {
 
-    /**
-     * Gets the WorldGuard region this SellRegion represents.
-     *
-     * @return the wrapped WorldGuard region
-     */
-    IWrappedRegion getRegion();
+	/**
+	 * Gets the WorldGuard region this SellRegion represents.
+	 *
+	 * @return the wrapped WorldGuard region
+	 */
+	IWrappedRegion getRegion();
 
-    /**
-     * Gets the {@link World} where this region is located.
-     *
-     * @return the world of the region
-     */
-    World getWorld();
+	/**
+	 * Gets the {@link World} where this region is located.
+	 *
+	 * @return the world of the region
+	 */
+	World getWorld();
 
-    /**
-     * Gets the permission node required for a player to sell items in this region.
-     *
-     * @return the required permission string
-     */
-    String getRequiredPermission();
+	/**
+	 * Gets the permission node required for a player to sell items in this region.
+	 *
+	 * @return the required permission string
+	 */
+	String getRequiredPermission();
 
-    /**
-     * Adds or updates the sell price for a specific material in this region.
-     *
-     * @param material the material to set the sell price for
-     * @param price    the price at which the material will be sold
-     */
-    void addSellPrice(XMaterial material, double price);
+	/**
+	 * Adds or updates the sell price for a specific block type in this region.
+	 * <p>
+	 * The block can be either a vanilla or a custom block represented by {@link MineBlock}.
+	 *
+	 * @param mineBlock the block to set the sell price for
+	 * @param price     the price at which the block will be sold
+	 */
+	void addSellPrice(MineBlock mineBlock, double price);
 
-    /**
-     * Removes a material from being sellable in this region.
-     *
-     * @param material the material to remove from the sell price list
-     */
-    void removeSellPrice(XMaterial material);
+	/**
+	 * Removes a block from being sellable in this region.
+	 *
+	 * @param mineBlock the block to remove from the sell price list
+	 */
+	void removeSellPrice(MineBlock mineBlock);
 
-    /**
-     * Gets the sell price for a specific material in this region.
-     *
-     * @param material the material to get the price for
-     * @return the sell price of the material, or 0 if not sellable
-     */
-    double getSellPriceForMaterial(XMaterial material);
+	/**
+	 * Gets the sell price for a specific block in this region.
+	 *
+	 * @param mineBlock the block to check
+	 * @return the sell price of the block, or 0 if it is not sellable
+	 */
+	double getSellPrice(MineBlock mineBlock);
 
-    /**
-     * Checks whether a given {@link Location} is inside this sell region.
-     *
-     * @param location the location to check
-     * @return true if the location is inside the region, false otherwise
-     */
-    boolean contains(Location location);
+	/**
+	 * Checks whether a given {@link Location} is inside this sell region.
+	 *
+	 * @param location the location to check
+	 * @return {@code true} if the location is inside the region, {@code false} otherwise
+	 */
+	boolean contains(Location location);
 
-    /**
-     * Checks if the given player has permission to sell in this region.
-     * This is based on {@link SellRegion#getRequiredPermission()}.
-     *
-     * @param player the player to check
-     * @return true if the player can sell in the region, false otherwise
-     */
-    boolean canPlayerSellInRegion(Player player);
+	/**
+	 * Checks if the given player has permission to sell in this region.
+	 * <p>
+	 * This is based on {@link SellRegion#getRequiredPermission()}.
+	 *
+	 * @param player the player to check
+	 * @return {@code true} if the player can sell in the region, {@code false} otherwise
+	 */
+	boolean canPlayerSellInRegion(Player player);
 }
