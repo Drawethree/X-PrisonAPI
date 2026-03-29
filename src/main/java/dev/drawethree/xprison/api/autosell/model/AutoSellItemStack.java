@@ -8,9 +8,17 @@ import org.bukkit.inventory.ItemStack;
 public interface AutoSellItemStack {
 
     /**
-     * Gets the {@link ItemStack} that will be sold in the sell region.
+     * Gets the {@link ItemStack} representing the item type being sold.
+     * The amount of this ItemStack should not be relied on.
      *
-     * @return the ItemStack to be sold
+     * @return the item stack type
      */
     ItemStack getItemStack();
+
+    /**
+     * Gets the amount of items being sold.
+     *
+     * @return amount of items
+     */
+    int getAmount();
 }
