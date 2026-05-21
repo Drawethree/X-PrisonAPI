@@ -116,4 +116,17 @@ public interface Mine {
      * @param setBlocksToAir set blocks to air
      */
     void handleBlockBreak(List<Block> blocks, boolean setBlocksToAir);
+
+    /**
+     * Handles breaking of blocks inside a mine. This method is the lighter way to handle blocks being destroyed in the mine by an enchant
+     * @param blockCount The amount of blocks broken
+     */
+    void handleBlockBreak(int blockCount);
+
+    /**
+     * Update the amount of blocks remaining inside the mine.
+     * @param currentBlocks The new amount of blocks remaining in the mine
+     */
+    void setCurrentBlocks(int currentBlocks);
+
 }
