@@ -6,6 +6,8 @@ import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import org.bukkit.OfflinePlayer;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
 
 public interface XPrisonCurrencyAPI {
 
@@ -90,4 +92,13 @@ public interface XPrisonCurrencyAPI {
      * @return true if player has enough, false otherwise.
      */
     boolean has(OfflinePlayer player, String currencyName, double amount);
+
+    /**
+     * Returns the top N players by balance for the given currency, ordered descending.
+     *
+     * @param currencyName the currency name
+     * @param limit        maximum number of entries to return
+     * @return ordered map of UUID → balance
+     */
+    Map<UUID, Double> getTopByBalance(String currencyName, int limit);
 }

@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -109,4 +110,28 @@ public interface XPrisonAutoSellAPI {
 	 * @return an {@link Optional} containing the sell region if found, or empty if no such region exists
 	 */
 	Optional<SellRegion> getSellRegionByName(String name);
+
+	/**
+	 * Returns all globally-priced blocks as a blockId → price map.
+	 *
+	 * @return unmodifiable map of block ID to sell price
+	 */
+	Map<String, Double> getGlobalPrices();
+
+	/**
+	 * Adds or updates a sell price for a specific block in the given region and persists the change.
+	 *
+	 * @param regionId the WorldGuard region ID
+	 * @param block    the block to price
+	 * @param price    the sell price (must be &gt; 0)
+	 */
+	void addRegionSellPrice(String regionId, MineBlock block, double price);
+
+	/**
+	 * Removes a block from the sell price list of the given region and persists the change.
+	 *
+	 * @param regionId the WorldGuard region ID
+	 * @param block    the block to remove
+	 */
+	void removeRegionSellPrice(String regionId, MineBlock block);
 }

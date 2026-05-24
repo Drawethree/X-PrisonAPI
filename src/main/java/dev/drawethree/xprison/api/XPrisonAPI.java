@@ -1,5 +1,6 @@
 package dev.drawethree.xprison.api;
 
+import dev.drawethree.xprison.api.addons.XPrisonAddonInfo;
 import dev.drawethree.xprison.api.autominer.XPrisonAutoMinerAPI;
 import dev.drawethree.xprison.api.autosell.XPrisonAutoSellAPI;
 import dev.drawethree.xprison.api.blocks.XPrisonBlocksAPI;
@@ -17,6 +18,8 @@ import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Main API interface for interacting with the X-Prison plugin modules.
@@ -150,6 +153,50 @@ public interface XPrisonAPI {
 	 */
 	@NotNull
 	XPrisonBlocksAPI getBlocksApi();
+
+    /**
+     * Returns all registered modules with their current enabled state.
+     */
+    @NotNull
+    List<XPrisonModule> getModules();
+
+    /**
+     * Enables a module by its config key and saves the state to config.yml.
+     * Has no effect if the module is already enabled or the key is unknown.
+     *
+     * @param configKey the value of {@code @XPrisonModuleInfo(configKey)}
+     */
+    void enableModule(@NotNull String configKey);
+
+    /**
+     * Disables a module by its config key and saves the state to config.yml.
+     * Has no effect if the module is already disabled or the key is unknown.
+     *
+     * @param configKey the value of {@code @XPrisonModuleInfo(configKey)}
+     */
+    void disableModule(@NotNull String configKey);
+
+    /**
+     * Returns metadata for every loaded addon, including whether it is currently enabled.
+     */
+    @NotNull
+    List<XPrisonAddonInfo> getLoadedAddons();
+
+    /**
+     * Enables a loaded addon by display name.
+     * Has no effect if the addon is already enabled or the name is unknown.
+     *
+     * @param name the addon's display name (case-insensitive)
+     */
+    void enableAddon(@NotNull String name);
+
+    /**
+     * Disables a loaded addon by display name.
+     * Has no effect if the addon is already disabled or the name is unknown.
+     *
+     * @param name the addon's display name (case-insensitive)
+     */
+    void disableAddon(@NotNull String name);
 
     /**
      * Gets the singleton instance of the XPrisonAPI.

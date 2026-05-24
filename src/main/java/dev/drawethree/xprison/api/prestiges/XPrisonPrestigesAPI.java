@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.prestiges;
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -73,4 +74,12 @@ public interface XPrisonPrestigesAPI {
 	 * @return the player's current Prestige, or null if not found
 	 */
 	Prestige getPlayerPrestigeOffline(UUID playerUuid);
+
+	/**
+	 * Returns the top N players by prestige, ordered descending.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of UUID → prestige ID
+	 */
+	Map<UUID, Long> getTopByPrestige(int limit);
 }

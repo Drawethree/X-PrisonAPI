@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.rebirth;
 import dev.drawethree.xprison.api.rebirth.model.Rebirth;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,4 +75,12 @@ public interface XPrisonRebirthAPI {
 	 * @return the player's current Rebirth, or null if not found
 	 */
 	Rebirth getPlayerRebirthOffline(UUID playerUuid);
+
+	/**
+	 * Returns the top N players by rebirth ID, ordered descending.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of UUID → rebirth ID
+	 */
+	Map<UUID, Integer> getTopByRebirth(int limit);
 }
