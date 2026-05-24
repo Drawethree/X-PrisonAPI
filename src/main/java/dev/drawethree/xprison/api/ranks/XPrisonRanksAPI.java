@@ -74,6 +74,14 @@ public interface XPrisonRanksAPI {
 	Rank getPlayerRankOffline(UUID playerUuid);
 
 	/**
+	 * Sets the rank of an offline player (database-only update; takes effect on next login).
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @param rankId     the rank ID to assign
+	 */
+	void setPlayerRankOffline(UUID playerUuid, long rankId);
+
+	/**
 	 * Returns the top N players by rank ID, ordered descending.
 	 *
 	 * @param limit maximum number of entries to return

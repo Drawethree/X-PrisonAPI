@@ -76,6 +76,14 @@ public interface XPrisonPrestigesAPI {
 	Prestige getPlayerPrestigeOffline(UUID playerUuid);
 
 	/**
+	 * Sets the prestige of an offline player (database-only update; takes effect on next login).
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @param prestigeId the prestige ID to assign
+	 */
+	void setPlayerPrestigeOffline(UUID playerUuid, long prestigeId);
+
+	/**
 	 * Returns the top N players by prestige, ordered descending.
 	 *
 	 * @param limit maximum number of entries to return

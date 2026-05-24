@@ -77,6 +77,14 @@ public interface XPrisonRebirthAPI {
 	Rebirth getPlayerRebirthOffline(UUID playerUuid);
 
 	/**
+	 * Sets the rebirth of an offline player (database-only update; takes effect on next login).
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @param rebirthId  the rebirth ID to assign
+	 */
+	void setPlayerRebirthOffline(UUID playerUuid, long rebirthId);
+
+	/**
 	 * Returns the top N players by rebirth ID, ordered descending.
 	 *
 	 * @param limit maximum number of entries to return
