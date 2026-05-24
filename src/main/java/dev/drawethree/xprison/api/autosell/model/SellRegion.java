@@ -6,6 +6,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.codemc.worldguardwrapper.region.IWrappedRegion;
 
+import java.util.Map;
+
 /**
  * Represents a region where auto-selling blocks or items is allowed.
  * Contains methods to manage sell prices and permissions within the region.
@@ -20,6 +22,15 @@ public interface SellRegion {
 	 * @return the wrapped WorldGuard region
 	 */
 	IWrappedRegion getRegion();
+
+	/**
+	 * Convenience shortcut for {@code getRegion().getId()}.
+	 *
+	 * @return the WorldGuard region ID
+	 */
+	default String getId() {
+		return getRegion().getId();
+	}
 
 	/**
 	 * Gets the {@link World} where this region is located.
@@ -77,4 +88,11 @@ public interface SellRegion {
 	 * @return {@code true} if the player can sell in the region, {@code false} otherwise
 	 */
 	boolean canPlayerSellInRegion(Player player);
+
+	/**
+	 * Returns all priced blocks in this region as a blockId → price map.
+	 *
+	 * @return unmodifiable map of block ID to sell price
+	 */
+	Map<String, Double> getPrices();
 }
