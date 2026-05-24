@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a mine area with associated properties and behaviors.
@@ -116,4 +117,20 @@ public interface Mine {
      * @param setBlocksToAir set blocks to air
      */
     void handleBlockBreak(List<Block> blocks, boolean setBlocksToAir);
+
+    /**
+     * Gets the active potion effects applied to players in this mine.
+     * The map key is the potion effect type name (e.g. "SPEED", "HASTE") and
+     * the value is the amplifier level (1-based, so 1 = level I).
+     *
+     * @return unmodifiable map of effect name to amplifier level; empty if none configured
+     */
+    Map<String, Integer> getEffects();
+
+    /**
+     * Gets the name of the reset type used when this mine resets.
+     *
+     * @return "INSTANT" or "GRADUAL"
+     */
+    String getResetTypeName();
 }
