@@ -4,6 +4,7 @@ import dev.drawethree.xprison.api.rebirth.model.Rebirth;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * API interface for interacting with the XPrison Rebirth system.
@@ -65,4 +66,12 @@ public interface XPrisonRebirthAPI {
 	 */
 	boolean tryRebirth(Player player);
 
+	/**
+	 * Gets the current rebirth of a player by UUID, including offline players.
+	 * Reads from the in-memory cache if online, otherwise queries the database.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return the player's current Rebirth, or null if not found
+	 */
+	Rebirth getPlayerRebirthOffline(UUID playerUuid);
 }
