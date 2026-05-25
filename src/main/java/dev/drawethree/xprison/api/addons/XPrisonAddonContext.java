@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.addons;
 
 import dev.drawethree.xprison.api.XPrisonAPI;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -48,4 +49,11 @@ public interface XPrisonAddonContext {
      * Use this instead of calling Bukkit.getPluginManager().registerEvents() directly.
      */
     void registerEvents(Listener listener);
+
+    /**
+     * Returns the underlying X-Prison {@link Plugin} instance.
+     * Required for registering commands via the helper library
+     * ({@code Commands.create().registerAndBind(plugin, "cmd")}).
+     */
+    Plugin getPlugin();
 }
