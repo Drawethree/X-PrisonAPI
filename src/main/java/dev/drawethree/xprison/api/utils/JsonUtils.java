@@ -104,5 +104,34 @@ public class JsonUtils {
         return element.getAsInt();
     }
 
+    public static double getOptionalDouble(JsonObject obj, String key, double defaultValue) {
+        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+            return defaultValue;
+        }
+
+        JsonElement element = obj.get(key);
+
+        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
+            return defaultValue;
+        }
+
+        return element.getAsDouble();
+    }
+
+
+    public static boolean getOptionalBoolean(JsonObject obj, String key, boolean defaultValue) {
+        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+            return defaultValue;
+        }
+
+        JsonElement element = obj.get(key);
+
+        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
+            return defaultValue;
+        }
+
+        return element.getAsBoolean();
+    }
+
 
 }

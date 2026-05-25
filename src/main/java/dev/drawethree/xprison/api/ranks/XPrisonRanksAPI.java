@@ -3,7 +3,9 @@ package dev.drawethree.xprison.api.ranks;
 import dev.drawethree.xprison.api.ranks.model.Rank;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface XPrisonRanksAPI {
 
@@ -61,4 +63,21 @@ public interface XPrisonRanksAPI {
 	 * @return true if the player has the max rank, false otherwise
 	 */
 	boolean isMaxRank(Player player);
+
+	/**
+	 * Gets the current rank of a player by UUID, including offline players.
+	 * Reads from the in-memory cache if online, otherwise queries the database.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return the player's current Rank, or null if not found
+	 */
+	Rank getPlayerRankOffline(UUID playerUuid);
+
+	/**
+	 * Returns the top N players by rank ID, ordered descending.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of UUID → rank ID
+	 */
+	Map<UUID, Integer> getTopByRank(int limit);
 }

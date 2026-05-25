@@ -38,4 +38,14 @@ public interface MineBlockFactory {
 	MineBlock fromItemStack(ItemStack itemStack);
 
 	MineBlock fromBlock(org.bukkit.block.Block block);
+
+	/**
+	 * Creates a MineBlock from a string block ID.
+	 * If the id contains {@code ':'} it is treated as a custom (ItemsAdder) block;
+	 * otherwise it is matched as a vanilla material name (case-insensitive).
+	 *
+	 * @param id the block ID, e.g. {@code "STONE"} or {@code "namespace:id"}
+	 * @return a new MineBlock, or {@code null} if the id cannot be resolved
+	 */
+	MineBlock fromId(String id);
 }

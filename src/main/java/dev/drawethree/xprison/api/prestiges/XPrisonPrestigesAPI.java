@@ -3,6 +3,9 @@ package dev.drawethree.xprison.api.prestiges;
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * API interface for handling prestige-related operations in XPrison.
  */
@@ -63,4 +66,20 @@ public interface XPrisonPrestigesAPI {
 	 */
 	void resetPlayerPrestige(Player player);
 
+	/**
+	 * Gets the current prestige of a player by UUID, including offline players.
+	 * Reads from the in-memory cache if online, otherwise queries the database.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return the player's current Prestige, or null if not found
+	 */
+	Prestige getPlayerPrestigeOffline(UUID playerUuid);
+
+	/**
+	 * Returns the top N players by prestige, ordered descending.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of UUID → prestige ID
+	 */
+	Map<UUID, Long> getTopByPrestige(int limit);
 }

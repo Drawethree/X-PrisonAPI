@@ -25,4 +25,12 @@ public interface XPrisonModule {
      * @return true if history tracking is enabled, false otherwise
      */
     boolean isHistoryEnabled();
+
+    /**
+     * Gets the config key used to enable/disable this module in config.yml.
+     * Corresponds to the {@code configKey} in the {@code @XPrisonModuleInfo} annotation.
+     *
+     * @return the config key, or an empty string if not annotated
+     */
+    String getConfigKey();
 }

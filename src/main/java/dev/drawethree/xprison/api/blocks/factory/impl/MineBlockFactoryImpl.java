@@ -41,6 +41,15 @@ public class MineBlockFactoryImpl implements MineBlockFactory {
 	}
 
 	@Override
+	public MineBlock fromId(String id) {
+		if (id == null || id.isBlank()) return null;
+		if (id.contains(":")) return new ItemsAdderMineBlock(id);
+		return XMaterial.matchXMaterial(id.toUpperCase())
+				.map(VanillaMineBlock::new)
+				.orElse(null);
+	}
+
+	@Override
 	public MineBlock fromBlock(Block block) {
 		if (block == null || block.getType() == XMaterial.AIR.parseMaterial()) {
 			throw new IllegalArgumentException("Block cannot be null or air");

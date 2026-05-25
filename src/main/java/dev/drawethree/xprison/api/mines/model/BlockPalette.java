@@ -2,6 +2,9 @@ package dev.drawethree.xprison.api.mines.model;
 
 import dev.drawethree.xprison.api.blocks.MineBlock;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Represents a weighted palette of blocks used to define the composition
  * of a mine.
@@ -60,4 +63,22 @@ public interface BlockPalette {
 	 * @param mineBlock the {@link MineBlock} to remove
 	 */
 	void remove(MineBlock mineBlock);
+
+	/**
+	 * Returns all blocks in this palette (including those with 0% percentage).
+	 *
+	 * @return the set of all {@link MineBlock} entries in the palette
+	 */
+	Set<MineBlock> getBlocks();
+
+	/**
+	 * Replaces the entire palette with the given map of block IDs to percentages.
+	 * Block IDs use the vanilla material name (e.g. {@code "DIAMOND_ORE"}) or a
+	 * namespaced custom block id (e.g. {@code "myitems:ruby_ore"}).
+	 * Percentages are in the range {@code 0.0}–{@code 1.0}.
+	 * Implementations should ignore unknown IDs rather than throwing.
+	 *
+	 * @param entries map of block ID → percentage
+	 */
+	void setPaletteByIds(Map<String, Double> entries);
 }

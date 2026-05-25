@@ -22,12 +22,18 @@ import java.util.List;
  * Handles common properties and configuration loading from JSON files.
  */
 @Getter
-public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, RefundableEnchant {
+public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, RefundableEnchant, PrestigeableEnchant {
 
     /** The configuration file for this enchantment */
     @Setter
     private File configFile;
     private Expression compiledExpression;
+
+    protected boolean prestigeEnabled;
+    protected int maxPrestige;
+    protected double multiplierPerPrestige;
+    protected String requiredActivationsFormula;
+    private Expression compiledPrestigeExpression;
 
     protected int id;
     protected String rawName;
@@ -104,6 +110,33 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");
         this.refundGuiSlot = JsonUtils.getRequiredInt(refundObject,"guiSlot");
         this.refundPercentage = JsonUtils.getRequiredDouble(refundObject, "percentage");
+
+        loadPrestigeProperties(config);
+    }
+
+    private void loadPrestigeProperties(JsonObject config) {
+        JsonObject prestigeObject = JsonUtils.getRequiredObject(config, "prestige");
+        this.prestigeEnabled = JsonUtils.getOptionalBoolean(prestigeObject, "enabled", false);
+        this.maxPrestige = JsonUtils.getOptionalInt(prestigeObject, "maxPrestige", 5);
+        this.multiplierPerPrestige = JsonUtils.getOptionalDouble(prestigeObject, "multiplierPerPrestige", 0.1);
+        this.requiredActivationsFormula = JsonUtils.getOptionalString(prestigeObject, "requiredActivationsFormula", "1000");
+
+        if (this.prestigeEnabled) {
+            this.compiledPrestigeExpression = new ExpressionBuilder(this.requiredActivationsFormula)
+                    .variable("prestige")
+                    .build();
+        }
+    }
+
+    @Override
+    public long getRequiredActivations(int currentPrestige) {
+        if (compiledPrestigeExpression == null) return Long.MAX_VALUE;
+        try {
+            compiledPrestigeExpression.setVariable("prestige", currentPrestige);
+            return Math.round(compiledPrestigeExpression.evaluate());
+        } catch (Exception e) {
+            return Long.MAX_VALUE;
+        }
     }
 
     /**
