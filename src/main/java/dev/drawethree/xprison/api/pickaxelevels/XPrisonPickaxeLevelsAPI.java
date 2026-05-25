@@ -3,8 +3,13 @@ package dev.drawethree.xprison.api.pickaxelevels;
 import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeLevel;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * API for managing pickaxe levels in XPrison.
@@ -60,5 +65,31 @@ public interface XPrisonPickaxeLevelsAPI {
 	 * @return a string representing the progress bar
 	 */
 	String getProgressBar(Player player);
+
+	/**
+	 * Returns all configured pickaxe levels in ascending order.
+	 *
+	 * @return ordered list of all defined pickaxe levels
+	 */
+	@NotNull
+	List<PickaxeLevel> getAllPickaxeLevels();
+
+	/**
+	 * Returns the highest configured pickaxe level.
+	 *
+	 * @return the max pickaxe level, or {@code null} if none are configured
+	 */
+	@Nullable
+	PickaxeLevel getMaxPickaxeLevel();
+
+	/**
+	 * Returns the top N online players by pickaxe level, ordered descending.
+	 * Only online players are considered since pickaxe level is item-based, not stored in a database.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of UUID → pickaxe level number
+	 */
+	@NotNull
+	Map<UUID, Integer> getTopByPickaxeLevel(int limit);
 
 }

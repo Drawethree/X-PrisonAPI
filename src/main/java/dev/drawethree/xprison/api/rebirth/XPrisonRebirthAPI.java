@@ -2,7 +2,10 @@ package dev.drawethree.xprison.api.rebirth;
 
 import dev.drawethree.xprison.api.rebirth.model.Rebirth;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,4 +94,28 @@ public interface XPrisonRebirthAPI {
 	 * @return ordered map of UUID → rebirth ID
 	 */
 	Map<UUID, Integer> getTopByRebirth(int limit);
+
+	/**
+	 * Returns all configured rebirths in ascending order.
+	 *
+	 * @return ordered list of all defined rebirths
+	 */
+	@NotNull
+	List<Rebirth> getAllRebirths();
+
+	/**
+	 * Returns the highest configured rebirth, or {@code null} if none are defined.
+	 *
+	 * @return the max rebirth
+	 */
+	@Nullable
+	Rebirth getMaxRebirth();
+
+	/**
+	 * Returns all player UUIDs stored in the rebirths database.
+	 *
+	 * @return list of all UUIDs that have a row in the rebirths table
+	 */
+	@NotNull
+	List<UUID> getAllPlayerUUIDs();
 }

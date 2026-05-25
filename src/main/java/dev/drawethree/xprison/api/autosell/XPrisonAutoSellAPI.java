@@ -134,4 +134,28 @@ public interface XPrisonAutoSellAPI {
 	 * @param block    the block to remove
 	 */
 	void removeRegionSellPrice(String regionId, MineBlock block);
+
+	/**
+	 * Enables auto-sell for the given player.
+	 * Has no effect if auto-sell is already enabled.
+	 *
+	 * @param player the online player
+	 */
+	void enableAutoSell(Player player);
+
+	/**
+	 * Disables auto-sell for the given player.
+	 * Has no effect if auto-sell is already disabled.
+	 *
+	 * @param player the online player
+	 */
+	void disableAutoSell(Player player);
+
+	/**
+	 * Immediately sells all sellable items in the player's inventory at current prices.
+	 *
+	 * @param player the online player whose inventory will be sold
+	 * @return total currency earned from the sale
+	 */
+	double sellPlayerInventory(Player player);
 }

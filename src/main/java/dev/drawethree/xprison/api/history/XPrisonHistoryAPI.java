@@ -39,4 +39,22 @@ public interface XPrisonHistoryAPI {
 	 * @return the created {@link HistoryLine}
 	 */
 	HistoryLine createHistoryLine(OfflinePlayer player, XPrisonModule module, String context);
+
+	/**
+	 * Returns a paginated slice of the player's full history, sorted by date descending.
+	 *
+	 * @param player   the player whose history is requested
+	 * @param page     1-based page number
+	 * @param pageSize number of entries per page
+	 * @return the requested page of history lines
+	 */
+	Collection<HistoryLine> getPlayerHistory(OfflinePlayer player, int page, int pageSize);
+
+	/**
+	 * Returns the total number of history entries for the given player.
+	 *
+	 * @param player the player to count history lines for
+	 * @return total history entry count
+	 */
+	int getPlayerHistoryCount(OfflinePlayer player);
 }

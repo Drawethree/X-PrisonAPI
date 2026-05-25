@@ -86,4 +86,11 @@ public interface Gang {
      * @param invitation the {@link GangInvitation} to remove
      */
     void removeInvite(GangInvitation invitation);
+
+    /**
+     * Returns the total number of members in this gang, including the owner.
+     *
+     * @return member count
+     */
+    int getMemberCount();
 }

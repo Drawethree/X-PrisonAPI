@@ -224,6 +224,22 @@ public interface XPrisonAPI {
     String getDashboardUrl();
 
     /**
+     * Returns the current version string of the X-Prison plugin.
+     *
+     * @return the plugin version (e.g. {@code "2026.2.2.4-BETA"})
+     */
+    @NotNull
+    String getPluginVersion();
+
+    /**
+     * Checks whether a specific module is currently enabled.
+     *
+     * @param configKey the value of {@code @XPrisonModuleInfo(configKey)} for the module
+     * @return {@code true} if the module is loaded and enabled
+     */
+    boolean isModuleEnabled(@NotNull String configKey);
+
+    /**
      * Gets the singleton instance of the XPrisonAPI.
      *
      * @return the XPrisonAPI instance

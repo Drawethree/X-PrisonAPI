@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface XPrisonRanksAPI {
 
@@ -97,4 +99,28 @@ public interface XPrisonRanksAPI {
 	 * @return list of all UUIDs that have a row in the ranks table
 	 */
 	List<UUID> getAllPlayerUUIDs();
+
+	/**
+	 * Returns all configured ranks in ascending order.
+	 *
+	 * @return ordered list of all ranks
+	 */
+	@NotNull
+	List<Rank> getAllRanks();
+
+	/**
+	 * Returns the highest configured rank.
+	 *
+	 * @return the max rank, or {@code null} if no ranks are configured
+	 */
+	@Nullable
+	Rank getMaxRank();
+
+	/**
+	 * Returns the first (default) rank assigned to new players.
+	 *
+	 * @return the default rank, or {@code null} if no ranks are configured
+	 */
+	@Nullable
+	Rank getDefaultRank();
 }

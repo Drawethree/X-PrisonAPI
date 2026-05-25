@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -131,4 +132,11 @@ public interface XPrisonEnchantsAPI {
 	 * @return {@code true} if enchantments are allowed, {@code false} otherwise.
 	 */
 	boolean isEnchantAllowed(Location location);
+
+	/**
+	 * Returns all enchantments currently registered in the system.
+	 *
+	 * @return a collection of all registered {@link XPrisonEnchantment}s
+	 */
+	Collection<XPrisonEnchantment> getAllEnchantments();
 }

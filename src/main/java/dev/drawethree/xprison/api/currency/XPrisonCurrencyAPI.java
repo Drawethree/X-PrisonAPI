@@ -4,6 +4,7 @@ import dev.drawethree.xprison.api.currency.enums.LostCause;
 import dev.drawethree.xprison.api.currency.enums.ReceiveCause;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -101,4 +102,64 @@ public interface XPrisonCurrencyAPI {
      * @return ordered map of UUID → balance
      */
     Map<UUID, Double> getTopByBalance(String currencyName, int limit);
+
+    /**
+     * Creates a new currency, persists it to {@code currencies.yml}, and registers it in memory.
+     * <p>
+     * If {@link XPrisonCurrency#getItemConfig()} returns non-{@code null}, the physical-item
+     * section is written to the config as well.
+     * <p>
+     * Note: this differs from {@link #registerCurrency(XPrisonCurrency)}, which only updates the
+     * in-memory registry without persisting to disk.
+     *
+     * @param currency the currency to create
+     * @return {@code true} on success; {@code false} if a currency with the same name already exists
+     */
+    boolean createCurrency(XPrisonCurrency currency);
+
+    /**
+     * Updates an existing currency's configuration in {@code currencies.yml} and re-registers it
+     * in memory with the new values.
+     * <p>
+     * If the updated currency's {@link XPrisonCurrency#getItemConfig()} returns {@code null},
+     * the physical-item section is removed from the config.
+     *
+     * @param currency the currency carrying the updated values (identified by {@link XPrisonCurrency#getName()})
+     * @return {@code true} on success; {@code false} if no currency with that name exists
+     */
+    boolean updateCurrency(XPrisonCurrency currency);
+
+    /**
+     * Removes a currency from {@code currencies.yml} and unregisters it from memory.
+     * <p>
+     * Currencies backed by an external {@link dev.drawethree.xprison.api.currency.model.XPrisonCurrencyHandler}
+     * cannot be deleted through this method.
+     *
+     * @param name the currency name (case-insensitive)
+     * @return {@code true} on success; {@code false} if not found or has an external handler
+     */
+    boolean deleteCurrency(String name);
+
+    /**
+     * Returns the top N players by balance for the given currency, with an optional offset for pagination.
+     *
+     * @param currencyName the currency name
+     * @param limit        maximum number of entries to return
+     * @param offset       number of entries to skip (0 = start from top)
+     * @return ordered map of UUID → balance
+     */
+    @NotNull
+    Map<UUID, Double> getTopByBalance(String currencyName, int limit, int offset);
+
+    /**
+     * Transfers an amount of currency from one player to another atomically.
+     * Fails if the source player does not have enough balance.
+     *
+     * @param from         the player sending the currency
+     * @param to           the player receiving the currency
+     * @param currencyName the currency name
+     * @param amount       the amount to transfer (must be positive)
+     * @return {@code true} if the transfer succeeded; {@code false} if the source had insufficient funds or currency not found
+     */
+    boolean transferBalance(OfflinePlayer from, OfflinePlayer to, String currencyName, double amount);
 }

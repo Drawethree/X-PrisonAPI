@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.mines.model;
 import me.lucko.helper.serialize.Point;
 import me.lucko.helper.serialize.Region;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -145,4 +146,30 @@ public interface Mine {
      * @return "INSTANT" or "GRADUAL"
      */
     String getResetTypeName();
+
+    /**
+     * Gets the Bukkit world this mine resides in.
+     *
+     * @return the {@link World} the mine is in
+     */
+    World getWorld();
+
+    /**
+     * Returns the current fill percentage of the mine (0.0 = empty, 100.0 = full).
+     * Computed as {@code (currentBlocks / totalBlocks) * 100}.
+     *
+     * @return fill percentage between 0.0 and 100.0
+     */
+    default double getPercentageFull() {
+        if (getTotalBlocks() == 0) return 0.0;
+        return (double) getCurrentBlocks() / getTotalBlocks() * 100.0;
+    }
+
+    /**
+     * Returns the timed-reset interval in seconds.
+     * Returns 0 if no timed reset is configured.
+     *
+     * @return reset interval in seconds
+     */
+    long getResetIntervalSeconds();
 }

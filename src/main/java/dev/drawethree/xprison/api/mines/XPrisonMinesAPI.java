@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.mines;
 import dev.drawethree.xprison.api.mines.model.Mine;
 import dev.drawethree.xprison.api.mines.model.MineSelection;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Collection;
 
@@ -58,4 +59,20 @@ public interface XPrisonMinesAPI {
 	 * @param mine The {@link Mine} to reset
 	 */
 	void resetMine(Mine mine);
+
+	/**
+	 * Sets the reset type for the given mine and persists the change.
+	 *
+	 * @param mineName  the mine name
+	 * @param resetType "INSTANT" or "GRADUAL" (case-insensitive)
+	 */
+	void setMineResetType(String mineName, String resetType);
+
+	/**
+	 * Returns all mines located in the given world.
+	 *
+	 * @param world the world to filter by
+	 * @return collection of mines in that world
+	 */
+	Collection<Mine> getMinesInWorld(World world);
 }

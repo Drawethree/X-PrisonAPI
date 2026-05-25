@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.multipliers.model;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a multiplier that can affect various aspects such as sell price or tokens.
@@ -39,6 +40,15 @@ public interface Multiplier {
      * Resets the multiplier to its default state.
      */
     void reset();
+
+    /**
+     * Extends the multiplier's end time by the given duration.
+     * If the multiplier is expired or has no end time, starts from now.
+     *
+     * @param unit     the time unit
+     * @param duration the duration to add
+     */
+    void addDuration(TimeUnit unit, int duration);
 
     /**
      * Gets the date when the multiplier ends.

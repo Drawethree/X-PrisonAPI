@@ -2,7 +2,7 @@ package dev.drawethree.xprison.api.currency.model;
 
 /**
  * Represents the metadata and formatting configuration of a currency in the XPrison API.
- * This includes display name, format rules, symbol settings, and optional icon.
+ * This includes display name, format rules, symbol settings, and optional withdraw item.
  * <p>
  * Currency balance operations are handled by a separate CurrencyService.
  */
@@ -50,6 +50,37 @@ public interface XPrisonCurrency {
      * @return The formatted currency string (e.g., "$1.2k", "$3,000").
      */
     String format(double amount);
+
+    /**
+     * Returns the initial balance assigned to a new player for this currency.
+     */
+    double getStartingAmount();
+
+    /**
+     * Returns the {@link java.text.DecimalFormat} pattern string used to format amounts
+     * (e.g., {@code "#,##0.##"}). Used when {@link #isShortFormat()} is {@code false}.
+     */
+    String getFormatPattern();
+
+    /**
+     * Returns {@code true} if amounts should be formatted in short notation (1k, 1M, 1B, …).
+     */
+    boolean isShortFormat();
+
+    /**
+     * Returns {@code true} if trailing zeros after the decimal point should be stripped.
+     */
+    boolean isTrimZeros();
+
+    /**
+     * Returns the physical withdraw-item configuration for this currency, or {@code null}
+     * if this currency has no physical form (i.e., it cannot be withdrawn as an item).
+     *
+     * @see XPrisonCurrencyItemConfig
+     */
+    default XPrisonCurrencyItemConfig getItemConfig() {
+        return null;
+    }
 
     /**
      * Retrieves the custom {@link XPrisonCurrencyHandler} responsible for managing balance operations

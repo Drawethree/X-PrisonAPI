@@ -4,6 +4,7 @@ import dev.drawethree.xprison.api.pickaxeskins.model.PickaxeSkin;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -52,4 +53,19 @@ public interface XPrisonPickaxeSkinsAPI {
 	 * @param skin the PickaxeSkin to apply to the item
 	 */
 	void setPickaxeSkin(Player player, ItemStack item, PickaxeSkin skin);
+
+	/**
+	 * Removes the skin from the given item, reverting it to its default appearance.
+	 *
+	 * @param player the player owning the item
+	 * @param item   the ItemStack to remove the skin from
+	 */
+	void removePickaxeSkin(Player player, ItemStack item);
+
+	/**
+	 * Returns all registered pickaxe skins.
+	 *
+	 * @return collection of all available skins
+	 */
+	Collection<PickaxeSkin> getAllSkins();
 }

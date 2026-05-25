@@ -2,8 +2,12 @@ package dev.drawethree.xprison.api.prestiges;
 
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -90,4 +94,38 @@ public interface XPrisonPrestigesAPI {
 	 * @return ordered map of UUID → prestige ID
 	 */
 	Map<UUID, Long> getTopByPrestige(int limit);
+
+	/**
+	 * Returns all configured prestiges in ascending order.
+	 * For servers using unlimited prestiges, returns an empty list.
+	 *
+	 * @return ordered list of all defined prestiges
+	 */
+	@NotNull
+	List<Prestige> getAllPrestiges();
+
+	/**
+	 * Returns the maximum prestige configured on this server.
+	 * Returns {@code null} on servers using unlimited prestiges.
+	 *
+	 * @return the max prestige, or {@code null} if not applicable
+	 */
+	@Nullable
+	Prestige getMaxPrestige();
+
+	/**
+	 * Gets the next prestige a player can achieve.
+	 *
+	 * @param player the player whose next prestige is requested
+	 * @return an Optional containing the next Prestige, or empty if the player has the max prestige
+	 */
+	Optional<Prestige> getNextPlayerPrestige(Player player);
+
+	/**
+	 * Returns all player UUIDs stored in the prestiges database.
+	 *
+	 * @return list of all UUIDs that have a row in the prestiges table
+	 */
+	@NotNull
+	List<UUID> getAllPlayerUUIDs();
 }

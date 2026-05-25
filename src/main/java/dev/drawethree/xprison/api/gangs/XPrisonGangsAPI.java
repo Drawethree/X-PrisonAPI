@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -62,4 +63,48 @@ public interface XPrisonGangsAPI {
 	 * @return a {@link GangNameCheckResult} indicating if the name is valid or why it is not
 	 */
 	GangNameCheckResult checkGangName(String name);
+
+	/**
+	 * Returns the top N gangs by value, ordered descending.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return ordered map of gang name → gang value
+	 */
+	LinkedHashMap<String, Long> getTopGangsByValue(int limit);
+
+	/**
+	 * Kicks a player from a gang.
+	 * Has no effect if the player is not in the gang.
+	 *
+	 * @param gang   the gang to kick the player from
+	 * @param player the player to kick
+	 */
+	void kickPlayerFromGang(Gang gang, OfflinePlayer player);
+
+	/**
+	 * Transfers gang ownership to a new owner.
+	 * The new owner must already be a member of the gang.
+	 *
+	 * @param gang     the gang whose ownership is being transferred
+	 * @param newOwner the player to become the new owner
+	 * @return {@code true} if the transfer succeeded; {@code false} if the player is not a member
+	 */
+	boolean transferGangOwnership(Gang gang, OfflinePlayer newOwner);
+
+	/**
+	 * Sets the gang's value to a specific amount and persists the change.
+	 *
+	 * @param gang  the gang to update
+	 * @param value the new value (must be ≥ 0)
+	 */
+	void setGangValue(Gang gang, long value);
+
+	/**
+	 * Adds to the gang's value and persists the change.
+	 * Use a negative delta to subtract value.
+	 *
+	 * @param gang  the gang to update
+	 * @param delta the amount to add (may be negative)
+	 */
+	void addGangValue(Gang gang, long delta);
 }
