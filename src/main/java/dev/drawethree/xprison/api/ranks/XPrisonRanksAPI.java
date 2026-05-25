@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.ranks;
 import dev.drawethree.xprison.api.ranks.model.Rank;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -88,4 +89,12 @@ public interface XPrisonRanksAPI {
 	 * @return ordered map of UUID → rank ID
 	 */
 	Map<UUID, Integer> getTopByRank(int limit);
+
+	/**
+	 * Returns all player UUIDs stored in the ranks database.
+	 * Intended for bulk operations such as populating an external player index.
+	 *
+	 * @return list of all UUIDs that have a row in the ranks table
+	 */
+	List<UUID> getAllPlayerUUIDs();
 }
