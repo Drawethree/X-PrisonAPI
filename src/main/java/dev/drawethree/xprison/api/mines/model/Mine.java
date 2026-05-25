@@ -119,6 +119,18 @@ public interface Mine {
     void handleBlockBreak(List<Block> blocks, boolean setBlocksToAir);
 
     /**
+     * Handles breaking of blocks inside a mine. This method is the lighter way to handle blocks being destroyed in the mine by an enchant
+     * @param blockCount The amount of blocks broken
+     */
+    void handleBlockBreak(int blockCount);
+
+    /**
+     * Update the amount of blocks remaining inside the mine.
+     * @param currentBlocks The new amount of blocks remaining in the mine
+     */
+    void setCurrentBlocks(int currentBlocks);
+
+    /**
      * Gets the active potion effects applied to players in this mine.
      * The map key is the potion effect type name (e.g. "SPEED", "HASTE") and
      * the value is the amplifier level (1-based, so 1 = level I).
