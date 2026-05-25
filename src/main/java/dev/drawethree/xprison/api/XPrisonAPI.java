@@ -18,6 +18,7 @@ import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -197,6 +198,30 @@ public interface XPrisonAPI {
      * @param name the addon's display name (case-insensitive)
      */
     void disableAddon(@NotNull String name);
+
+    /**
+     * Loads an addon JAR from the X-Prison addons folder at runtime.
+     * The addon's {@code onEnable()} is called immediately if loading succeeds.
+     *
+     * @param filename the JAR filename (e.g. {@code "MyAddon.jar"}); must exist in the addons folder
+     * @return {@code true} if the addon was loaded and enabled successfully
+     */
+    boolean loadAddonFromFile(String filename);
+
+    /**
+     * Registers the publicly accessible URL of the Dashboard addon.
+     * Called by the Dashboard addon on enable; pass {@code null} on disable.
+     *
+     * @param url the publicly accessible URL, or {@code null} to clear
+     */
+    void setDashboardUrl(@Nullable String url);
+
+    /**
+     * Returns the URL registered by the Dashboard addon, or {@code null} if the addon
+     * is not currently running.
+     */
+    @Nullable
+    String getDashboardUrl();
 
     /**
      * Gets the singleton instance of the XPrisonAPI.
