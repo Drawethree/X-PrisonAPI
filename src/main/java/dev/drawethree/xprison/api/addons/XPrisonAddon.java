@@ -15,6 +15,9 @@ package dev.drawethree.xprison.api.addons;
  *   <li>{@code X-Prison-Addon-Author} — author name</li>
  *   <li>{@code X-Prison-Addon-Description} — short description</li>
  *   <li>{@code X-Prison-Min-Version} — minimum X-Prison version required (e.g. {@code 2026.2.0}), optional</li>
+ *   <li>{@code X-Prison-Priority} — load order priority (integer, default {@code 50}); lower values load first, optional</li>
+ *   <li>{@code X-Prison-Depends} — comma-separated list of addon names this addon depends on; they are guaranteed
+ *       to be loaded before this addon (e.g. {@code MyCore, MyEconomy}), optional</li>
  * </ul>
  * </p>
  */
