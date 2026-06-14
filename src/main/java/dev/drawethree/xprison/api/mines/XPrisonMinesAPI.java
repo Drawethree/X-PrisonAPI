@@ -75,4 +75,24 @@ public interface XPrisonMinesAPI {
 	 * @return collection of mines in that world
 	 */
 	Collection<Mine> getMinesInWorld(World world);
+
+	/**
+	 * Renames a mine and persists the change.
+	 *
+	 * @param mine    the mine to rename
+	 * @param newName the new name (must be non-blank and not already in use)
+	 * @return {@code true} if the mine was renamed; {@code false} if the name was invalid or taken
+	 */
+	boolean renameMine(Mine mine, String newName);
+
+	/**
+	 * Sets the timed-reset interval for a mine and persists the change.
+	 * <p>
+	 * The interval is stored at whole-minute granularity, so the supplied seconds are rounded down to
+	 * the nearest minute (minimum one minute).
+	 *
+	 * @param mine    the mine to update
+	 * @param seconds the new reset interval, in seconds
+	 */
+	void setMineResetInterval(Mine mine, int seconds);
 }

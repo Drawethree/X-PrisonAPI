@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.prestiges;
 
 import dev.drawethree.xprison.api.prestiges.model.Prestige;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * API interface for handling prestige-related operations in XPrison.
@@ -128,4 +130,40 @@ public interface XPrisonPrestigesAPI {
 	 */
 	@NotNull
 	List<UUID> getAllPlayerUUIDs();
+
+	/**
+	 * Paginated variant of {@link #getTopByPrestige(int)}.
+	 * <p>
+	 * The default implementation over-fetches and slices the ordered result client-side.
+	 *
+	 * @param limit  maximum number of entries to return
+	 * @param offset number of leading entries to skip (0 = start from top)
+	 * @return ordered map of UUID → prestige ID
+	 */
+	@NotNull
+	default Map<UUID, Long> getTopByPrestige(int limit, int offset) {
+		return Pagination.slice(getTopByPrestige(limit + Math.max(offset, 0)), limit, offset);
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getTopByPrestige(int)} that runs the query off the server thread.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return a future completing with the ordered map of UUID → prestige ID
+	 */
+	@NotNull
+	default CompletableFuture<Map<UUID, Long>> getTopByPrestigeAsync(int limit) {
+		return CompletableFuture.supplyAsync(() -> getTopByPrestige(limit));
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getPlayerPrestigeOffline(UUID)} that runs the query off the server thread.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return a future completing with the player's prestige, or {@code null} if not found
+	 */
+	@NotNull
+	default CompletableFuture<Prestige> getPlayerPrestigeOfflineAsync(UUID playerUuid) {
+		return CompletableFuture.supplyAsync(() -> getPlayerPrestigeOffline(playerUuid));
+	}
 }

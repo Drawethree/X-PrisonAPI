@@ -3,12 +3,15 @@ package dev.drawethree.xprison.api.gangs;
 import dev.drawethree.xprison.api.gangs.enums.GangCreateResult;
 import dev.drawethree.xprison.api.gangs.enums.GangNameCheckResult;
 import dev.drawethree.xprison.api.gangs.model.Gang;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * API for interacting with the Gangs system in the XPrison plugin.
@@ -107,4 +110,29 @@ public interface XPrisonGangsAPI {
 	 * @param delta the amount to add (may be negative)
 	 */
 	void addGangValue(Gang gang, long delta);
+
+	/**
+	 * Paginated variant of {@link #getTopGangsByValue(int)}.
+	 * <p>
+	 * The default implementation over-fetches and slices the ordered result client-side.
+	 *
+	 * @param limit  maximum number of entries to return
+	 * @param offset number of leading entries to skip (0 = start from top)
+	 * @return ordered map of gang name → gang value
+	 */
+	@NotNull
+	default LinkedHashMap<String, Long> getTopGangsByValue(int limit, int offset) {
+		return new LinkedHashMap<>(Pagination.slice(getTopGangsByValue(limit + Math.max(offset, 0)), limit, offset));
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getTopGangsByValue(int)} that runs the query off the server thread.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return a future completing with the ordered map of gang name → gang value
+	 */
+	@NotNull
+	default CompletableFuture<LinkedHashMap<String, Long>> getTopGangsByValueAsync(int limit) {
+		return CompletableFuture.supplyAsync(() -> getTopGangsByValue(limit));
+	}
 }

@@ -68,4 +68,17 @@ public interface XPrisonPickaxeSkinsAPI {
 	 * @return collection of all available skins
 	 */
 	Collection<PickaxeSkin> getAllSkins();
+
+	/**
+	 * Convenience accessor for the skin currently applied to the pickaxe the player is holding.
+	 * <p>
+	 * Equivalent to {@link #getPickaxeSkin(Player)}; provided for readability at call sites that
+	 * want the "active" skin semantics.
+	 *
+	 * @param player the player whose held pickaxe will be checked
+	 * @return an {@link Optional} containing the active PickaxeSkin if found; otherwise, empty
+	 */
+	default Optional<PickaxeSkin> getActiveSkin(Player player) {
+		return getPickaxeSkin(player);
+	}
 }

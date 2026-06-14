@@ -65,6 +65,20 @@ public interface XPrisonEnchantsAPI {
     long getAmountOfActivations(ItemStack item, XPrisonEnchantment enchantment);
 
 	/**
+	 * Sets the number of activations recorded for a specific enchantment on the given item.
+	 * <p>
+	 * Counterpart to {@link #getAmountOfActivations(ItemStack, XPrisonEnchantment)}; useful for
+	 * migrations or admin tooling. A value of {@code 0} clears the stored activation count.
+	 *
+	 * @param player      The player owning the item (used for lore refresh).
+	 * @param item        The item to modify.
+	 * @param enchantment The enchantment whose activation count is being set.
+	 * @param amount      The new activation count (clamped at 0).
+	 * @return The modified {@link ItemStack}.
+	 */
+	ItemStack setAmountOfActivations(Player player, ItemStack item, XPrisonEnchantment enchantment, long amount);
+
+	/**
 	 * Sets or updates a specific enchantment with a defined level on an item.
 	 *
 	 * @param player      The player applying the enchantment.

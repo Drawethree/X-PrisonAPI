@@ -1,7 +1,9 @@
 package dev.drawethree.xprison.api.autominer;
 
 import dev.drawethree.xprison.api.autominer.model.AutoMinerRegion;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -76,4 +78,18 @@ public interface XPrisonAutoMinerAPI {
      * @return ordered map of UUID → remaining seconds
      */
     Map<UUID, Integer> getTopByAutoMinerTime(int limit);
+
+    /**
+     * Paginated variant of {@link #getTopByAutoMinerTime(int)}.
+     * <p>
+     * The default implementation over-fetches and slices the ordered result client-side.
+     *
+     * @param limit  maximum number of entries to return
+     * @param offset number of leading entries to skip (0 = start from top)
+     * @return ordered map of UUID → remaining seconds
+     */
+    @NotNull
+    default Map<UUID, Integer> getTopByAutoMinerTime(int limit, int offset) {
+        return Pagination.slice(getTopByAutoMinerTime(limit + Math.max(offset, 0)), limit, offset);
+    }
 }

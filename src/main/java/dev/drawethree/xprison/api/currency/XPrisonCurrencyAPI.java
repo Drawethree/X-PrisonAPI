@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.currency;
 
 import dev.drawethree.xprison.api.currency.enums.LostCause;
 import dev.drawethree.xprison.api.currency.enums.ReceiveCause;
+import dev.drawethree.xprison.api.currency.enums.TransactionStatus;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface XPrisonCurrencyAPI {
 
@@ -162,4 +164,102 @@ public interface XPrisonCurrencyAPI {
      * @return {@code true} if the transfer succeeded; {@code false} if the source had insufficient funds or currency not found
      */
     boolean transferBalance(OfflinePlayer from, OfflinePlayer to, String currencyName, double amount);
+
+    // ------------------------------------------------------------------
+    // Richer-return variants (status-aware). These mirror the boolean
+    // methods above but report exactly why an operation succeeded/failed.
+    // ------------------------------------------------------------------
+
+    /**
+     * Adds currency to a player and reports the outcome.
+     *
+     * @param player       the player to add currency to
+     * @param currencyName the currency to add
+     * @param amount       the amount to add (must be positive and finite)
+     * @param receiveCause the reason for receiving the currency
+     * @return the {@link TransactionStatus} describing the outcome
+     */
+    @NotNull
+    TransactionStatus tryAddBalance(OfflinePlayer player, String currencyName, double amount, ReceiveCause receiveCause);
+
+    /**
+     * Removes currency from a player and reports the outcome.
+     *
+     * @param player       the player to remove currency from
+     * @param currencyName the currency to remove
+     * @param amount       the amount to remove (must be positive and finite)
+     * @param lostCause    the reason for removing the currency
+     * @return the {@link TransactionStatus} describing the outcome
+     *         ({@link TransactionStatus#INSUFFICIENT_FUNDS} if the player lacks the balance)
+     */
+    @NotNull
+    TransactionStatus tryRemoveBalance(OfflinePlayer player, String currencyName, double amount, LostCause lostCause);
+
+    /**
+     * Transfers currency between two players and reports the outcome.
+     *
+     * @param from         the player sending the currency
+     * @param to           the player receiving the currency
+     * @param currencyName the currency to transfer
+     * @param amount       the amount to transfer (must be positive and finite)
+     * @return the {@link TransactionStatus} describing the outcome
+     */
+    @NotNull
+    TransactionStatus tryTransferBalance(OfflinePlayer from, OfflinePlayer to, String currencyName, double amount);
+
+    /**
+     * Adds the same amount of currency to many players in one call.
+     * Useful for payouts and reward distribution without issuing N separate calls.
+     *
+     * @param players      the players to credit
+     * @param currencyName the currency to add
+     * @param amount       the amount to add to each player
+     * @param receiveCause the reason for receiving the currency
+     * @return a map of each player UUID to the {@link TransactionStatus} of their individual operation
+     */
+    @NotNull
+    Map<UUID, TransactionStatus> addBalanceBulk(Collection<OfflinePlayer> players, String currencyName, double amount, ReceiveCause receiveCause);
+
+    // ------------------------------------------------------------------
+    // Async (non-blocking) read variants. Default implementations run the
+    // corresponding synchronous read on the common pool so callers never
+    // block the server thread on a database query.
+    // ------------------------------------------------------------------
+
+    /**
+     * Asynchronous variant of {@link #getBalance(OfflinePlayer, String)}.
+     *
+     * @param player       the player whose balance to retrieve
+     * @param currencyName the currency to check
+     * @return a future completing with the player's balance
+     */
+    @NotNull
+    default CompletableFuture<Double> getBalanceAsync(OfflinePlayer player, String currencyName) {
+        return CompletableFuture.supplyAsync(() -> getBalance(player, currencyName));
+    }
+
+    /**
+     * Asynchronous variant of {@link #getTopByBalance(String, int)}.
+     *
+     * @param currencyName the currency name
+     * @param limit        maximum number of entries to return
+     * @return a future completing with the ordered map of UUID → balance
+     */
+    @NotNull
+    default CompletableFuture<Map<UUID, Double>> getTopByBalanceAsync(String currencyName, int limit) {
+        return CompletableFuture.supplyAsync(() -> getTopByBalance(currencyName, limit));
+    }
+
+    /**
+     * Asynchronous variant of {@link #getTopByBalance(String, int, int)}.
+     *
+     * @param currencyName the currency name
+     * @param limit        maximum number of entries to return
+     * @param offset       number of entries to skip (0 = start from top)
+     * @return a future completing with the ordered map of UUID → balance
+     */
+    @NotNull
+    default CompletableFuture<Map<UUID, Double>> getTopByBalanceAsync(String currencyName, int limit, int offset) {
+        return CompletableFuture.supplyAsync(() -> getTopByBalance(currencyName, limit, offset));
+    }
 }

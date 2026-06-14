@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.rebirth;
 
 import dev.drawethree.xprison.api.rebirth.model.Rebirth;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * API interface for interacting with the XPrison Rebirth system.
@@ -118,4 +120,40 @@ public interface XPrisonRebirthAPI {
 	 */
 	@NotNull
 	List<UUID> getAllPlayerUUIDs();
+
+	/**
+	 * Paginated variant of {@link #getTopByRebirth(int)}.
+	 * <p>
+	 * The default implementation over-fetches and slices the ordered result client-side.
+	 *
+	 * @param limit  maximum number of entries to return
+	 * @param offset number of leading entries to skip (0 = start from top)
+	 * @return ordered map of UUID → rebirth ID
+	 */
+	@NotNull
+	default Map<UUID, Integer> getTopByRebirth(int limit, int offset) {
+		return Pagination.slice(getTopByRebirth(limit + Math.max(offset, 0)), limit, offset);
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getTopByRebirth(int)} that runs the query off the server thread.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return a future completing with the ordered map of UUID → rebirth ID
+	 */
+	@NotNull
+	default CompletableFuture<Map<UUID, Integer>> getTopByRebirthAsync(int limit) {
+		return CompletableFuture.supplyAsync(() -> getTopByRebirth(limit));
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getPlayerRebirthOffline(UUID)} that runs the query off the server thread.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return a future completing with the player's rebirth, or {@code null} if not found
+	 */
+	@NotNull
+	default CompletableFuture<Rebirth> getPlayerRebirthOfflineAsync(UUID playerUuid) {
+		return CompletableFuture.supplyAsync(() -> getPlayerRebirthOffline(playerUuid));
+	}
 }

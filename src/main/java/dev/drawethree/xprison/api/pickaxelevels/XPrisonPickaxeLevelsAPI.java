@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.pickaxelevels;
 
 import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeLevel;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -91,5 +92,19 @@ public interface XPrisonPickaxeLevelsAPI {
 	 */
 	@NotNull
 	Map<UUID, Integer> getTopByPickaxeLevel(int limit);
+
+	/**
+	 * Paginated variant of {@link #getTopByPickaxeLevel(int)}.
+	 * <p>
+	 * The default implementation over-fetches and slices the ordered result client-side.
+	 *
+	 * @param limit  maximum number of entries to return
+	 * @param offset number of leading entries to skip (0 = start from top)
+	 * @return ordered map of UUID → pickaxe level number
+	 */
+	@NotNull
+	default Map<UUID, Integer> getTopByPickaxeLevel(int limit, int offset) {
+		return Pagination.slice(getTopByPickaxeLevel(limit + Math.max(offset, 0)), limit, offset);
+	}
 
 }

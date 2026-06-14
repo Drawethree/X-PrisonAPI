@@ -6,6 +6,7 @@ import dev.drawethree.xprison.api.multipliers.model.PlayerMultiplier;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -77,5 +78,44 @@ public interface XPrisonMultipliersAPI {
 	 * @return collection of active player multipliers
 	 */
 	Collection<PlayerMultiplier> getActivePlayerMultipliers(XPrisonCurrency currency);
+
+	/**
+	 * Returns the number of seconds remaining on the global multiplier for the given currency.
+	 *
+	 * @param currency the currency to check
+	 * @return remaining seconds, or {@code 0} if the multiplier is inactive or has no end time
+	 */
+	default long getGlobalMultiplierRemainingSeconds(XPrisonCurrency currency) {
+		return remainingSeconds(getGlobalMultiplier(currency));
+	}
+
+	/**
+	 * Returns the number of seconds remaining on the player's personal multiplier for the given currency.
+	 *
+	 * @param player   the player to check
+	 * @param currency the currency to check
+	 * @return remaining seconds, or {@code 0} if the multiplier is inactive or has no end time
+	 */
+	default long getPlayerMultiplierRemainingSeconds(Player player, XPrisonCurrency currency) {
+		return remainingSeconds(getPlayerMultiplier(player, currency));
+	}
+
+	/**
+	 * Computes whole seconds remaining until a multiplier's end date.
+	 *
+	 * @param multiplier the multiplier (may be {@code null})
+	 * @return remaining seconds, clamped to {@code 0}
+	 */
+	static long remainingSeconds(Multiplier multiplier) {
+		if (multiplier == null || !multiplier.isActive()) {
+			return 0L;
+		}
+		Date endDate = multiplier.getEndDate();
+		if (endDate == null) {
+			return 0L;
+		}
+		long millis = endDate.getTime() - System.currentTimeMillis();
+		return millis <= 0 ? 0L : millis / 1000L;
+	}
 
 }

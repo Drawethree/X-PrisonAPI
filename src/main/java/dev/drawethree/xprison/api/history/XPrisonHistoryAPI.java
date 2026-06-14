@@ -3,8 +3,10 @@ package dev.drawethree.xprison.api.history;
 import dev.drawethree.xprison.api.XPrisonModule;
 import dev.drawethree.xprison.api.history.model.HistoryLine;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * API for interacting with player history within the XPrison plugin.
@@ -57,4 +59,28 @@ public interface XPrisonHistoryAPI {
 	 * @return total history entry count
 	 */
 	int getPlayerHistoryCount(OfflinePlayer player);
+
+	/**
+	 * Asynchronous variant of {@link #getPlayerHistory(OfflinePlayer)} that runs the query off the server thread.
+	 *
+	 * @param player the player whose history is requested
+	 * @return a future completing with the player's full history
+	 */
+	@NotNull
+	default CompletableFuture<Collection<HistoryLine>> getPlayerHistoryAsync(OfflinePlayer player) {
+		return CompletableFuture.supplyAsync(() -> getPlayerHistory(player));
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getPlayerHistory(OfflinePlayer, int, int)} that runs the query off the server thread.
+	 *
+	 * @param player   the player whose history is requested
+	 * @param page     1-based page number
+	 * @param pageSize number of entries per page
+	 * @return a future completing with the requested page of history lines
+	 */
+	@NotNull
+	default CompletableFuture<Collection<HistoryLine>> getPlayerHistoryAsync(OfflinePlayer player, int page, int pageSize) {
+		return CompletableFuture.supplyAsync(() -> getPlayerHistory(player, page, pageSize));
+	}
 }

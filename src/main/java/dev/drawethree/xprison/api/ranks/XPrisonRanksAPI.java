@@ -1,12 +1,14 @@
 package dev.drawethree.xprison.api.ranks;
 
 import dev.drawethree.xprison.api.ranks.model.Rank;
+import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,4 +125,40 @@ public interface XPrisonRanksAPI {
 	 */
 	@Nullable
 	Rank getDefaultRank();
+
+	/**
+	 * Paginated variant of {@link #getTopByRank(int)}.
+	 * <p>
+	 * The default implementation over-fetches and slices the ordered result client-side.
+	 *
+	 * @param limit  maximum number of entries to return
+	 * @param offset number of leading entries to skip (0 = start from top)
+	 * @return ordered map of UUID → rank ID
+	 */
+	@NotNull
+	default Map<UUID, Integer> getTopByRank(int limit, int offset) {
+		return Pagination.slice(getTopByRank(limit + Math.max(offset, 0)), limit, offset);
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getTopByRank(int)} that runs the query off the server thread.
+	 *
+	 * @param limit maximum number of entries to return
+	 * @return a future completing with the ordered map of UUID → rank ID
+	 */
+	@NotNull
+	default CompletableFuture<Map<UUID, Integer>> getTopByRankAsync(int limit) {
+		return CompletableFuture.supplyAsync(() -> getTopByRank(limit));
+	}
+
+	/**
+	 * Asynchronous variant of {@link #getPlayerRankOffline(UUID)} that runs the query off the server thread.
+	 *
+	 * @param playerUuid the UUID of the player
+	 * @return a future completing with the player's rank, or {@code null} if not found
+	 */
+	@NotNull
+	default CompletableFuture<Rank> getPlayerRankOfflineAsync(UUID playerUuid) {
+		return CompletableFuture.supplyAsync(() -> getPlayerRankOffline(playerUuid));
+	}
 }
