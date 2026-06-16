@@ -72,6 +72,47 @@ public interface XPrisonAutoMinerAPI {
     void removeAutoMinerTime(Player player, int seconds);
 
     /**
+     * Gets the player's current AutoMiner tier (1-based).
+     *
+     * @param player the online player
+     * @return the current tier number
+     */
+    int getTier(Player player);
+
+    /**
+     * Sets the player's AutoMiner tier (clamped to a minimum of 1).
+     *
+     * @param player the online player
+     * @param tier   the new tier number
+     */
+    void setTier(Player player, int tier);
+
+    /**
+     * Gets the lifetime amount of blocks this player's AutoMiner has mined.
+     *
+     * @param player the online player
+     * @return total blocks mined
+     */
+    long getBlocksMined(Player player);
+
+    /**
+     * Gets the lifetime amount of currency this player's AutoMiner has earned.
+     *
+     * @param player the online player
+     * @return total currency earned
+     */
+    double getMoneyEarned(Player player);
+
+    /**
+     * Estimates the average income a single reward cycle would produce for the
+     * player at their current tier inside the region they are standing in.
+     *
+     * @param player the online player
+     * @return estimated income per cycle, or 0 if not currently computable
+     */
+    double getEstimatedIncomePerCycle(Player player);
+
+    /**
      * Returns the top N players by remaining AutoMiner time, ordered descending.
      *
      * @param limit maximum number of entries to return
