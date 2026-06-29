@@ -3,7 +3,9 @@ package dev.drawethree.xprison.api;
 import dev.drawethree.xprison.api.addons.XPrisonAddonInfo;
 import dev.drawethree.xprison.api.autominer.XPrisonAutoMinerAPI;
 import dev.drawethree.xprison.api.autosell.XPrisonAutoSellAPI;
+import dev.drawethree.xprison.api.battlepass.XPrisonBattlePassAPI;
 import dev.drawethree.xprison.api.blocks.XPrisonBlocksAPI;
+import dev.drawethree.xprison.api.dailyrewards.XPrisonDailyRewardsAPI;
 import dev.drawethree.xprison.api.bombs.XPrisonBombsAPI;
 import dev.drawethree.xprison.api.currency.XPrisonCurrencyAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
@@ -15,6 +17,7 @@ import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
 import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
+import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import org.jetbrains.annotations.NotNull;
@@ -154,6 +157,30 @@ public interface XPrisonAPI {
 	 */
 	@NotNull
 	XPrisonBlocksAPI getBlocksApi();
+
+    /**
+     * Gets the Battle Pass module API.
+     *
+     * @return the Battle Pass API instance
+     */
+    @NotNull
+    XPrisonBattlePassAPI getBattlePassApi();
+
+    /**
+     * Gets the Quests module API.
+     *
+     * @return the Quests API instance
+     */
+    @NotNull
+    XPrisonQuestsAPI getQuestsApi();
+
+    /**
+     * Gets the Daily Rewards module API.
+     *
+     * @return the Daily Rewards API instance
+     */
+    @NotNull
+    XPrisonDailyRewardsAPI getDailyRewardsApi();
 
     /**
      * Returns all registered modules with their current enabled state.
