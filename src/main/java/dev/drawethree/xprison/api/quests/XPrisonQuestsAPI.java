@@ -72,4 +72,66 @@ public interface XPrisonQuestsAPI {
 	 * @param playerUuid the player's unique id
 	 */
 	void rerollDaily(@NotNull UUID playerUuid);
+
+	// ---------------------------------------------------------------------
+	// Administration (config + offline-capable player data management)
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Reloads the Quests configuration from {@code quests.yml} and re-applies it to online
+	 * players. Use after editing the config file externally (e.g. from the web dashboard).
+	 */
+	void reloadConfig();
+
+	/**
+	 * Gets all of the player's active quests across every category. Works for offline players
+	 * (loaded from storage without re-rolling or persisting).
+	 *
+	 * @param playerUuid the player's unique id
+	 * @return an immutable list of the player's active quests
+	 */
+	@NotNull
+	List<ActiveQuest> getActiveQuests(@NotNull UUID playerUuid);
+
+	/**
+	 * Sets the player's absolute progress on a specific quest (clamped to the quest's target).
+	 * Works for offline players. Has no effect if the quest is not assigned to the player.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param questId    the quest id
+	 * @param progress   the absolute progress value to set
+	 */
+	void setProgress(@NotNull UUID playerUuid, @NotNull String questId, long progress);
+
+	/**
+	 * Sets the claimed flag on a specific quest for the player. Works for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param questId    the quest id
+	 * @param claimed    whether the quest's reward should be marked claimed
+	 */
+	void setClaimed(@NotNull UUID playerUuid, @NotNull String questId, boolean claimed);
+
+	/**
+	 * Rerolls the player's quests for a category, assigning a fresh random selection. Works for
+	 * offline players (their reroll is applied to storage and surfaces on next login).
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param category   the category to reroll
+	 */
+	void reroll(@NotNull UUID playerUuid, @NotNull QuestCategory category);
+
+	/**
+	 * Deletes all of the player's stored quest progress. Works for offline players. The player
+	 * receives a fresh assignment on next login.
+	 *
+	 * @param playerUuid the player's unique id
+	 */
+	void resetPlayer(@NotNull UUID playerUuid);
+
+	/**
+	 * Deletes every player's stored quest progress (administrative bulk reset). Online players
+	 * are re-assigned a fresh set immediately.
+	 */
+	void resetAllPlayers();
 }

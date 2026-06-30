@@ -49,5 +49,27 @@ public enum QuestType {
 	/**
 	 * Perform a number of auto-miner cycles.
 	 */
-	AUTOMINE
+	AUTOMINE,
+
+	/**
+	 * Sell a number of items (via auto-sell or {@code /sellall}).
+	 */
+	SELL_BLOCKS,
+
+	/**
+	 * Accumulate a number of minutes of online play time.
+	 */
+	PLAYTIME,
+
+	/**
+	 * Reach a currency balance (optionally filtered to one currency by name). Tracks the
+	 * highest balance reached rather than a running total.
+	 */
+	REACH_BALANCE,
+
+	/**
+	 * Mine a number of a specific block type, narrowed with a filter naming the material
+	 * (e.g. {@code filter: EMERALD_ORE}).
+	 */
+	MINE_SPECIFIC
 }

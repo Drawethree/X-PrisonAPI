@@ -53,4 +53,47 @@ public interface XPrisonDailyRewardsAPI {
 	 * @return {@code true} if a reward was claimed
 	 */
 	boolean claim(@NotNull UUID playerUuid);
+
+	// ---------------------------------------------------------------------
+	// Administration (config + offline-capable player data)
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Reloads the Daily Rewards configuration from {@code dailyrewards.yml}. Use after editing
+	 * the config externally (e.g. from the web dashboard).
+	 */
+	void reloadConfig();
+
+	/**
+	 * Sets a player's current consecutive-day streak (clamped to {@code >= 0}). Works for
+	 * offline players. The longest streak is raised to match if exceeded.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param streak     the streak value to set
+	 */
+	void setStreak(@NotNull UUID playerUuid, int streak);
+
+	/**
+	 * Sets a player's longest-ever streak (clamped to {@code >= 0}). Works for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param streak     the longest-streak value to set
+	 */
+	void setLongestStreak(@NotNull UUID playerUuid, int streak);
+
+	/**
+	 * Sets a player's lifetime claim count (clamped to {@code >= 0}). Works for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param total      the total-claims value to set
+	 */
+	void setTotalClaims(@NotNull UUID playerUuid, long total);
+
+	/**
+	 * Clears a player's streak state (streak, longest, total and last-claim), making a claim
+	 * available again. Works for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 */
+	void resetPlayer(@NotNull UUID playerUuid);
 }

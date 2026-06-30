@@ -84,4 +84,39 @@ public interface XPrisonBattlePassAPI {
 	 * @param premium    {@code true} to grant premium access, {@code false} to revoke it
 	 */
 	void setPremium(@NotNull UUID playerUuid, boolean premium);
+
+	// ---------------------------------------------------------------------
+	// Administration (config + season + offline-capable player data)
+	// ---------------------------------------------------------------------
+
+	/**
+	 * Reloads the Battle Pass configuration from {@code battlepass.yml} and re-applies it to
+	 * online players. Use after editing the config externally (e.g. from the web dashboard).
+	 */
+	void reloadConfig();
+
+	/**
+	 * Switches to a new season by id: persists it, rebuilds tiers and reloads online players.
+	 * Previous-season data remains archived in storage.
+	 *
+	 * @param seasonId the new season id
+	 */
+	void startNewSeason(@NotNull String seasonId);
+
+	/**
+	 * Sets a player's absolute season XP (clamped to {@code >= 0}), recomputing their tier.
+	 * Works for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 * @param xp         the absolute XP value to set
+	 */
+	void setXp(@NotNull UUID playerUuid, long xp);
+
+	/**
+	 * Clears a player's progress for the current season (XP, tier, premium and claims). Works
+	 * for offline players.
+	 *
+	 * @param playerUuid the player's unique id
+	 */
+	void resetPlayer(@NotNull UUID playerUuid);
 }

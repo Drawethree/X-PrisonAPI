@@ -21,6 +21,15 @@ public interface ActiveQuest {
 	long getProgress();
 
 	/**
+	 * Gets the player's effective target for this quest — the configured base target after any
+	 * per-player scaling has been applied. Equal to {@link Quest#getTargetAmount()} when the
+	 * quest is not scaled.
+	 *
+	 * @return the effective (scaled) target this player must reach
+	 */
+	long getEffectiveTarget();
+
+	/**
 	 * Checks whether the target has been reached.
 	 *
 	 * @return {@code true} if the quest is completed
