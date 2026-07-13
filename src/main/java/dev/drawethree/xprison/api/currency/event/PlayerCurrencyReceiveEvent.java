@@ -3,17 +3,21 @@ package dev.drawethree.xprison.api.currency.event;
 import dev.drawethree.xprison.api.currency.enums.ReceiveCause;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+import java.math.BigDecimal;
+
 /**
  * Called when a player is about to receive currency.
  * <p>
  * This event is {@link Cancellable}, allowing plugins to prevent the player from receiving the currency.
- * You can also modify the amount to be received via {@link #setAmount(double)}.
+ * You can also modify the amount to be received via {@link #setAmount(double)} or, for OP-scale exact
+ * amounts, {@link #setAmountExact(BigDecimal)}.
  */
 @Getter
 public final class PlayerCurrencyReceiveEvent extends XPrisonPlayerEvent implements Cancellable {
@@ -31,11 +35,11 @@ public final class PlayerCurrencyReceiveEvent extends XPrisonPlayerEvent impleme
 	private final ReceiveCause cause;
 
 	/**
-	 * The amount of currency the player will receive.
-	 * Can be modified using {@link #setAmount(double)}.
+	 * The exact amount of currency the player will receive (source of truth).
+	 * Can be modified using {@link #setAmount(double)} or {@link #setAmountExact(BigDecimal)}.
 	 */
-	@Setter
-	private double amount;
+	@Getter(AccessLevel.NONE)
+	private BigDecimal amount;
 
 	/**
 	 * Whether the event is cancelled.
@@ -53,9 +57,54 @@ public final class PlayerCurrencyReceiveEvent extends XPrisonPlayerEvent impleme
 	 * @param amount the amount of currency to be received
 	 */
 	public PlayerCurrencyReceiveEvent(XPrisonCurrency currency, ReceiveCause cause, OfflinePlayer player, double amount) {
+		this(currency, cause, player, CurrencyAmounts.exact(amount));
+	}
+
+	/**
+	 * Constructs a new {@link PlayerCurrencyReceiveEvent} with an exact amount.
+	 *
+	 * @param currency the {@link XPrisonCurrency}
+	 * @param cause  the {@link ReceiveCause} indicating why the currency is being granted
+	 * @param player the {@link OfflinePlayer} receiving the currency
+	 * @param amount the exact amount of currency to be received
+	 */
+	public PlayerCurrencyReceiveEvent(XPrisonCurrency currency, ReceiveCause cause, OfflinePlayer player, BigDecimal amount) {
 		super(player);
 		this.currency = currency;
 		this.cause = cause;
+		this.amount = amount;
+	}
+
+	/**
+	 * @return the amount the player will receive (loses precision above 2^53; prefer
+	 *         {@link #getAmountExact()})
+	 */
+	public double getAmount() {
+		return amount.doubleValue();
+	}
+
+	/**
+	 * @return the exact amount the player will receive
+	 */
+	public BigDecimal getAmountExact() {
+		return amount;
+	}
+
+	/**
+	 * Sets the amount the player will receive.
+	 *
+	 * @param amount the new amount
+	 */
+	public void setAmount(double amount) {
+		this.amount = CurrencyAmounts.exact(amount);
+	}
+
+	/**
+	 * Sets the exact amount the player will receive.
+	 *
+	 * @param amount the new exact amount
+	 */
+	public void setAmountExact(BigDecimal amount) {
 		this.amount = amount;
 	}
 

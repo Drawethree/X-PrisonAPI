@@ -1,5 +1,7 @@
 package dev.drawethree.xprison.api.currency.model;
 
+import java.math.BigDecimal;
+
 /**
  * Represents the metadata and formatting configuration of a currency in the XPrison API.
  * This includes display name, format rules, symbol settings, and optional withdraw item.
@@ -19,7 +21,10 @@ public interface XPrisonCurrency {
      * Gets the maximum amount of a currency player can have
      *
      * @return maximum amount (cap) of a currency for player
+     * @deprecated a {@code double} cannot exactly represent OP-scale caps above ~9 quadrillion
+     *             (2^53); use {@link #getMaxAmountExact()} instead.
      */
+    @Deprecated
     double getMaxAmount();
 
     /**
@@ -52,8 +57,24 @@ public interface XPrisonCurrency {
     String format(double amount);
 
     /**
-     * Returns the initial balance assigned to a new player for this currency.
+     * Formats an exact {@link BigDecimal} amount according to the currency's configuration.
+     * Prefer this over {@link #format(double)} when the value may exceed a {@code double}'s
+     * ~9 quadrillion (2^53) integer-precision limit, so the display stays exact.
+     *
+     * @param amount the amount to format
+     * @return the formatted currency string (e.g., {@code "$1.2k"}, {@code "$3,000"})
      */
+    default String format(BigDecimal amount) {
+        return format(amount.doubleValue());
+    }
+
+    /**
+     * Returns the initial balance assigned to a new player for this currency.
+     *
+     * @deprecated a {@code double} cannot exactly represent OP-scale starting amounts above
+     *             ~9 quadrillion (2^53); use {@link #getStartingAmountExact()} instead.
+     */
+    @Deprecated
     double getStartingAmount();
 
     /**
@@ -71,6 +92,25 @@ public interface XPrisonCurrency {
      * Returns {@code true} if trailing zeros after the decimal point should be stripped.
      */
     boolean isTrimZeros();
+
+    /**
+     * Exact-precision variant of {@link #getMaxAmount()}. Implementations that store the cap as a
+     * {@link BigDecimal} override this so OP-scale caps stay exact.
+     *
+     * @return the maximum amount (cap) of this currency for a player
+     */
+    default BigDecimal getMaxAmountExact() {
+        return BigDecimal.valueOf(getMaxAmount());
+    }
+
+    /**
+     * Exact-precision variant of {@link #getStartingAmount()}.
+     *
+     * @return the initial balance assigned to a new player for this currency
+     */
+    default BigDecimal getStartingAmountExact() {
+        return BigDecimal.valueOf(getStartingAmount());
+    }
 
     /**
      * Returns the physical withdraw-item configuration for this currency, or {@code null}

@@ -2,11 +2,14 @@ package dev.drawethree.xprison.api.currency.event;
 
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
+
+import java.math.BigDecimal;
 
 /**
  * Called when a player's balance of a currency is about to be set to an explicit value
@@ -14,7 +17,8 @@ import org.bukkit.event.HandlerList;
  * <p>
  * Unlike {@link PlayerCurrencyReceiveEvent} / {@link PlayerCurrencyLoseEvent}, this fires for an
  * absolute assignment rather than a delta. It is {@link Cancellable}; cancelling leaves the existing
- * balance untouched. The target value can be adjusted via {@link #setNewAmount(double)}.
+ * balance untouched. The target value can be adjusted via {@link #setNewAmount(double)} or, for
+ * OP-scale exact amounts, {@link #setNewAmountExact(BigDecimal)}.
  */
 @Getter
 public final class PlayerCurrencyBalanceSetEvent extends XPrisonPlayerEvent implements Cancellable {
@@ -27,16 +31,17 @@ public final class PlayerCurrencyBalanceSetEvent extends XPrisonPlayerEvent impl
 	private final XPrisonCurrency currency;
 
 	/**
-	 * The player's balance before the set operation.
+	 * The player's exact balance before the set operation (source of truth).
 	 */
-	private final double oldAmount;
+	@Getter(AccessLevel.NONE)
+	private final BigDecimal oldAmount;
 
 	/**
-	 * The balance the player will be set to.
-	 * Can be modified using {@link #setNewAmount(double)}.
+	 * The exact balance the player will be set to (source of truth).
+	 * Can be modified using {@link #setNewAmount(double)} or {@link #setNewAmountExact(BigDecimal)}.
 	 */
-	@Setter
-	private double newAmount;
+	@Getter(AccessLevel.NONE)
+	private BigDecimal newAmount;
 
 	/**
 	 * Whether the event is cancelled.
@@ -54,9 +59,69 @@ public final class PlayerCurrencyBalanceSetEvent extends XPrisonPlayerEvent impl
 	 * @param newAmount the balance the player will be set to
 	 */
 	public PlayerCurrencyBalanceSetEvent(XPrisonCurrency currency, OfflinePlayer player, double oldAmount, double newAmount) {
+		this(currency, player, CurrencyAmounts.exact(oldAmount), CurrencyAmounts.exact(newAmount));
+	}
+
+	/**
+	 * Constructs a new {@link PlayerCurrencyBalanceSetEvent} with exact amounts.
+	 *
+	 * @param currency  the {@link XPrisonCurrency} whose balance is being set
+	 * @param player    the {@link OfflinePlayer} whose balance is changing
+	 * @param oldAmount the exact balance before the set operation
+	 * @param newAmount the exact balance the player will be set to
+	 */
+	public PlayerCurrencyBalanceSetEvent(XPrisonCurrency currency, OfflinePlayer player, BigDecimal oldAmount, BigDecimal newAmount) {
 		super(player);
 		this.currency = currency;
 		this.oldAmount = oldAmount;
+		this.newAmount = newAmount;
+	}
+
+	/**
+	 * @return the balance before the set operation (loses precision above 2^53; prefer
+	 *         {@link #getOldAmountExact()})
+	 */
+	public double getOldAmount() {
+		return oldAmount.doubleValue();
+	}
+
+	/**
+	 * @return the exact balance before the set operation
+	 */
+	public BigDecimal getOldAmountExact() {
+		return oldAmount;
+	}
+
+	/**
+	 * @return the balance the player will be set to (loses precision above 2^53; prefer
+	 *         {@link #getNewAmountExact()})
+	 */
+	public double getNewAmount() {
+		return newAmount.doubleValue();
+	}
+
+	/**
+	 * @return the exact balance the player will be set to
+	 */
+	public BigDecimal getNewAmountExact() {
+		return newAmount;
+	}
+
+	/**
+	 * Sets the balance the player will be set to.
+	 *
+	 * @param newAmount the new target balance
+	 */
+	public void setNewAmount(double newAmount) {
+		this.newAmount = CurrencyAmounts.exact(newAmount);
+	}
+
+	/**
+	 * Sets the exact balance the player will be set to.
+	 *
+	 * @param newAmount the new exact target balance
+	 */
+	public void setNewAmountExact(BigDecimal newAmount) {
 		this.newAmount = newAmount;
 	}
 
