@@ -10,6 +10,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -24,7 +25,7 @@ public final class XPrisonSellAllEvent extends XPrisonPlayerEvent implements Can
 
 	@Getter
 	@Setter
-	private Map<AutoSellItemStack, Double> itemsToSell;
+	private Map<AutoSellItemStack, BigDecimal> itemsToSell;
 
     @Nullable
     private final SellRegion region;
@@ -37,10 +38,10 @@ public final class XPrisonSellAllEvent extends XPrisonPlayerEvent implements Can
 	 * Constructs a new sell-all event.
 	 *
 	 * @param player      The player performing the sell-all
-	 * @param itemsToSell A map of items to sell and their respective prices
+	 * @param itemsToSell A map of items to sell and their respective (exact) prices
      * @param region         The sell region where the blocks were mined, can be null
 	 */
-	public XPrisonSellAllEvent(Player player, Map<AutoSellItemStack, Double> itemsToSell, @Nullable SellRegion region) {
+	public XPrisonSellAllEvent(Player player, Map<AutoSellItemStack, BigDecimal> itemsToSell, @Nullable SellRegion region) {
 		super(player);
 		this.player = player;
 		this.itemsToSell = itemsToSell;

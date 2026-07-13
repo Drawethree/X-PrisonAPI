@@ -2,6 +2,8 @@ package dev.drawethree.xprison.api.currency.model;
 
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
+
 public interface PhysicalItemCurrency {
 
     /**
@@ -10,6 +12,19 @@ public interface PhysicalItemCurrency {
      *
      * @param amount Amount of currency
      * @return The {@link ItemStack} used as the item, or null if not set.
+     * @deprecated {@code double} loses precision at OP scale; use {@link #getPhysicalItem(BigDecimal)}.
      */
-    ItemStack getPhysicalItem(double amount);
+    @Deprecated
+    default ItemStack getPhysicalItem(double amount) {
+        return getPhysicalItem(BigDecimal.valueOf(amount));
+    }
+
+    /**
+     * Gets the configured physical item for this currency, if any, holding an exact amount.
+     * This can be used in GUIs or displays to represent the currency visually.
+     *
+     * @param amount Exact amount of currency
+     * @return The {@link ItemStack} used as the item, or null if not set.
+     */
+    ItemStack getPhysicalItem(BigDecimal amount);
 }
