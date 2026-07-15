@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.blocks;
 
 import dev.drawethree.xprison.api.blocks.impl.ItemsAdderMineBlock;
 import dev.drawethree.xprison.api.blocks.impl.NexoMineBlock;
+import dev.drawethree.xprison.api.blocks.impl.OraxenMineBlock;
 import dev.drawethree.xprison.api.blocks.impl.VanillaMineBlock;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
  * @see VanillaMineBlock
  * @see ItemsAdderMineBlock
  * @see NexoMineBlock
+ * @see OraxenMineBlock
  */
 public interface MineBlock {
 

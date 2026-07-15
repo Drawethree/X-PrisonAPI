@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.blocks.provider;
 import dev.drawethree.xprison.api.blocks.MineBlock;
 import dev.drawethree.xprison.api.blocks.provider.impl.ItemsAdderBlockProvider;
 import dev.drawethree.xprison.api.blocks.provider.impl.NexoBlockProvider;
+import dev.drawethree.xprison.api.blocks.provider.impl.OraxenBlockProvider;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +27,7 @@ public final class CustomBlockProviders {
 
 	private static final List<CustomBlockProvider> PROVIDERS = List.of(
 			new NexoBlockProvider(),
+			new OraxenBlockProvider(),
 			new ItemsAdderBlockProvider()
 	);
 

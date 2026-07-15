@@ -47,6 +47,10 @@
             <id>nexomc</id>
             <url>https://repo.nexomc.com/releases</url>
         </repository>
+        <repository>
+            <id>oraxen</id>
+            <url>https://repo.oraxen.com/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -117,6 +121,19 @@
             <scope>provided</scope>
             <!-- Compile only against Nexo's own API classes; exclude its transitive runtime tree
                  (e.g. triumph-gui:3.2.0-SNAPSHOT, hosted only on the TriumphTeam snapshot repo). -->
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.th0rgal</groupId>
+            <artifactId>oraxen</artifactId>
+            <version>1.217.0</version>
+            <scope>provided</scope>
+            <!-- Compile only against Oraxen's own API classes; exclude its large transitive runtime tree. -->
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
