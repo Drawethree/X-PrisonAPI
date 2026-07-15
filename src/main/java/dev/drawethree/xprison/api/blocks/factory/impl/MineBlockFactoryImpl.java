@@ -3,14 +3,17 @@ package dev.drawethree.xprison.api.blocks.factory.impl;
 import com.cryptomorin.xseries.XMaterial;
 import dev.drawethree.xprison.api.blocks.MineBlock;
 import dev.drawethree.xprison.api.blocks.factory.MineBlockFactory;
-import dev.drawethree.xprison.api.blocks.impl.ItemsAdderMineBlock;
 import dev.drawethree.xprison.api.blocks.impl.VanillaMineBlock;
-import dev.lone.itemsadder.api.CustomBlock;
-import dev.lone.itemsadder.api.CustomStack;
-import org.bukkit.Bukkit;
+import dev.drawethree.xprison.api.blocks.provider.CustomBlockProviders;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Default {@link MineBlockFactory}. Custom-block resolution is delegated to the ordered
+ * {@link CustomBlockProviders} registry (ItemsAdder, Nexo, ...); anything no provider claims falls
+ * back to a {@link VanillaMineBlock}. Adding a new custom-content provider therefore requires no
+ * change here.
+ */
 public class MineBlockFactoryImpl implements MineBlockFactory {
 
 	@Override
@@ -20,7 +23,7 @@ public class MineBlockFactoryImpl implements MineBlockFactory {
 
 	@Override
 	public MineBlock fromCustom(String id) {
-		return new ItemsAdderMineBlock(id);
+		return CustomBlockProviders.fromConfigId(id);
 	}
 
 	@Override
@@ -29,21 +32,23 @@ public class MineBlockFactoryImpl implements MineBlockFactory {
 			throw new IllegalArgumentException("ItemStack cannot be null or air");
 		}
 
-		if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
-			CustomStack customStack = CustomStack.byItemStack(itemStack);
-			if (customStack != null) {
-				return new ItemsAdderMineBlock(customStack.getNamespacedID());
-			}
+		MineBlock custom = CustomBlockProviders.fromItemStack(itemStack);
+		if (custom != null) {
+			return custom;
 		}
 
-		XMaterial material = XMaterial.matchXMaterial(itemStack);
-		return new VanillaMineBlock(material);
+		return new VanillaMineBlock(XMaterial.matchXMaterial(itemStack));
 	}
 
 	@Override
 	public MineBlock fromId(String id) {
 		if (id == null || id.isBlank()) return null;
-		if (id.contains(":")) return new ItemsAdderMineBlock(id);
+
+		MineBlock custom = CustomBlockProviders.fromConfigId(id);
+		if (custom != null) {
+			return custom;
+		}
+
 		return XMaterial.matchXMaterial(id.toUpperCase())
 				.map(VanillaMineBlock::new)
 				.orElse(null);
@@ -55,15 +60,12 @@ public class MineBlockFactoryImpl implements MineBlockFactory {
 			throw new IllegalArgumentException("Block cannot be null or air");
 		}
 
-		if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
-			CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
-			if (customBlock != null) {
-				return new ItemsAdderMineBlock(customBlock.getNamespacedID());
-			}
+		MineBlock custom = CustomBlockProviders.fromBlock(block);
+		if (custom != null) {
+			return custom;
 		}
 
-		XMaterial material = XMaterial.matchXMaterial(block.getType());
-		return new VanillaMineBlock(material);
+		return new VanillaMineBlock(XMaterial.matchXMaterial(block.getType()));
 	}
 
 }

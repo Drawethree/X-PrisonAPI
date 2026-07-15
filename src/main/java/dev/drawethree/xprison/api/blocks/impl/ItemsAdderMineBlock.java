@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.blocks.impl;
 
 import dev.drawethree.xprison.api.blocks.MineBlock;
 import dev.lone.itemsadder.api.CustomStack;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 
 public final class ItemsAdderMineBlock implements MineBlock {
@@ -28,7 +29,8 @@ public final class ItemsAdderMineBlock implements MineBlock {
 
 	@Override
 	public ItemStack toItemStack(int amount) {
-		if (namespacedId == null || namespacedId.isEmpty()) {
+		if (namespacedId == null || namespacedId.isEmpty()
+				|| !Bukkit.getPluginManager().isPluginEnabled("ItemsAdder")) {
 			return null;
 		}
 

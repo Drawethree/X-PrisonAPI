@@ -43,6 +43,10 @@
             <id>matteodev</id>
             <url>https://maven.devs.beer/</url>
         </repository>
+        <repository>
+            <id>nexomc</id>
+            <url>https://repo.nexomc.com/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -104,6 +108,12 @@
             <groupId>dev.lone</groupId>
             <artifactId>api-itemsadder</artifactId>
             <version>4.0.10</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nexomc</groupId>
+            <artifactId>nexo</artifactId>
+            <version>1.25.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

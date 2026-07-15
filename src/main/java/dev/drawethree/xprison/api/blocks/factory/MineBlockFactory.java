@@ -20,17 +20,17 @@ public interface MineBlockFactory {
 	MineBlock fromVanilla(XMaterial material);
 
 	/**
-	 * Creates a MineBlock from a namespaced custom block ID.
-	 * Example: ItemsAdder block ID "myitems:ruby_ore".
+	 * Creates a MineBlock from a custom block ID owned by one of the registered custom-content
+	 * providers. Examples: ItemsAdder {@code "myitems:ruby_ore"} or Nexo {@code "nexo:sapphire_ore"}.
 	 *
-	 * @param id the namespaced ID of the custom block
-	 * @return a new MineBlock instance
+	 * @param id the custom block ID
+	 * @return a new MineBlock instance, or {@code null} if no provider owns the id
 	 */
 	MineBlock fromCustom(String id);
 
 	/**
 	 * Creates a MineBlock from an {@link ItemStack}.
-	 * Will automatically detect if it's vanilla or custom (e.g., ItemsAdder).
+	 * Will automatically detect if it's vanilla or custom (e.g. ItemsAdder / Nexo).
 	 *
 	 * @param itemStack the item stack
 	 * @return a new MineBlock instance

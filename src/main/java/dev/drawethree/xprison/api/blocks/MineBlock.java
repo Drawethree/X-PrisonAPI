@@ -1,6 +1,7 @@
 package dev.drawethree.xprison.api.blocks;
 
 import dev.drawethree.xprison.api.blocks.impl.ItemsAdderMineBlock;
+import dev.drawethree.xprison.api.blocks.impl.NexoMineBlock;
 import dev.drawethree.xprison.api.blocks.impl.VanillaMineBlock;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,13 +10,14 @@ import org.bukkit.inventory.ItemStack;
  * <p>
  * A {@code MineBlock} is an abstraction over different block providers,
  * allowing mines to contain both vanilla Minecraft blocks and custom blocks
- * supplied by external plugins such as ItemsAdder.
+ * supplied by external plugins such as ItemsAdder or Nexo.
  * <p>
  * Implementations should be immutable and uniquely identifiable by their
  * {@link #getId()} value.
  *
  * @see VanillaMineBlock
  * @see ItemsAdderMineBlock
+ * @see NexoMineBlock
  */
 public interface MineBlock {
 
