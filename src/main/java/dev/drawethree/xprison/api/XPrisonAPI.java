@@ -20,6 +20,8 @@ import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
+import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPI;
+import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPIImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -173,6 +175,18 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonQuestsAPI getQuestsApi();
+
+    /**
+     * Gets the virtual (packet-only) blocks API. Packet-based private-mine plugins register their
+     * {@link dev.drawethree.xprison.api.virtualblocks.VirtualBlockProvider} here so X-Prison's
+     * mining pipeline can resolve and remove blocks that exist only client-side.
+     *
+     * @return the Virtual Blocks API instance
+     */
+    @NotNull
+    default XPrisonVirtualBlocksAPI getVirtualBlocksApi() {
+        return XPrisonVirtualBlocksAPIImpl.INSTANCE;
+    }
 
     /**
      * Gets the Daily Rewards module API.

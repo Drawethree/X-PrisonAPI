@@ -5,6 +5,7 @@ import dev.drawethree.xprison.api.blocks.MineBlock;
 import dev.drawethree.xprison.api.blocks.factory.MineBlockFactory;
 import dev.drawethree.xprison.api.blocks.impl.VanillaMineBlock;
 import dev.drawethree.xprison.api.blocks.provider.CustomBlockProviders;
+import dev.drawethree.xprison.api.virtualblocks.VirtualBlockProviders;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -56,7 +57,17 @@ public class MineBlockFactoryImpl implements MineBlockFactory {
 
 	@Override
 	public MineBlock fromBlock(Block block) {
-		if (block == null || block.getType() == XMaterial.AIR.parseMaterial()) {
+		if (block == null) {
+			throw new IllegalArgumentException("Block cannot be null or air");
+		}
+
+		if (block.getType() == XMaterial.AIR.parseMaterial()) {
+			// Server-side air may still be a virtual (packet-only) mine block; resolve it through
+			// the registered providers / open snapshots before rejecting the block.
+			MineBlock virtual = VirtualBlockProviders.blockAt(block.getLocation());
+			if (virtual != null) {
+				return virtual;
+			}
 			throw new IllegalArgumentException("Block cannot be null or air");
 		}
 
