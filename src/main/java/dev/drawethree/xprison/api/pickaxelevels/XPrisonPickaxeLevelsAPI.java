@@ -107,4 +107,47 @@ public interface XPrisonPickaxeLevelsAPI {
 		return Pagination.slice(getTopByPickaxeLevel(limit + Math.max(offset, 0)), limit, offset);
 	}
 
+	/**
+	 * Gets the pickaxe experience stored on the given pickaxe.
+	 * <p>
+	 * Legacy pickaxes created before the experience system report their blocks-broken count
+	 * (1 block = 1 exp) until their experience tag is first written.
+	 *
+	 * @param pickaxe the pickaxe ItemStack to read; {@code null} or unsupported items return 0
+	 * @return the pickaxe's current experience
+	 */
+	long getPickaxeExp(ItemStack pickaxe);
+
+	/**
+	 * Grants additional pickaxe experience to a player's pickaxe and immediately re-evaluates
+	 * its level, applying any resulting level-ups and rewards.
+	 * <p>
+	 * Intended for addons that reward bonus pickaxe progression (e.g. a pet or booster). The gain
+	 * is fired through {@link dev.drawethree.xprison.api.pickaxelevels.event.PlayerPickaxeExpGainEvent}
+	 * with source {@link dev.drawethree.xprison.api.pickaxelevels.model.PickaxeExpSource#API} and is
+	 * subject to the configured {@code api} source multiplier. The blocks-broken statistic is
+	 * <b>not</b> affected. The {@code pickaxe} must be a supported pickaxe held by the player;
+	 * otherwise this call is a no-op. The pickaxe's lore is refreshed and the (possibly upgraded)
+	 * item is written back to the player's hand.
+	 *
+	 * @param player   the owning player
+	 * @param pickaxe  the pickaxe ItemStack to progress (typically the item in the player's hand)
+	 * @param extraExp additional experience to add; values {@code <= 0} are ignored
+	 */
+	void addPickaxeExp(Player player, ItemStack pickaxe, long extraExp);
+
+	/**
+	 * Sets the pickaxe experience to an absolute value and re-evaluates the pickaxe's level.
+	 * <p>
+	 * Unlike {@link #addPickaxeExp(Player, ItemStack, long)} this is an administrative write: no
+	 * {@code PlayerPickaxeExpGainEvent} is fired and no source multiplier is applied. The
+	 * blocks-broken statistic is not affected. The {@code pickaxe} must be a supported pickaxe
+	 * held by the player; otherwise this call is a no-op.
+	 *
+	 * @param player  the owning player
+	 * @param pickaxe the pickaxe ItemStack to modify (typically the item in the player's hand)
+	 * @param exp     the absolute experience value to set; negative values are clamped to 0
+	 */
+	void setPickaxeExp(Player player, ItemStack pickaxe, long exp);
+
 }
