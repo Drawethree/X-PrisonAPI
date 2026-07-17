@@ -199,6 +199,13 @@ public final class VirtualBlockProviders {
 	 */
 	@NotNull
 	public static SnapshotHandle captureAndOpen(@NotNull Collection<Block> blocks) {
+		// Zero-overhead fast path: with no provider registered and no snapshot open, nothing
+		// virtual can exist, so the whole capture scan (one iteration over every affected block —
+		// e.g. an entire Nuke region) is skipped. This keeps AOE enchants / bombs byte-for-byte
+		// as cheap as before packet-mines existed when the feature is off.
+		if (PROVIDERS.isEmpty() && SNAPSHOTS.get().isEmpty()) {
+			return NO_OP_HANDLE;
+		}
 		Map<PosKey, MineBlock> captured = new HashMap<>();
 		for (Block block : blocks) {
 			if (!isAir(block.getType())) {
@@ -262,6 +269,10 @@ public final class VirtualBlockProviders {
 		@Override
 		void close();
 	}
+
+	/** Shared no-op handle returned by the {@link #captureAndOpen} fast path (nothing was pushed). */
+	private static final SnapshotHandle NO_OP_HANDLE = () -> {
+	};
 
 	/**
 	 * Immutable block-position key (world id + block coordinates).
