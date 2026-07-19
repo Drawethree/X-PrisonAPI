@@ -2,12 +2,15 @@ package dev.drawethree.xprison.api.virtualblocks;
 
 import dev.drawethree.xprison.api.blocks.MineBlock;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A source of <i>virtual</i> (packet-only) mine blocks — blocks that exist in a plugin's own
@@ -68,5 +71,29 @@ public interface VirtualBlockProvider {
 	 */
 	default boolean breakBlock(@Nullable Player cause, @NotNull Location location) {
 		return breakBlocks(cause, List.of(location)) > 0;
+	}
+
+	/**
+	 * Counts every virtual block this provider has inside the given cuboid (inclusive), returning how
+	 * many of each block type are present and — when {@code removeBlocks} is {@code true} — clearing
+	 * them as it goes. Same contract as {@link #breakBlocks}: fires no X-Prison events and creates no
+	 * drops.
+	 * <p>
+	 * Implementations resolve this from their in-memory store (a single array scan), so it is the
+	 * TPS-safe path for whole-region area enchants such as Nuke — no per-block {@code getBlockAt} and
+	 * no per-block world access. The default returns an empty map (provider manages nothing here).
+	 *
+	 * @param cause        the player that caused the collection, or {@code null}
+	 * @param world        the world of the cuboid
+	 * @param removeBlocks {@code true} to clear the counted blocks from the store and clients (Nuke
+	 *                     that resets the mine); {@code false} to count only, leaving them intact
+	 *                     (a "sell the whole mine without clearing it" enchant)
+	 * @return block types mapped to their counts (empty if none)
+	 */
+	@NotNull
+	default Map<MineBlock, Long> collectRegion(@Nullable Player cause, @NotNull World world,
+											   int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+											   boolean removeBlocks) {
+		return Collections.emptyMap();
 	}
 }

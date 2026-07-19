@@ -187,6 +187,30 @@ public final class VirtualBlockProviders {
 	}
 
 	/**
+	 * Counts every virtual block inside the cuboid through the provider that owns it, optionally
+	 * clearing them, and returns how many of each block type were found. See
+	 * {@link VirtualBlockProvider#collectRegion} — this is the TPS-safe whole-region path for area
+	 * enchants (Nuke) that resolves straight from the provider's store instead of scanning the world
+	 * block-by-block.
+	 *
+	 * @param removeBlocks {@code true} to clear the counted blocks (mine-resetting Nuke); {@code false}
+	 *                     to count only, for a "sell without clearing" enchant
+	 * @return block types mapped to their counts (empty if no provider owns the cuboid)
+	 */
+	@NotNull
+	public static Map<MineBlock, Long> collectRegion(@Nullable Player cause, @NotNull World world,
+													 int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+													 boolean removeBlocks) {
+		for (VirtualBlockProvider provider : PROVIDERS) {
+			Map<MineBlock, Long> found = provider.collectRegion(cause, world, minX, minY, minZ, maxX, maxY, maxZ, removeBlocks);
+			if (!found.isEmpty()) {
+				return found;
+			}
+		}
+		return Map.of();
+	}
+
+	/**
 	 * Captures the virtual types of the given blocks (positions that are server-side air but
 	 * resolve through a provider or an already-open snapshot) and opens a snapshot overlay with
 	 * them, so they keep resolving for the duration of one break pipeline even after the provider
