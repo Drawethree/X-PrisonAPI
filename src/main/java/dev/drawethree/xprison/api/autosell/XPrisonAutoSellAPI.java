@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,22 @@ public interface XPrisonAutoSellAPI {
 	 * @return the price of the block
 	 */
 	double getPriceForBlock(Block block);
+
+	/**
+	 * Exact-precision variant of {@link #getPriceForBlock(Block)}.
+	 * <p>
+	 * Prefer this when summing many block prices or on OP-scale servers, where a {@code double}
+	 * loses precision above {@code 2^53}. Resolves vanilla, custom (ItemsAdder/Nexo/Oraxen) and
+	 * virtual (packet-mine) blocks alike; virtual blocks resolve only while still present in the
+	 * provider store or under an open snapshot, so call this before clearing them.
+	 *
+	 * @param block the block to get the price for
+	 * @return the exact global sell price, or {@link BigDecimal#ZERO} if the block is not sellable
+	 * @since 1.9
+	 */
+	default BigDecimal getPriceForBlockExact(Block block) {
+		return BigDecimal.valueOf(getPriceForBlock(block));
+	}
 
 	/**
 	 * Sells the specified list of blocks on behalf of a player.
