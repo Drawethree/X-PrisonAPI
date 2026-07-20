@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.text;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +64,43 @@ public interface XPrisonTextAPI {
      */
     void sendTitle(@NotNull Player target, @Nullable String title, @Nullable String subtitle,
                    int fadeInTicks, int stayTicks, int fadeOutTicks);
+
+    /**
+     * Sets an item's display name from MiniMessage text.
+     *
+     * <p>Use this rather than {@code ItemMeta#displayName(Component)}: that overload names an
+     * Adventure type in its signature, which is enough on its own to stop the calling class from
+     * loading on a server without Adventure.
+     *
+     * <p>Item text renders in italics by default. Prefix the string with {@code <italic:false>} to
+     * turn that off, as X-Prison's own configs do.
+     *
+     * @param meta        the meta to modify in place
+     * @param miniMessage raw display name
+     */
+    void applyDisplayName(@NotNull ItemMeta meta, @Nullable String miniMessage);
+
+    /**
+     * Replaces an item's lore with the given MiniMessage lines.
+     *
+     * @param meta        the meta to modify in place
+     * @param miniMessage raw lore lines
+     */
+    void applyLore(@NotNull ItemMeta meta, @NotNull List<String> miniMessage);
+
+    /**
+     * Escapes MiniMessage tags so they render as literal text.
+     *
+     * <p>Apply this to anything a player can type before putting it into a message - chat relayed
+     * from another platform, nicknames, gang names, sign text. Without it a player can type
+     * {@code <click:run_command:'/op them'>} into your message and have it rendered as a real
+     * clickable tag.
+     *
+     * @param text untrusted text
+     * @return the text with tag syntax neutralised
+     */
+    @NotNull
+    String escapeTags(@Nullable String text);
 
     /**
      * Renders text to legacy section codes.
