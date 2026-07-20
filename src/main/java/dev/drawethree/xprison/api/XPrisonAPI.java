@@ -19,6 +19,7 @@ import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
+import dev.drawethree.xprison.api.text.XPrisonTextAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPIImpl;
@@ -263,6 +264,19 @@ public interface XPrisonAPI {
      */
     @Nullable
     String getDashboardUrl();
+
+    /**
+     * Gets the text rendering API.
+     *
+     * <p>Use this to send and render MiniMessage text instead of depending on Adventure directly:
+     * X-Prison does not shade Adventure, so an addon that imports {@code net.kyori} works on Paper
+     * but fails to link on Spigot.
+     *
+     * @return the text API instance
+     * @since 1.9
+     */
+    @NotNull
+    XPrisonTextAPI getTextApi();
 
     /**
      * Returns the current version string of the X-Prison plugin.
