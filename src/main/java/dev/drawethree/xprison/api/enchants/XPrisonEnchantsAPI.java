@@ -64,6 +64,20 @@ public interface XPrisonEnchantsAPI {
      */
     long getAmountOfActivations(ItemStack item, XPrisonEnchantment enchantment);
 
+    /**
+     * Retrieves the prestige tier a specific enchantment has reached on the given item.
+     * <p>
+     * Addon enchants need this to apply their configured prestige reward bonus - feed the result
+     * to {@link dev.drawethree.xprison.api.enchants.model.PrestigeableEnchant#getPrestigeMultiplier(int)}
+     * and pass that multiplier when rewarding the player.
+     *
+     * @param item        The {@link ItemStack} to read, typically the player's pickaxe.
+     * @param enchantment The {@link XPrisonEnchantment} whose prestige tier is wanted.
+     * @return The prestige tier, or {@code 0} when the item is null or has never prestiged it.
+     * @since 1.9
+     */
+    int getEnchantPrestige(ItemStack item, XPrisonEnchantment enchantment);
+
 	/**
 	 * Sets the number of activations recorded for a specific enchantment on the given item.
 	 * <p>
