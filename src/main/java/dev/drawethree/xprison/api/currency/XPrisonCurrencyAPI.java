@@ -313,6 +313,34 @@ public interface XPrisonCurrencyAPI {
     }
 
     /**
+     * Credits a currency and reports how much was <b>actually</b> added.
+     * <p>
+     * A currency may define a maximum balance, so the credited amount can be smaller than the
+     * amount requested. Callers that display what the player earned (an enchant's "you earned
+     * %amount%" proc message) must report the returned value rather than the requested one,
+     * otherwise the message overstates the payout whenever the cap clamps it.
+     * <p>
+     * The default implementation delegates to
+     * {@link #addBalance(OfflinePlayer, String, BigDecimal, ReceiveCause)} and therefore cannot
+     * observe clamping: it returns the full requested amount on success and
+     * {@link BigDecimal#ZERO} on failure.
+     *
+     * @param player       the player to credit
+     * @param currency     the currency to add
+     * @param amount       the amount to add
+     * @param receiveCause the reason for receiving the currency
+     * @return the amount actually credited, never {@code null}
+     * @since 1.9
+     */
+    @NotNull
+    default BigDecimal addBalance(OfflinePlayer player, XPrisonCurrency currency, BigDecimal amount, ReceiveCause receiveCause) {
+        if (currency == null || amount == null || amount.signum() <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return addBalance(player, currency.getName(), amount, receiveCause) ? amount : BigDecimal.ZERO;
+    }
+
+    /**
      * Exact-precision variant of {@link #removeBalance(OfflinePlayer, String, double, LostCause)}.
      *
      * @param player       the player to remove currency from

@@ -1,13 +1,16 @@
 package dev.drawethree.xprison.api.enchants;
 
+import dev.drawethree.xprison.api.enchants.area.AreaBounds;
 import dev.drawethree.xprison.api.enchants.model.XPrisonEnchantment;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The {@code XPrisonEnchantsAPI} interface defines methods for interacting with and managing
@@ -167,4 +170,65 @@ public interface XPrisonEnchantsAPI {
 	 * @return a collection of all registered {@link XPrisonEnchantment}s
 	 */
 	Collection<XPrisonEnchantment> getAllEnchantments();
+
+	/**
+	 * Returns the bounds of the enchant-enabled region covering a location — the cuboid an area
+	 * enchant is allowed to affect.
+	 * <p>
+	 * This is the enumerable counterpart to {@link #isEnchantAllowed(Location)}: where that answers
+	 * "may enchants fire here?", this hands back the actual cuboid so an enchant can bound or scan
+	 * its target selection (a whole-mine enchant needs the min/max corners). Where several regions
+	 * overlap, the highest-priority one that permits enchants is returned.
+	 * <p>
+	 * The default implementation returns {@link Optional#empty()}; callers must degrade gracefully
+	 * (typically by falling back to a per-block {@link #isEnchantAllowed(Location)} check).
+	 *
+	 * @param location a location inside the region
+	 * @return the region's bounds, or empty if no enchant-enabled region covers the location
+	 * @since 1.9
+	 */
+	default Optional<AreaBounds> getEnchantRegionBounds(Location location) {
+		return Optional.empty();
+	}
+
+	/**
+	 * Checks whether a block is excluded from Fortune's drop multiplication.
+	 * <p>
+	 * Area enchants must honour the same blacklist as the built-in Fortune enchant so a blacklisted
+	 * block yields a single drop no matter how it was broken.
+	 * <p>
+	 * The default implementation returns {@code false} (nothing blacklisted).
+	 *
+	 * @param block the block to test
+	 * @return {@code true} if Fortune must not multiply this block's drops
+	 * @since 1.9
+	 */
+	default boolean isFortuneBlacklisted(Block block) {
+		return false;
+	}
+
+	/**
+	 * Convenience accessor for the built-in Fortune level on an item.
+	 * <p>
+	 * Equivalent to looking up the Fortune enchantment and calling
+	 * {@link #getEnchantLevel(ItemStack, XPrisonEnchantment)}, which is what every enchant that
+	 * multiplies drops needs to do.
+	 *
+	 * @param item the item to read, typically the player's pickaxe; {@code null} returns 0
+	 * @return the Fortune level, or {@code 0} when absent, disabled or unreadable
+	 * @since 1.9
+	 */
+	default int getItemFortuneLevel(ItemStack item) {
+		if (item == null) {
+			return 0;
+		}
+		XPrisonEnchantment fortune = getByName("Fortune");
+		if (fortune == null) {
+			fortune = getById(3);
+		}
+		if (fortune == null || !fortune.isEnabled()) {
+			return 0;
+		}
+		return getEnchantLevel(item, fortune);
+	}
 }

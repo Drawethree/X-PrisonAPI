@@ -3,6 +3,7 @@ package dev.drawethree.xprison.api.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
@@ -91,46 +92,74 @@ public class JsonUtils {
     }
 
     public static int getOptionalInt(JsonObject obj, String key, int defaultValue) {
-        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+        JsonPrimitive primitive = optionalPrimitive(obj, key);
+        if (primitive == null) {
             return defaultValue;
         }
-
-        JsonElement element = obj.get(key);
-
-        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
-            return defaultValue;
+        if (primitive.isNumber()) {
+            return primitive.getAsInt();
         }
-
-        return element.getAsInt();
+        // Tolerate a quoted number, which hand-edited configs commonly contain.
+        if (primitive.isString()) {
+            try {
+                return Integer.parseInt(primitive.getAsString().trim());
+            } catch (NumberFormatException notANumber) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
     public static double getOptionalDouble(JsonObject obj, String key, double defaultValue) {
-        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+        JsonPrimitive primitive = optionalPrimitive(obj, key);
+        if (primitive == null) {
             return defaultValue;
         }
-
-        JsonElement element = obj.get(key);
-
-        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
-            return defaultValue;
+        if (primitive.isNumber()) {
+            return primitive.getAsDouble();
         }
-
-        return element.getAsDouble();
+        if (primitive.isString()) {
+            try {
+                return Double.parseDouble(primitive.getAsString().trim());
+            } catch (NumberFormatException notANumber) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 
 
     public static boolean getOptionalBoolean(JsonObject obj, String key, boolean defaultValue) {
-        if (!obj.has(key) || obj.get(key).isJsonNull()) {
+        JsonPrimitive primitive = optionalPrimitive(obj, key);
+        if (primitive == null) {
             return defaultValue;
         }
+        if (primitive.isBoolean()) {
+            return primitive.getAsBoolean();
+        }
+        // Tolerate a quoted boolean ("true"/"false").
+        if (primitive.isString()) {
+            String value = primitive.getAsString().trim();
+            if (value.equalsIgnoreCase("true")) {
+                return true;
+            }
+            if (value.equalsIgnoreCase("false")) {
+                return false;
+            }
+        }
+        return defaultValue;
+    }
 
+    /**
+     * @return the primitive stored under {@code key}, or {@code null} when the key is absent, null,
+     * or not a primitive at all
+     */
+    private static JsonPrimitive optionalPrimitive(JsonObject obj, String key) {
+        if (obj == null || !obj.has(key) || obj.get(key).isJsonNull()) {
+            return null;
+        }
         JsonElement element = obj.get(key);
-
-        if (!element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString()) {
-            return defaultValue;
-        }
-
-        return element.getAsBoolean();
+        return element.isJsonPrimitive() ? element.getAsJsonPrimitive() : null;
     }
 
 

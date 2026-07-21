@@ -97,6 +97,21 @@ public interface XPrisonAutoSellAPI {
 	double getSellPrice(MineBlock mineBlock);
 
 	/**
+	 * Exact-precision variant of {@link #getSellPrice(MineBlock)}.
+	 * <p>
+	 * Prefer this when multiplying a type's price by a large count — the bulk path of an area
+	 * enchant on a packet mine prices once per block <i>type</i> and multiplies by how many were
+	 * broken, where a {@code double} would lose precision on OP-scale servers.
+	 *
+	 * @param mineBlock the block type to price
+	 * @return the exact sell price, or {@link BigDecimal#ZERO} if the block is not sellable
+	 * @since 1.9
+	 */
+	default BigDecimal getSellPriceForBlockExact(MineBlock mineBlock) {
+		return BigDecimal.valueOf(getSellPrice(mineBlock));
+	}
+
+	/**
 	 * Gets the sell price of a specific {@link ItemStack} in a particular {@link SellRegion}.
 	 *
 	 * @param region the sell region to check pricing in

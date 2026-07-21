@@ -1,12 +1,15 @@
 package dev.drawethree.xprison.api.pickaxelevels;
 
+import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeExpSource;
 import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeLevel;
 import dev.drawethree.xprison.api.shared.Pagination;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -149,5 +152,45 @@ public interface XPrisonPickaxeLevelsAPI {
 	 * @param exp     the absolute experience value to set; negative values are clamped to 0
 	 */
 	void setPickaxeExp(Player player, ItemStack pickaxe, long exp);
+
+	/**
+	 * Credits a pickaxe with both the blocks it just broke and the experience they are worth,
+	 * attributed to a specific source.
+	 * <p>
+	 * This is the accounting call for multi-block breaks: unlike
+	 * {@link #addPickaxeExp(Player, ItemStack, long)} it also advances the pickaxe's blocks-broken
+	 * counter and lets the caller attribute the gain (so the configured per-source multiplier for
+	 * e.g. {@link dev.drawethree.xprison.api.pickaxelevels.model.PickaxeExpSource#AREA_ENCHANTS}
+	 * applies instead of the generic {@code API} source).
+	 * <p>
+	 * The default implementation falls back to {@link #addPickaxeExp(Player, ItemStack, long)},
+	 * which awards the experience but not the blocks-broken count.
+	 *
+	 * @param player  the owning player
+	 * @param pickaxe the pickaxe to progress, typically the item in the player's hand
+	 * @param blocks  how many blocks were broken; values {@code <= 0} are ignored
+	 * @param exp     how much experience those blocks are worth; values {@code <= 0} are ignored
+	 * @param source  what caused the gain, for the per-source multiplier and the gain event
+	 * @since 1.9
+	 */
+	default void addBlocksAndExp(Player player, ItemStack pickaxe, int blocks, long exp, PickaxeExpSource source) {
+		addPickaxeExp(player, pickaxe, exp);
+	}
+
+	/**
+	 * Sums the pickaxe experience a set of blocks is worth, honouring the configured per-block
+	 * experience values.
+	 * <p>
+	 * Must be called while the blocks are still intact — a broken (or virtual, already-removed)
+	 * block no longer resolves to a type. The default implementation returns one experience per
+	 * block, matching X-Prison's behaviour when the pickaxe-levels module is disabled.
+	 *
+	 * @param blocks the blocks to price; {@code null} returns 0
+	 * @return the total experience the blocks are worth
+	 * @since 1.9
+	 */
+	default long getExpForBlocks(Collection<Block> blocks) {
+		return blocks == null ? 0L : blocks.size();
+	}
 
 }

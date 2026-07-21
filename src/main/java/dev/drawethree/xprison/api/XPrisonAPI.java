@@ -295,6 +295,21 @@ public interface XPrisonAPI {
     boolean isModuleEnabled(@NotNull String configKey);
 
     /**
+     * Checks whether X-Prison's UltraBackpacks integration is active.
+     * <p>
+     * When it is, mined drops belong in the player's backpack rather than their inventory, so any
+     * enchant that hands out drops itself must route them through UltraBackpacks instead. Note that
+     * UltraBackpacks reads real world block state and cannot resolve virtual (packet-mine) blocks,
+     * so callers should bypass it whenever the affected blocks are virtual.
+     *
+     * @return {@code true} if the UltraBackpacks integration is enabled and usable
+     * @since 1.9
+     */
+    default boolean isUltraBackpacksEnabled() {
+        return false;
+    }
+
+    /**
      * Gets the singleton instance of the XPrisonAPI.
      *
      * @return the XPrisonAPI instance
