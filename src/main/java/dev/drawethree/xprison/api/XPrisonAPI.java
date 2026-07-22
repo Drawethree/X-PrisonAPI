@@ -15,6 +15,7 @@ import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
 import dev.drawethree.xprison.api.miningstats.XPrisonMiningStatsAPI;
 import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
+import dev.drawethree.xprison.api.pickaxequality.XPrisonPickaxeQualityAPI;
 import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
@@ -144,6 +145,14 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonPickaxeSkinsAPI getPickaxeSkinsApi();
+
+    /**
+     * Gets the pickaxe quality API
+     *
+     * @return the Pickaxe Quality API instance
+     */
+    @NotNull
+    XPrisonPickaxeQualityAPI getPickaxeQualityApi();
 
     /**
      * Gets the Rebirth API

@@ -55,6 +55,9 @@ public final class LostCause {
     /** Player lost currency by withdrawing it to physical item form. */
     public static final LostCause WITHDRAW = of("WITHDRAW");
 
+    /** Player lost currency by upgrading their pickaxe's quality tier. */
+    public static final LostCause PICKAXE_QUALITY = of("PICKAXE_QUALITY");
+
     /** Reason not specified or not covered by another constant. */
     public static final LostCause UNKNOWN  = of("UNKNOWN");
     // ─────────────────────────────────────────────────────────────────────────
