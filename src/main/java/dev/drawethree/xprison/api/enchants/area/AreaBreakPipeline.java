@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -171,6 +172,10 @@ public final class AreaBreakPipeline {
 		final AreaBreakSettings settings = context.areaSettings();
 		final boolean providers = VirtualBlockProviders.hasAnyProviders();
 
+		// A PER_BLOCK enchant running on packet mines is auto-downgraded to AGGREGATE (unless the
+		// owner opted out): per-block events buy nothing there and cost one dispatch per block.
+		final BreakEventStrategy strategy = PacketMinePolicy.resolveStrategy(context.areaDisplayName(), settings.eventStrategy());
+
 		// Re-validated here rather than trusting the selection: a deferred effect resolves long
 		// afterwards, and the callback may legitimately supply a different set of blocks.
 		List<Block> blocks = filterTargets(enchants, context, targets, origin, region);
@@ -183,7 +188,7 @@ public final class AreaBreakPipeline {
 		// no packet-mine plugin is installed.
 		try (VirtualBlockProviders.SnapshotHandle ignored = VirtualBlockProviders.captureAndOpen(blocks)) {
 
-			if (settings.eventStrategy() == BreakEventStrategy.PER_BLOCK) {
+			if (strategy == BreakEventStrategy.PER_BLOCK) {
 				blocks = firePerBlockEvents(enchants, player, blocks);
 				if (blocks.isEmpty()) {
 					return;
@@ -213,7 +218,7 @@ public final class AreaBreakPipeline {
 
 			// With PER_BLOCK, X-Prison already ran this pipeline for each synthetic event; running it
 			// again would double-count. With NONE the break is deliberately silent.
-			if (settings.eventStrategy() == BreakEventStrategy.AGGREGATE) {
+			if (strategy == BreakEventStrategy.AGGREGATE) {
 				XPrisonBlocksAPI blocksApi = optional(api::getBlocksApi);
 				if (blocksApi != null) {
 					blocksApi.handleBlockBreak(player, blocks, settings.countBlocksBroken());
@@ -336,8 +341,16 @@ public final class AreaBreakPipeline {
 		final XPrisonAutoSellAPI autoSellApi = optional(api::getAutoSellApi);
 		final boolean autoSell = autoSellApi != null && autoSellApi.hasAutoSellEnabled(player);
 		final int fortune = fortuneLevel(enchants, pickaxe);
-		final MineBlockFactory factory = autoSell ? null : blockFactory(api);
 
+		// On packet mines, pricing and drops are a pure function of the resolved block type, so we
+		// resolve/price each distinct (type, amount) once and multiply by its count - collapsing the
+		// per-block loop (and its BigDecimal / inventory.addItem churn) to O(distinct types), exactly
+		// as resolveEntireVirtualRegion does. Gated behind the single optimize-packet-mining flag.
+		if (PacketMinePolicy.isOptimizeForPacketMines() && VirtualBlockProviders.hasAnyProviders()) {
+			return collectAggregated(api, enchants, autoSellApi, autoSell, player, blocks, fortune);
+		}
+
+		final MineBlockFactory factory = autoSell ? null : blockFactory(api);
 		BigDecimal earnings = BigDecimal.ZERO;
 		for (Block block : blocks) {
 			int amount = enchants.isFortuneBlacklisted(block) ? 1 : fortune;
@@ -349,6 +362,51 @@ public final class AreaBreakPipeline {
 			}
 		}
 		return earnings;
+	}
+
+	/**
+	 * The packet-mine fast path for {@link #collectDropsOrEarnings}: buckets blocks by their resolved
+	 * {@link MineBlock} type and per-block Fortune amount, then prices/drops once per bucket.
+	 * <p>
+	 * Behaviour-preserving relative to the per-block loop: sell pricing is type-keyed
+	 * ({@code getSellPriceForBlockExact}), so {@code Σ price·amount} per block equals {@code price·amount·count}
+	 * per bucket (BigDecimal sums are order-independent), and dropped item counts are identical. Blocks that
+	 * cannot be resolved to a type are skipped, matching {@link #giveDrop}'s existing behaviour.
+	 */
+	private static BigDecimal collectAggregated(XPrisonAPI api, XPrisonEnchantsAPI enchants,
+												XPrisonAutoSellAPI autoSellApi, boolean autoSell,
+												Player player, List<Block> blocks, int fortune) {
+		final MineBlockFactory factory = blockFactory(api);
+		Map<AggregateKey, Long> counts = new HashMap<>();
+		for (Block block : blocks) {
+			MineBlock type;
+			try {
+				type = factory.fromBlock(block);
+			} catch (IllegalArgumentException unresolvable) {
+				continue;
+			}
+			int amount = enchants.isFortuneBlacklisted(block) ? 1 : fortune;
+			counts.merge(new AggregateKey(type, amount), 1L, Long::sum);
+		}
+
+		if (!autoSell) {
+			for (Map.Entry<AggregateKey, Long> bucket : counts.entrySet()) {
+				giveStacks(player, bucket.getKey().type(), bucket.getValue() * bucket.getKey().amount());
+			}
+			return BigDecimal.ZERO;
+		}
+
+		BigDecimal earnings = BigDecimal.ZERO;
+		for (Map.Entry<AggregateKey, Long> bucket : counts.entrySet()) {
+			earnings = earnings.add(autoSellApi.getSellPriceForBlockExact(bucket.getKey().type())
+					.multiply(BigDecimal.valueOf(bucket.getKey().amount()))
+					.multiply(BigDecimal.valueOf(bucket.getValue())));
+		}
+		return earnings;
+	}
+
+	/** Aggregation key for the packet-mine drop/earnings fast path: a block type paired with its Fortune amount. */
+	private record AggregateKey(MineBlock type, int amount) {
 	}
 
 	private static int fortuneLevel(@Nullable XPrisonEnchantsAPI enchants, ItemStack pickaxe) {
@@ -418,8 +476,19 @@ public final class AreaBreakPipeline {
 		}
 		Mine mine = minesApi.getMineAtLocation(origin.getLocation());
 		if (mine != null) {
+			boolean setToAir = context.minesClearBlocks();
+			// On packet mines, when the pipeline already ran clearBlocks (shouldRemoveBlocks), the blocks
+			// are already gone (virtual removed via the batched provider call, real set to AIR), so the
+			// mines module's per-block setType(AIR) is pure waste. currentBlocks is decremented regardless,
+			// so reset accounting is unaffected. Guarded by shouldRemoveBlocks so reward-only enchants that
+			// rely on the mines module as their only clearer are untouched.
+			if (setToAir && context.shouldRemoveBlocks()
+					&& PacketMinePolicy.isOptimizeForPacketMines()
+					&& VirtualBlockProviders.hasAnyProviders()) {
+				setToAir = false;
+			}
 			// Copied: the mines module prunes entries outside its own region from the list it is given.
-			mine.handleBlockBreak(new ArrayList<>(blocks), context.minesClearBlocks());
+			mine.handleBlockBreak(new ArrayList<>(blocks), setToAir);
 		}
 	}
 
