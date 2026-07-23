@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import dev.drawethree.xprison.api.utils.BigNumbers;
 import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import org.bukkit.Material;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -163,28 +165,42 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     }
 
     /**
-     * Calculate the cost for this enchantment at a specific level.
+     * Saturating {@code long} view of {@link #getCostAtLevelExact(int)}, kept for API compatibility.
+     *
+     * @param level The enchantment level.
+     * @return The calculated cost at this level, clamped to {@code long} range.
+     */
+    @Override
+    public long getCostAtLevel(int level) {
+        return BigNumbers.clampToLong(getCostAtLevelExact(level));
+    }
+
+    /**
+     * Calculate the exact cost for this enchantment at a specific level.
      * Supports formulas with variables: baseCost, level.
+     * <p>
+     * Computed and returned as {@link BigDecimal} so exponential curves that exceed {@code long}
+     * range stay exact instead of overflowing (which surfaced as negative purchase prices).
      *
      * @param level The enchantment level.
      * @return The calculated cost at this level.
      */
     @Override
-    public long getCostAtLevel(int level) {
+    public BigDecimal getCostAtLevelExact(int level) {
         if (level == 0) {
-            return baseCost;
+            return BigDecimal.valueOf(baseCost);
         }
         if (compiledExpression == null) {
-            long increaseCost = Long.parseLong(costFormula);
-            return baseCost + (level * increaseCost);
+            return BigDecimal.valueOf(baseCost)
+                    .add(BigDecimal.valueOf(level).multiply(new BigDecimal(costFormula)));
         }
         try {
             compiledExpression
                     .setVariable("baseCost", getBaseCost())
                     .setVariable("level", level);
-            return Math.round(compiledExpression.evaluate());
+            return BigNumbers.finite(compiledExpression.evaluate());
         } catch (Exception ex) {
-            return 0;
+            return BigDecimal.ZERO;
         }
     }
 

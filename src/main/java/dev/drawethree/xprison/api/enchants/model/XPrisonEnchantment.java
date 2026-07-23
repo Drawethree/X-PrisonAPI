@@ -3,6 +3,8 @@ package dev.drawethree.xprison.api.enchants.model;
 import dev.drawethree.xprison.api.XPrisonAPI;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 
+import java.math.BigDecimal;
+
 /**
  * Represents a custom enchantment in the XPrison system.
  * Each enchantment has a unique ID, name, configuration, and purchasing behavior.
@@ -74,11 +76,32 @@ public interface XPrisonEnchantment {
 
     /**
      * Gets the cost of this enchantment at the specified level.
+     * <p>
+     * <b>Saturating:</b> the value is clamped to {@code long} range, so an exponential cost curve
+     * (or a sum of many levels) that exceeds {@link Long#MAX_VALUE} is capped rather than allowed to
+     * overflow negative. For any pricing arithmetic prefer {@link #getCostAtLevelExact(int)}.
      *
      * @param level The enchantment level.
-     * @return The cost at that level.
+     * @return The cost at that level, clamped to {@code long} range.
      */
     long getCostAtLevel(int level);
+
+    /**
+     * Gets the exact cost of this enchantment at the specified level.
+     * <p>
+     * Unlike {@link #getCostAtLevel(int)} this never clamps to {@code long} range, so high-level
+     * exponential curves and sums of many levels stay exact instead of overflowing. This is what the
+     * purchase flow charges against the (also {@link BigDecimal}) currency balance.
+     * <p>
+     * The default implementation returns {@link #getCostAtLevel(int)} widened to {@link BigDecimal};
+     * override it to expose the un-clamped value.
+     *
+     * @param level The enchantment level.
+     * @return The exact cost at that level.
+     */
+    default BigDecimal getCostAtLevelExact(int level) {
+        return BigDecimal.valueOf(getCostAtLevel(level));
+    }
 
     /**
      * Initializes or loads this enchantment. Called during plugin load or reload.

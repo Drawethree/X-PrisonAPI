@@ -2,12 +2,14 @@ package dev.drawethree.xprison.api.enchants.events;
 
 import dev.drawethree.xprison.api.enchants.model.XPrisonEnchantment;
 import dev.drawethree.xprison.api.shared.events.player.XPrisonPlayerEvent;
+import dev.drawethree.xprison.api.utils.BigNumbers;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
 
 /**
  * Called when a player removes levels from an enchantment via the disenchant / refund flow.
@@ -28,20 +30,54 @@ public final class XPrisonEnchantDisenchantEvent extends XPrisonPlayerEvent impl
     private final int levelsRemoved;
     /** Whether this is an admin disenchant (no currency refunded). */
     private final boolean admin;
-    /** Currency that will be refunded to the player. Listeners may change this. */
-    @Setter
+    /**
+     * Currency that will be refunded to the player, clamped to {@code long} range. Kept in sync with
+     * {@link #refundAmountExact}; prefer {@link #getRefundAmountExact()}.
+     */
     private long refundAmount;
+    /** Exact currency that will be refunded to the player. Listeners may change this. */
+    private BigDecimal refundAmountExact;
 
     private boolean cancelled;
 
     public XPrisonEnchantDisenchantEvent(Player player, XPrisonEnchantment enchantment, int currentLevel,
-                                         int levelsRemoved, long refundAmount, boolean admin) {
+                                         int levelsRemoved, BigDecimal refundAmount, boolean admin) {
         super(player);
         this.enchantment = enchantment;
         this.currentLevel = currentLevel;
         this.levelsRemoved = levelsRemoved;
-        this.refundAmount = refundAmount;
+        this.refundAmountExact = refundAmount;
+        this.refundAmount = BigNumbers.clampToLong(refundAmount);
         this.admin = admin;
+    }
+
+    /**
+     * @deprecated a {@code long} refund saturates for high-level curves;
+     *             use {@link #XPrisonEnchantDisenchantEvent(Player, XPrisonEnchantment, int, int, BigDecimal, boolean)}.
+     */
+    @Deprecated
+    public XPrisonEnchantDisenchantEvent(Player player, XPrisonEnchantment enchantment, int currentLevel,
+                                         int levelsRemoved, long refundAmount, boolean admin) {
+        this(player, enchantment, currentLevel, levelsRemoved, BigDecimal.valueOf(refundAmount), admin);
+    }
+
+    /**
+     * Sets the exact refund amount, keeping the saturating {@code long} view in sync.
+     *
+     * @param refundAmount the exact currency to refund
+     */
+    public void setRefundAmountExact(BigDecimal refundAmount) {
+        this.refundAmountExact = refundAmount;
+        this.refundAmount = BigNumbers.clampToLong(refundAmount);
+    }
+
+    /**
+     * @param refundAmount the currency to refund
+     * @deprecated a {@code long} refund saturates for high-level curves; use {@link #setRefundAmountExact(BigDecimal)}.
+     */
+    @Deprecated
+    public void setRefundAmount(long refundAmount) {
+        setRefundAmountExact(BigDecimal.valueOf(refundAmount));
     }
 
     @Override
