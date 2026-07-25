@@ -174,7 +174,9 @@ public final class AreaBreakPipeline {
 
 		// A PER_BLOCK enchant running on packet mines is auto-downgraded to AGGREGATE (unless the
 		// owner opted out): per-block events buy nothing there and cost one dispatch per block.
-		final BreakEventStrategy strategy = PacketMinePolicy.resolveStrategy(context.areaDisplayName(), settings.eventStrategy());
+		final boolean rewardOnly = enchants.isVirtualBreakEnabled(player, pickaxe);
+		final BreakEventStrategy strategy = rewardOnly ? BreakEventStrategy.NONE
+				: PacketMinePolicy.resolveStrategy(context.areaDisplayName(), settings.eventStrategy());
 
 		// Re-validated here rather than trusting the selection: a deferred effect resolves long
 		// afterwards, and the callback may legitimately supply a different set of blocks.
@@ -206,11 +208,11 @@ public final class AreaBreakPipeline {
 				earnings = collectDropsOrEarnings(api, enchants, player, pickaxe, blocks);
 			}
 
-			if (context.shouldRemoveBlocks()) {
+			if (!rewardOnly && context.shouldRemoveBlocks()) {
 				clearBlocks(context, player, blocks, providers);
 			}
 
-			countTowardMines(api, context, origin, blocks);
+			countTowardMines(api, context, rewardOnly, origin, blocks);
 
 			if (settings.countBlocksBroken() && pickaxeLevels != null) {
 				pickaxeLevels.addBlocksAndExp(player, pickaxe, blocks.size(), expToAward, PickaxeExpSource.AREA_ENCHANTS);
@@ -241,9 +243,12 @@ public final class AreaBreakPipeline {
 			return;
 		}
 
+		final XPrisonEnchantsAPI enchants = optional(api::getEnchantsApi);
+		final boolean rewardOnly = enchants != null && enchants.isVirtualBreakEnabled(player, pickaxe);
+
 		Map<MineBlock, Long> broken = VirtualBlockProviders.collectRegion(player, region.world(),
 				region.minX(), region.minY(), region.minZ(),
-				region.maxX(), region.maxY(), region.maxZ(), context.shouldRemoveBlocks());
+				region.maxX(), region.maxY(), region.maxZ(), !rewardOnly && context.shouldRemoveBlocks());
 		if (broken.isEmpty()) {
 			return;
 		}
@@ -284,7 +289,7 @@ public final class AreaBreakPipeline {
 			}
 		}
 
-		if (context.shouldCountTowardMines()) {
+		if (!rewardOnly && context.shouldCountTowardMines()) {
 			XPrisonMinesAPI minesApi = optional(api::getMinesApi);
 			if (minesApi != null) {
 				Mine mine = minesApi.getMineAtLocation(
@@ -466,8 +471,8 @@ public final class AreaBreakPipeline {
 		}
 	}
 
-	private static void countTowardMines(XPrisonAPI api, AreaBreakContext context, Block origin, List<Block> blocks) {
-		if (!context.shouldCountTowardMines()) {
+	private static void countTowardMines(XPrisonAPI api, AreaBreakContext context, boolean rewardOnly, Block origin, List<Block> blocks) {
+		if (rewardOnly || !context.shouldCountTowardMines()) {
 			return;
 		}
 		XPrisonMinesAPI minesApi = optional(api::getMinesApi);
@@ -517,7 +522,7 @@ public final class AreaBreakPipeline {
 		BigDecimal credited = currencyApi.addBalance(player, currency, amount, ReceiveCause.MINING);
 
 		String message = settings.message();
-		if (message != null && !message.isEmpty() && credited.signum() > 0) {
+		if (message != null && !message.isEmpty() && credited.signum() > 0 && context.shouldSendProcMessage(player, pickaxe)) {
 			// Reports the credited amount, which a currency balance cap may have clamped.
 			api.getTextApi().sendMessage(player, message
 					.replace("%amount%", currency.format(credited))

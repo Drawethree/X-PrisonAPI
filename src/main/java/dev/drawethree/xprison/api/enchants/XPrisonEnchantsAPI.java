@@ -231,4 +231,22 @@ public interface XPrisonEnchantsAPI {
 		}
 		return getEnchantLevel(item, fortune);
 	}
+
+	/**
+	 * Whether the given pickaxe is in "virtual block breaking" (reward-only) mode — a per-pickaxe
+	 * player setting. When {@code true}, {@link dev.drawethree.xprison.api.enchants.area.AreaBreakPipeline}
+	 * pays out an area break without clearing blocks, resetting the mine, or firing break events, for
+	 * every area enchant regardless of its own {@code removeBlocks} setting.
+	 * <p>
+	 * The default implementation returns {@code false}, so a break behaves exactly as its enchant
+	 * configures it unless the running plugin resolves a per-pickaxe flag.
+	 *
+	 * @param player  the mining player
+	 * @param pickaxe the pickaxe that caused the break
+	 * @return {@code true} to force the break reward-only
+	 * @since 1.9
+	 */
+	default boolean isVirtualBreakEnabled(Player player, ItemStack pickaxe) {
+		return false;
+	}
 }

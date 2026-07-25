@@ -124,6 +124,19 @@ public interface AreaBreakContext {
 		return shouldRemoveBlocks();
 	}
 
+	/**
+	 * Whether this enchant's configured proc message should be sent to the player for this break. Lets
+	 * an implementation honour a per-pickaxe per-enchant notification toggle.
+	 *
+	 * @param player  the mining player
+	 * @param pickaxe the pickaxe that caused the break
+	 * @return {@code true} to send the proc message
+	 * @since 1.9
+	 */
+	default boolean shouldSendProcMessage(Player player, ItemStack pickaxe) {
+		return true;
+	}
+
 	/** @return whether the mines module should clear the blocks too (the pipeline already did) */
 	default boolean minesClearBlocks() {
 		return false;
