@@ -74,4 +74,22 @@ class PacketMinePolicyTest {
 		assertEquals(BreakEventStrategy.NONE,
 				PacketMinePolicy.resolveStrategy("Layer", BreakEventStrategy.NONE));
 	}
+
+	/**
+	 * The core guarantee for servers with no packet-mines plugin: whatever the enchant is configured
+	 * with, and whether or not optimisation is enabled, the strategy is returned untouched. No provider
+	 * is registered in this test (nor in the rest of the suite), so this is the "packet mining disabled"
+	 * configuration.
+	 */
+	@Test
+	@DisplayName("without any provider, every strategy is returned unchanged regardless of the flag")
+	void noProvidersNeverRewritesAnyStrategy() {
+		for (boolean optimise : new boolean[]{true, false}) {
+			PacketMinePolicy.setOptimizeForPacketMines(optimise);
+			for (BreakEventStrategy s : BreakEventStrategy.values()) {
+				assertEquals(s, PacketMinePolicy.resolveStrategy("AnyEnchant", s),
+						"strategy " + s + " must pass through untouched with no provider (optimise=" + optimise + ")");
+			}
+		}
+	}
 }
