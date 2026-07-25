@@ -80,10 +80,18 @@ public final class AreaBreakPipeline {
 		// could be holding something else.
 		final ItemStack pickaxe = player.getInventory().getItemInMainHand();
 
+		// Per-pickaxe "Enchant Animations" setting. When off, the deferred cosmetic effect is bypassed
+		// (resolve runs immediately) and the completion hook is skipped, for every area enchant.
+		final boolean animations = enchants.isEnchantAnimationEnabled(player, pickaxe);
+
 		if (region != null && context.breaksEntireRegion() && VirtualBlockProviders.isVirtualMineArea(originLocation)) {
 			context.onBreakStart(player, origin, level);
-			context.dispatchWithEffect(player, origin, Collections.emptyList(), level,
-					ignoredTargets -> resolveEntireVirtualRegion(api, context, player, pickaxe, region));
+			if (animations) {
+				context.dispatchWithEffect(player, origin, Collections.emptyList(), level,
+						ignoredTargets -> resolveEntireVirtualRegion(api, context, player, pickaxe, region, true));
+			} else {
+				resolveEntireVirtualRegion(api, context, player, pickaxe, region, false);
+			}
 			return;
 		}
 
@@ -93,8 +101,12 @@ public final class AreaBreakPipeline {
 		}
 
 		context.onBreakStart(player, origin, level);
-		context.dispatchWithEffect(player, origin, targets, level,
-				finalTargets -> resolve(api, context, player, pickaxe, origin, region, finalTargets));
+		if (animations) {
+			context.dispatchWithEffect(player, origin, targets, level,
+					finalTargets -> resolve(api, context, player, pickaxe, origin, region, finalTargets, true));
+		} else {
+			resolve(api, context, player, pickaxe, origin, region, targets, false);
+		}
 	}
 
 	/**
@@ -160,7 +172,7 @@ public final class AreaBreakPipeline {
 	 * The normal, per-block path.
 	 */
 	private static void resolve(XPrisonAPI api, AreaBreakContext context, Player player,
-								ItemStack pickaxe, Block origin, @Nullable AreaBounds region, List<Block> targets) {
+								ItemStack pickaxe, Block origin, @Nullable AreaBounds region, List<Block> targets, boolean animations) {
 		if (!player.isOnline()) {
 			return;
 		}
@@ -230,7 +242,9 @@ public final class AreaBreakPipeline {
 			payout(api, context, player, pickaxe, earnings);
 		}
 
-		context.onBreakComplete(player, blocks);
+		if (animations) {
+			context.onBreakComplete(player, blocks);
+		}
 	}
 
 	/**
@@ -238,7 +252,7 @@ public final class AreaBreakPipeline {
 	 * touching a single world block or firing a single per-block event.
 	 */
 	private static void resolveEntireVirtualRegion(XPrisonAPI api, AreaBreakContext context, Player player,
-												   ItemStack pickaxe, AreaBounds region) {
+												   ItemStack pickaxe, AreaBounds region, boolean animations) {
 		if (!player.isOnline()) {
 			return;
 		}
@@ -301,7 +315,9 @@ public final class AreaBreakPipeline {
 		}
 
 		payout(api, context, player, pickaxe, earnings);
-		context.onBreakComplete(player, Collections.emptyList());
+		if (animations) {
+			context.onBreakComplete(player, Collections.emptyList());
+		}
 	}
 
 	/**

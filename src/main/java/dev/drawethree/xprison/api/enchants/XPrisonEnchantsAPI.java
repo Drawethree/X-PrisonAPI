@@ -267,4 +267,22 @@ public interface XPrisonEnchantsAPI {
 	default boolean isEnchantNotificationEnabled(Player player, ItemStack pickaxe, XPrisonEnchantment enchantment) {
 		return true;
 	}
+
+	/**
+	 * Whether enchant animations are enabled for the given pickaxe — a per-pickaxe player setting.
+	 * When {@code false}, {@link dev.drawethree.xprison.api.enchants.area.AreaBreakPipeline} skips the
+	 * cosmetic animation of an area break (the deferred effect and the completion hook) while still
+	 * paying out, so no addon has to opt in.
+	 * <p>
+	 * The default implementation returns {@code true}, so animations play unless the running plugin
+	 * resolves a per-pickaxe flag.
+	 *
+	 * @param player  the mining player
+	 * @param pickaxe the pickaxe that caused the break
+	 * @return {@code true} to play enchant animations
+	 * @since 1.9
+	 */
+	default boolean isEnchantAnimationEnabled(Player player, ItemStack pickaxe) {
+		return true;
+	}
 }
