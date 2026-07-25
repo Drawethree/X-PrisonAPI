@@ -136,4 +136,21 @@ public interface XPrisonEnchantment {
         return XPrisonAPI.getInstance().getCurrencyApi().getCurrency(getCurrencyName());
     }
 
+    /**
+     * Whether this enchant sends the player a message when it procs, and therefore can be silenced
+     * from the in-game "Enchant Notifications" menu.
+     * <p>
+     * Return {@code true} to make this enchant appear in that menu; players can then toggle its
+     * message per pickaxe. An enchant that opts in should also gate its own message send on
+     * {@link dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI#isEnchantNotificationEnabled}
+     * (area enchants get this for free — see {@code AreaBreakEnchant}). The default is {@code false},
+     * so an enchant that never messages the player is never listed.
+     *
+     * @return {@code true} if this enchant has a per-pickaxe-toggleable proc message
+     * @since 1.9
+     */
+    default boolean hasProcNotification() {
+        return false;
+    }
+
 }

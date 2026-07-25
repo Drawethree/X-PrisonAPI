@@ -154,6 +154,29 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 		return this.areaSettings;
 	}
 
+	/**
+	 * Area enchants opt in automatically when they are configured with a proc {@code message}: the
+	 * player can then silence it from the "Enchant Notifications" menu. No override needed in a
+	 * subclass.
+	 */
+	@Override
+	public boolean hasProcNotification() {
+		return this.areaSettings != null && this.areaSettings.message() != null && !this.areaSettings.message().isEmpty();
+	}
+
+	/**
+	 * Honours the per-pickaxe notification toggle for this enchant's proc message. The pipeline calls
+	 * this before sending {@link AreaBreakSettings#message()}, so an addon author gets it for free.
+	 */
+	@Override
+	public boolean shouldSendProcMessage(@NotNull Player player, @Nullable ItemStack pickaxe) {
+		try {
+			return XPrisonAPI.getInstance().getEnchantsApi().isEnchantNotificationEnabled(player, pickaxe, this);
+		} catch (RuntimeException enchantsUnavailable) {
+			return true; // enchants module disabled mid-flight; do not swallow the message
+		}
+	}
+
 	@Override
 	@NotNull
 	public final String areaDisplayName() {

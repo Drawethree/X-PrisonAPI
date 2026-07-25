@@ -249,4 +249,22 @@ public interface XPrisonEnchantsAPI {
 	default boolean isVirtualBreakEnabled(Player player, ItemStack pickaxe) {
 		return false;
 	}
+
+	/**
+	 * Whether the player wants this enchant's proc message on the given pickaxe — the per-pickaxe
+	 * "Enchant Notifications" toggle. An enchant that reports {@link XPrisonEnchantment#hasProcNotification()}
+	 * should call this before sending its proc message so a player can silence it.
+	 * <p>
+	 * The default implementation returns {@code true} (never silenced), so an enchant behaves
+	 * unchanged unless the running plugin resolves a per-pickaxe flag.
+	 *
+	 * @param player      the mining player
+	 * @param pickaxe     the pickaxe that caused the break
+	 * @param enchantment the enchant about to message the player
+	 * @return {@code true} to send the proc message
+	 * @since 1.9
+	 */
+	default boolean isEnchantNotificationEnabled(Player player, ItemStack pickaxe, XPrisonEnchantment enchantment) {
+		return true;
+	}
 }
