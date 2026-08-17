@@ -61,4 +61,40 @@ public interface XPrisonBlocksAPI {
 	default void handleBulkBlockBreak(Player player, Map<MineBlock, Long> typeCounts) {
 		// No-op by default; the core implementation performs the real pipeline.
 	}
+
+	/**
+	 * Whether any lucky block is configured to be consumed by mining it — {@code give-block: false}
+	 * in {@code blocks.yml}, meaning the block yields only its lucky rewards.
+	 * <p>
+	 * This is a constant-time flag, so callers on the block-break hot path can skip the per-block
+	 * {@link #isBlockItemSuppressed(Block)} lookup entirely on the common setup where every lucky
+	 * block still hands out its item.
+	 * <p>
+	 * The default implementation returns {@code false}.
+	 *
+	 * @return {@code true} when at least one configured lucky block suppresses its own item
+	 * @since 1.9
+	 */
+	default boolean hasItemSuppressingLuckyBlocks() {
+		return false;
+	}
+
+	/**
+	 * Whether the given block is a lucky block configured with {@code give-block: false}.
+	 * <p>
+	 * Such a block must yield neither its item nor its auto-sell value: mining it grants the lucky
+	 * rewards and nothing else. Callers that hand out drops or earnings for broken blocks are
+	 * expected to skip these blocks — but only where the lucky rewards actually fire, otherwise the
+	 * break would pay out nothing at all.
+	 * <p>
+	 * The default implementation returns {@code false}.
+	 *
+	 * @param block the broken block; may be air when a packet-mine provider still holds a virtual
+	 *              block at its location
+	 * @return {@code true} when the block's item and sell value must be discarded
+	 * @since 1.9
+	 */
+	default boolean isBlockItemSuppressed(Block block) {
+		return false;
+	}
 }

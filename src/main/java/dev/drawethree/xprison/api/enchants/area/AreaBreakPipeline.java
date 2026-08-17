@@ -215,9 +215,13 @@ public final class AreaBreakPipeline {
 			final long expToAward = settings.countBlocksBroken() && pickaxeLevels != null
 					? pickaxeLevels.getExpForBlocks(blocks) : 0L;
 
+			// Lucky blocks set to be consumed pay out their rewards only; they are still cleared and
+			// still count as broken, they just hand out no item and no sell value.
+			final List<Block> rewardable = rewardableBlocks(api, blocks);
+
 			BigDecimal earnings = BigDecimal.ZERO;
-			if (!routeToUltraBackpacks(api, player, blocks, providers)) {
-				earnings = collectDropsOrEarnings(api, enchants, player, pickaxe, blocks);
+			if (!rewardable.isEmpty() && !routeToUltraBackpacks(api, player, rewardable, providers)) {
+				earnings = collectDropsOrEarnings(api, enchants, player, pickaxe, rewardable);
 			}
 
 			if (!rewardOnly && context.shouldRemoveBlocks()) {
@@ -335,6 +339,25 @@ public final class AreaBreakPipeline {
 			}
 		}
 		return allowed;
+	}
+
+	/**
+	 * Drops the blocks whose item and sell value the Blocks module suppresses (lucky blocks configured
+	 * with {@code give-block: false}). Returns the very same list when no such block is configured, so
+	 * the overwhelmingly common setup pays nothing for this.
+	 */
+	private static List<Block> rewardableBlocks(XPrisonAPI api, List<Block> blocks) {
+		final XPrisonBlocksAPI blocksApi = optional(api::getBlocksApi);
+		if (blocksApi == null || !blocksApi.hasItemSuppressingLuckyBlocks()) {
+			return blocks;
+		}
+		List<Block> rewardable = new ArrayList<>(blocks.size());
+		for (Block block : blocks) {
+			if (!blocksApi.isBlockItemSuppressed(block)) {
+				rewardable.add(block);
+			}
+		}
+		return rewardable;
 	}
 
 	private static boolean routeToUltraBackpacks(XPrisonAPI api, Player player, List<Block> blocks, boolean providers) {
