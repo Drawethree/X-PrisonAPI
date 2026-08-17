@@ -49,6 +49,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     protected String currencyName;
     protected boolean refundEnabled;
     protected int refundGuiSlot;
+    protected int refundGuiPage;
     protected double refundPercentage;
 
     /**
@@ -110,7 +111,8 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
 
         JsonObject refundObject = JsonUtils.getRequiredObject(config,"refund");
         this.refundEnabled = JsonUtils.getRequiredBoolean(refundObject,"enabled");
-        this.refundGuiSlot = JsonUtils.getRequiredInt(refundObject,"guiSlot");
+        this.refundGuiSlot = JsonUtils.getOptionalInt(refundObject, "guiSlot", -1);
+        this.refundGuiPage = JsonUtils.getOptionalInt(refundObject, "guiPage", 1);
         this.refundPercentage = JsonUtils.getRequiredDouble(refundObject, "percentage");
 
         loadPrestigeProperties(config);
@@ -150,6 +152,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         JsonObject gui = JsonUtils.getRequiredObject(config, "gui");
 
         int slot = JsonUtils.getRequiredInt(gui, "slot");
+        int page = JsonUtils.getOptionalInt(gui, "page", 1);
         String guiName = ChatColor.translateAlternateColorCodes('&', JsonUtils.getRequiredString(gui, "name"));
         Material mat = Material.valueOf(JsonUtils.getRequiredString(gui, "material"));
         String base64 = JsonUtils.getOptionalString(gui, "base64", null);
@@ -161,7 +164,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
 
         int customModelData = JsonUtils.getOptionalInt(gui, "customModelData", 0);
 
-        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, guiName, base64, mat, desc, customModelData);
+        this.guiProperties = new XPrisonEnchantmentGuiPropertiesBase(slot, page, guiName, base64, mat, desc, customModelData);
     }
 
     /**

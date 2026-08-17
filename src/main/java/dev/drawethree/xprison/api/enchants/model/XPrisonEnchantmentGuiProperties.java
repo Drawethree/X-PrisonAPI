@@ -14,6 +14,21 @@ public interface XPrisonEnchantmentGuiProperties {
     int getGuiSlot();
 
     /**
+     * Gets the page of the enchanting GUI this enchantment is displayed on.
+     * <p>
+     * Pages are 1-based, so {@code 1} is the first page. Enchantments that do not fit the
+     * page they ask for - because the slot is already taken, or falls outside the menu's
+     * configured content region - are moved to the next free slot automatically, spilling
+     * onto additional pages as needed.
+     *
+     * @return the 1-based GUI page; defaults to {@code 1}.
+     * @since 1.9
+     */
+    default int getGuiPage() {
+        return 1;
+    }
+
+    /**
      * Gets the material type of the GUI item representing this enchantment.
      *
      * @return The material used in the GUI.

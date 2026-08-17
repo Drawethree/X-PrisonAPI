@@ -22,6 +22,11 @@ class XPrisonEnchantmentGuiPropertiesBase implements XPrisonEnchantmentGuiProper
     private int guiSlot;
 
     /**
+     * The 1-based page of the GUI this enchantment appears on.
+     */
+    private int guiPage;
+
+    /**
      * The display name of the enchantment in the GUI (may contain color codes).
      */
     private String guiName;
