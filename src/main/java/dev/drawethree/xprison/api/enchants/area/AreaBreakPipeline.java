@@ -286,7 +286,7 @@ public final class AreaBreakPipeline {
 						.multiply(BigDecimal.valueOf(fortune))
 						.multiply(BigDecimal.valueOf(entry.getValue())));
 			} else {
-				giveStacks(player, entry.getKey(), entry.getValue() * fortune);
+				giveStacks(autoSellApi, player, entry.getKey(), entry.getValue() * fortune);
 			}
 		}
 
@@ -379,7 +379,7 @@ public final class AreaBreakPipeline {
 				earnings = earnings.add(autoSellApi.getPriceForBlockExact(block)
 						.multiply(BigDecimal.valueOf(amount)));
 			} else {
-				giveDrop(factory, player, block, amount);
+				giveDrop(factory, autoSellApi, player, block, amount);
 			}
 		}
 		return earnings;
@@ -412,7 +412,7 @@ public final class AreaBreakPipeline {
 
 		if (!autoSell) {
 			for (Map.Entry<AggregateKey, Long> bucket : counts.entrySet()) {
-				giveStacks(player, bucket.getKey().type(), bucket.getValue() * bucket.getKey().amount());
+				giveStacks(autoSellApi, player, bucket.getKey().type(), bucket.getValue() * bucket.getKey().amount());
 			}
 			return BigDecimal.ZERO;
 		}
@@ -446,27 +446,40 @@ public final class AreaBreakPipeline {
 	 * Resolves through the mine-block factory so vanilla, custom (ItemsAdder/Nexo/Oraxen) and virtual
 	 * blocks all yield the right item - {@code block.getType()} would be air for a virtual block.
 	 */
-	private static void giveDrop(MineBlockFactory factory, Player player, Block block, int amount) {
+	private static void giveDrop(MineBlockFactory factory, @Nullable XPrisonAutoSellAPI autoSellApi,
+								 Player player, Block block, int amount) {
 		try {
 			ItemStack drop = factory.fromBlock(block).toItemStack(amount);
 			if (drop != null && !drop.getType().isAir()) {
-				player.getInventory().addItem(drop);
+				player.getInventory().addItem(smelt(autoSellApi, drop));
 			}
 		} catch (IllegalArgumentException unresolvable) {
 			// Nothing meaningful to give for this block.
 		}
 	}
 
-	private static void giveStacks(Player player, MineBlock type, long amount) {
+	private static void giveStacks(@Nullable XPrisonAutoSellAPI autoSellApi, Player player, MineBlock type, long amount) {
 		while (amount > 0) {
 			int size = (int) Math.min(amount, 64L);
 			ItemStack item = type.toItemStack(size);
 			if (item == null || item.getType().isAir()) {
 				return;
 			}
-			player.getInventory().addItem(item);
+			player.getInventory().addItem(smelt(autoSellApi, item));
 			amount -= size;
 		}
+	}
+
+	/**
+	 * Routes a drop through AutoSell's auto-smelt mapping, so an area enchant hands out exactly what
+	 * breaking the same block by hand would. A no-op when the AutoSell module is off.
+	 */
+	private static ItemStack smelt(@Nullable XPrisonAutoSellAPI autoSellApi, ItemStack drop) {
+		if (autoSellApi == null) {
+			return drop;
+		}
+		ItemStack smelted = autoSellApi.applyAutoSmelt(drop);
+		return smelted == null || smelted.getType().isAir() ? drop : smelted;
 	}
 
 	/**

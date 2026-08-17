@@ -190,4 +190,26 @@ public interface XPrisonAutoSellAPI {
 	 * @return total currency earned from the sale
 	 */
 	double sellPlayerInventory(Player player);
+
+	/**
+	 * Applies the server's configured auto-smelt mapping ({@code auto-smelt} in {@code autosell.yml})
+	 * to a mined drop, so a block that has a smelted counterpart is handed to the player in its
+	 * smelted form.
+	 * <p>
+	 * Call this on any {@link ItemStack} that is about to be placed in a miner's inventory as the
+	 * result of a block break — area enchants included — so auto-smelt behaves identically no matter
+	 * which code path produced the drop. It is a no-op when auto-smelt is switched off, when no
+	 * mapping exists for the item's type, or when the mapped material cannot be resolved. Item
+	 * amount is preserved; the returned stack may be the argument itself.
+	 * <p>
+	 * Auto-smelt never affects auto-sell earnings: sold blocks are priced by block type and are
+	 * never turned into items.
+	 *
+	 * @param drop the drop about to be given to the player, may be {@code null}
+	 * @return the smelted stack, or {@code drop} unchanged when no mapping applies
+	 * @since 1.9
+	 */
+	default ItemStack applyAutoSmelt(ItemStack drop) {
+		return drop;
+	}
 }
