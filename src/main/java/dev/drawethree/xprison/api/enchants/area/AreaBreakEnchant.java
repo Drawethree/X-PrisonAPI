@@ -75,6 +75,11 @@ import java.util.List;
  * Enchants that clear an entire region should also override {@link #breaksEntireRegion()}: on a
  * packet mine that switches to a bulk path resolving the whole region straight from the mine
  * plugin's store in O(distinct block types), with no per-block world access and no per-block events.
+ * <p>
+ * A proc affecting more blocks than {@link AreaBreakChunking#threshold()} has its world-facing work
+ * spread over several ticks rather than landing in one; the rewards are still settled once, up
+ * front. Nothing is needed from a subclass for this, but {@link #onBreakComplete} may then fire
+ * several ticks after {@link #onBreakStart}.
  *
  * @see AreaBreakPipeline
  * @see BreakEventStrategy

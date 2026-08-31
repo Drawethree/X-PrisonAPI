@@ -45,7 +45,7 @@ public final class VirtualBlockProviders {
 
 	private static final CopyOnWriteArrayList<VirtualBlockProvider> PROVIDERS = new CopyOnWriteArrayList<>();
 
-	private static final ThreadLocal<ArrayDeque<Map<PosKey, MineBlock>>> SNAPSHOTS =
+	private static final ThreadLocal<ArrayDeque<Snapshot>> SNAPSHOTS =
 			ThreadLocal.withInitial(ArrayDeque::new);
 
 	private VirtualBlockProviders() {
@@ -103,11 +103,11 @@ public final class VirtualBlockProviders {
 	 */
 	@Nullable
 	public static MineBlock blockAt(@NotNull Location location) {
-		ArrayDeque<Map<PosKey, MineBlock>> snapshots = SNAPSHOTS.get();
+		ArrayDeque<Snapshot> snapshots = SNAPSHOTS.get();
 		if (!snapshots.isEmpty()) {
 			PosKey key = PosKey.of(location);
-			for (Map<PosKey, MineBlock> snapshot : snapshots) {
-				MineBlock block = snapshot.get(key);
+			for (Snapshot snapshot : snapshots) {
+				MineBlock block = snapshot.captured.get(key);
 				if (block != null) {
 					return block;
 				}
@@ -223,12 +223,32 @@ public final class VirtualBlockProviders {
 	 */
 	@NotNull
 	public static SnapshotHandle captureAndOpen(@NotNull Collection<Block> blocks) {
+		return capture(blocks).open();
+	}
+
+	/**
+	 * Captures the virtual types of the given blocks <b>without</b> opening an overlay, yielding a
+	 * reusable {@link Snapshot}.
+	 * <p>
+	 * Exists for pipelines that cannot finish inside a single tick: an area enchant large enough to
+	 * be spread over several ticks captures once (the scan is O(blocks) and must not be repeated),
+	 * then opens the very same snapshot around each slice of work and closes it again before
+	 * yielding the tick. That keeps at most one overlay open at any instant, so concurrent breaks
+	 * from different players never see each other's captured blocks.
+	 *
+	 * @param blocks the blocks about to be processed by a break pipeline
+	 * @return the captured snapshot; {@link Snapshot#isEmpty() empty} when nothing virtual was found
+	 * @see #captureAndOpen(Collection)
+	 * @since 1.9
+	 */
+	@NotNull
+	public static Snapshot capture(@NotNull Collection<Block> blocks) {
 		// Zero-overhead fast path: with no provider registered and no snapshot open, nothing
 		// virtual can exist, so the whole capture scan (one iteration over every affected block —
 		// e.g. an entire Nuke region) is skipped. This keeps AOE enchants / bombs byte-for-byte
 		// as cheap as before packet-mines existed when the feature is off.
 		if (PROVIDERS.isEmpty() && SNAPSHOTS.get().isEmpty()) {
-			return NO_OP_HANDLE;
+			return Snapshot.EMPTY;
 		}
 		Map<PosKey, MineBlock> captured = new HashMap<>();
 		for (Block block : blocks) {
@@ -241,7 +261,7 @@ public final class VirtualBlockProviders {
 				captured.put(PosKey.of(location), virtual);
 			}
 		}
-		return open(captured);
+		return captured.isEmpty() ? Snapshot.EMPTY : new Snapshot(captured);
 	}
 
 	/**
@@ -258,7 +278,7 @@ public final class VirtualBlockProviders {
 		for (Map.Entry<Location, MineBlock> entry : resolved.entrySet()) {
 			keyed.put(PosKey.of(entry.getKey()), entry.getValue());
 		}
-		return open(keyed);
+		return new Snapshot(keyed).open();
 	}
 
 	/**
@@ -271,16 +291,64 @@ public final class VirtualBlockProviders {
 				|| material == org.bukkit.Material.VOID_AIR;
 	}
 
-	private static SnapshotHandle open(Map<PosKey, MineBlock> snapshot) {
-		ArrayDeque<Map<PosKey, MineBlock>> stack = SNAPSHOTS.get();
+	private static SnapshotHandle open(Snapshot snapshot) {
+		ArrayDeque<Snapshot> stack = SNAPSHOTS.get();
 		stack.push(snapshot);
 		return () -> {
-			ArrayDeque<Map<PosKey, MineBlock>> current = SNAPSHOTS.get();
+			ArrayDeque<Snapshot> current = SNAPSHOTS.get();
 			current.remove(snapshot);
 			if (current.isEmpty()) {
 				SNAPSHOTS.remove();
 			}
 		};
+	}
+
+	/**
+	 * A captured set of virtual block types that can be opened as an overlay, closed, and opened
+	 * again.
+	 * <p>
+	 * Capturing is O(blocks); opening is O(1), which is what lets a long-running break pipeline
+	 * re-open the same capture once per tick instead of re-scanning. Instances are identity-keyed on
+	 * the snapshot stack, so a snapshot must not be opened twice concurrently — open it, use it,
+	 * close it (try-with-resources), then open it again for the next slice of work.
+	 *
+	 * @since 1.9
+	 */
+	public static final class Snapshot {
+
+		/** Shared "nothing virtual was captured" instance; opening it is a no-op. */
+		private static final Snapshot EMPTY = new Snapshot(Map.of());
+
+		private final Map<PosKey, MineBlock> captured;
+
+		private Snapshot(Map<PosKey, MineBlock> captured) {
+			this.captured = captured;
+		}
+
+		/**
+		 * @return {@code true} when no virtual block was captured, so opening this snapshot changes
+		 * nothing
+		 */
+		public boolean isEmpty() {
+			return this.captured.isEmpty();
+		}
+
+		/**
+		 * @return the number of captured virtual block positions
+		 */
+		public int size() {
+			return this.captured.size();
+		}
+
+		/**
+		 * Pushes this capture onto the current thread's snapshot stack.
+		 *
+		 * @return a handle that must be closed (try-with-resources) when the work using it finishes
+		 */
+		@NotNull
+		public SnapshotHandle open() {
+			return this.captured.isEmpty() ? NO_OP_HANDLE : VirtualBlockProviders.open(this);
+		}
 	}
 
 	/**

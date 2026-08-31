@@ -17,6 +17,7 @@ import dev.drawethree.xprison.api.pickaxelevels.model.PickaxeExpSource;
 import dev.drawethree.xprison.api.virtualblocks.VirtualBlockProviders;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -45,6 +46,12 @@ import java.util.function.Supplier;
  * Every module-backed sub-API is treated as optional. A server may run with Mines, AutoSell, Blocks,
  * Pickaxe Levels or Currency switched off, and each feature simply drops out of the pipeline rather
  * than breaking the enchant.
+ *
+ * <h2>Oversized procs</h2>
+ * A proc is normally resolved in one synchronous pass. Above {@link AreaBreakChunking#threshold()}
+ * the rewards are still settled in that one pass, but clearing the blocks, advancing the mine and
+ * firing the aggregate break event are spread over consecutive ticks - see
+ * {@link AreaBreakChunking}.
  *
  * @since 1.9
  */
@@ -162,10 +169,20 @@ public final class AreaBreakPipeline {
 	 * packet-mine provider still has a virtual block there.
 	 */
 	private static boolean isPresent(Block block, boolean providers) {
-		if (!block.getType().isAir()) {
+		if (!isAirBlock(block.getType())) {
 			return true;
 		}
 		return providers && VirtualBlockProviders.hasProviderBlockAt(block.getLocation());
+	}
+
+	/**
+	 * Air check by constant comparison — equivalent to {@link Material#isAir()} for block materials,
+	 * without resolving the Bukkit block-type registry. Mirrors
+	 * {@code VirtualBlockProviders}' identical check, and keeps the per-block hot path free of a
+	 * registry lookup.
+	 */
+	private static boolean isAirBlock(Material material) {
+		return material == Material.AIR || material == Material.CAVE_AIR || material == Material.VOID_AIR;
 	}
 
 	/**
@@ -194,6 +211,14 @@ public final class AreaBreakPipeline {
 		// afterwards, and the callback may legitimately supply a different set of blocks.
 		List<Block> blocks = filterTargets(enchants, context, targets, origin, region);
 		if (blocks.isEmpty()) {
+			return;
+		}
+
+		// Above the chunking threshold the world-facing half of the proc is spread over several
+		// ticks; the reward half still resolves here, in one pass. See AreaBreakChunking.
+		if (AreaBreakChunking.shouldChunk(blocks.size())) {
+			resolveChunked(api, context, enchants, player, pickaxe, origin, blocks,
+					settings, strategy, rewardOnly, providers, animations);
 			return;
 		}
 
@@ -248,6 +273,217 @@ public final class AreaBreakPipeline {
 
 		if (animations) {
 			context.onBreakComplete(player, blocks);
+		}
+	}
+
+	/**
+	 * The spread-out variant of {@link #resolve}, taken when a proc affects more blocks than
+	 * {@link AreaBreakChunking#threshold()}.
+	 * <p>
+	 * Everything the player observes as a reward - drops or auto-sell earnings, the currency payout,
+	 * the proc message, pickaxe blocks and experience - is resolved here, synchronously and exactly
+	 * once, while the blocks are still intact and the player is still guaranteed to be online. Only
+	 * the world-facing remainder (clearing the blocks, advancing the mine's reset counter and firing
+	 * the aggregate break event) is handed to a {@link ChunkedAreaBreak}, which finishes it a slice
+	 * per tick.
+	 * <p>
+	 * Paying before the first slice rather than after the last one is deliberate: no disconnect,
+	 * death, world change, mine reset or server shutdown occurring part-way through the slices can
+	 * then strand a payout the player has already earned, or duplicate one.
+	 */
+	private static void resolveChunked(XPrisonAPI api, AreaBreakContext context, XPrisonEnchantsAPI enchants,
+									   Player player, ItemStack pickaxe, Block origin, List<Block> blocks,
+									   AreaBreakSettings settings, BreakEventStrategy strategy,
+									   boolean rewardOnly, boolean providers, boolean animations) {
+		// Captured once for the whole proc and re-opened around each slice, so the virtual types stay
+		// resolvable for every slice without ever leaving two overlays open at the same instant.
+		final VirtualBlockProviders.Snapshot snapshot = VirtualBlockProviders.capture(blocks);
+
+		List<Block> affected = blocks;
+		try (VirtualBlockProviders.SnapshotHandle ignored = snapshot.open()) {
+
+			if (strategy == BreakEventStrategy.PER_BLOCK) {
+				affected = firePerBlockEvents(enchants, player, blocks);
+				if (affected.isEmpty()) {
+					return;
+				}
+			}
+
+			final XPrisonPickaxeLevelsAPI pickaxeLevels = optional(api::getPickaxeLevelsApi);
+
+			final long expToAward = settings.countBlocksBroken() && pickaxeLevels != null
+					? pickaxeLevels.getExpForBlocks(affected) : 0L;
+
+			final List<Block> rewardable = rewardableBlocks(api, affected);
+
+			BigDecimal earnings = BigDecimal.ZERO;
+			if (!rewardable.isEmpty() && !routeToUltraBackpacks(api, player, rewardable, providers)) {
+				earnings = collectDropsOrEarnings(api, enchants, player, pickaxe, rewardable);
+			}
+
+			if (settings.countBlocksBroken() && pickaxeLevels != null) {
+				pickaxeLevels.addBlocksAndExp(player, pickaxe, affected.size(), expToAward, PickaxeExpSource.AREA_ENCHANTS);
+			}
+
+			payout(api, context, player, pickaxe, earnings);
+		}
+
+		new ChunkedAreaBreak(api, context, player, origin, affected, snapshot,
+				strategy == BreakEventStrategy.AGGREGATE, settings.countBlocksBroken(),
+				rewardOnly, providers, animations).start();
+	}
+
+	/**
+	 * One oversized area break in flight, finishing its world-facing work a slice per tick.
+	 *
+	 * <h2>Interleaving</h2>
+	 * Every piece of per-proc state lives on this object, which is created per proc - never on the
+	 * enchant, which is a single shared instance serving every player. Two players procing the same
+	 * enchant therefore drive two independent instances whose slices may freely interleave.
+	 *
+	 * <h2>Exactly once</h2>
+	 * The payout, the drops and the pickaxe award already happened before the first slice ran, so
+	 * nothing here can duplicate them. Within the slices each block is visited exactly once (the
+	 * cursor only ever moves forward) and the completion hook fires once, from {@link #finish()}.
+	 *
+	 * <h2>Giving up early</h2>
+	 * Slicing stops when the mine has refilled underneath the proc - otherwise its tail would eat
+	 * into a mine that has just reset - and when a packet-mine proc's owner has gone offline, since
+	 * those blocks only ever existed in that one player's client. A proc against real world blocks
+	 * keeps clearing even if its owner leaves: the mine is shared state and must not be left
+	 * half-eaten.
+	 */
+	private static final class ChunkedAreaBreak {
+
+		private final XPrisonAPI api;
+		private final AreaBreakContext context;
+		private final Player player;
+		private final Block origin;
+		private final List<Block> blocks;
+		private final VirtualBlockProviders.Snapshot snapshot;
+		private final boolean aggregate;
+		private final boolean countBlocksBroken;
+		private final boolean rewardOnly;
+		private final boolean providers;
+		private final boolean animations;
+		private final boolean clearsBlocks;
+		private final boolean virtual;
+		private final int sliceSize;
+
+		private int cursor;
+		private int mineBlocksSeen = -1;
+		private boolean finished;
+
+		ChunkedAreaBreak(XPrisonAPI api, AreaBreakContext context, Player player, Block origin,
+						 List<Block> blocks, VirtualBlockProviders.Snapshot snapshot,
+						 boolean aggregate, boolean countBlocksBroken,
+						 boolean rewardOnly, boolean providers, boolean animations) {
+			this.api = api;
+			this.context = context;
+			this.player = player;
+			this.origin = origin;
+			this.blocks = blocks;
+			this.snapshot = snapshot;
+			this.aggregate = aggregate;
+			this.countBlocksBroken = countBlocksBroken;
+			this.rewardOnly = rewardOnly;
+			this.providers = providers;
+			this.animations = animations;
+			this.clearsBlocks = !rewardOnly && context.shouldRemoveBlocks();
+			this.virtual = providers && !snapshot.isEmpty();
+			this.sliceSize = Math.max(1, AreaBreakChunking.threshold());
+		}
+
+		/** Starts the proc, running its first slice immediately so the break begins this tick. */
+		void start() {
+			this.mineBlocksSeen = currentMineBlocks();
+			runSlice();
+		}
+
+		/**
+		 * Runs one slice, then yields the tick. If the platform refuses to schedule the next slice
+		 * the remaining ones are drained in this same loop rather than recursively, so work that has
+		 * already been paid for is never dropped and the stack never grows with the block count.
+		 */
+		private void runSlice() {
+			while (step()) {
+				if (AreaBreakChunking.tryRunNextTick(this::runSlice)) {
+					return;
+				}
+			}
+			finish();
+		}
+
+		/**
+		 * @return {@code true} if blocks remain to be processed after this slice
+		 */
+		private boolean step() {
+			if (abandoned() || mineRefilled()) {
+				return false;
+			}
+
+			final int end = Math.min(this.cursor + this.sliceSize, this.blocks.size());
+			final List<Block> slice = this.blocks.subList(this.cursor, end);
+
+			try (VirtualBlockProviders.SnapshotHandle ignored = this.snapshot.open()) {
+				if (this.clearsBlocks) {
+					clearBlocks(this.context, this.player, slice, this.providers);
+				}
+
+				countTowardMines(this.api, this.context, this.rewardOnly, this.origin, slice);
+
+				if (this.aggregate) {
+					XPrisonBlocksAPI blocksApi = optional(this.api::getBlocksApi);
+					if (blocksApi != null) {
+						blocksApi.handleBlockBreak(this.player, slice, this.countBlocksBroken);
+					}
+				}
+			}
+
+			this.cursor = end;
+			this.mineBlocksSeen = currentMineBlocks();
+			return this.cursor < this.blocks.size();
+		}
+
+		/** A packet-mine proc is meaningless once its owner has left; a real-world one is not. */
+		private boolean abandoned() {
+			return this.virtual && !this.player.isOnline();
+		}
+
+		/**
+		 * Detects a mine reset that landed between two slices - the counter can only fall while this
+		 * proc runs, so a rise (or an in-progress gradual reset) means the mine has been refilled and
+		 * the remaining slices would eat into a mine that is standing again.
+		 */
+		private boolean mineRefilled() {
+			if (this.mineBlocksSeen < 0) {
+				return false;
+			}
+			Mine mine = mineAt(this.api, this.origin);
+			return mine != null && (mine.isResetting() || mine.getCurrentBlocks() > this.mineBlocksSeen);
+		}
+
+		/**
+		 * @return the mine's current block count, or {@code -1} when this proc does not account
+		 * against a mine at all and refills need not be watched for
+		 */
+		private int currentMineBlocks() {
+			if (this.rewardOnly || !this.context.shouldCountTowardMines()) {
+				return -1;
+			}
+			Mine mine = mineAt(this.api, this.origin);
+			return mine == null ? -1 : mine.getCurrentBlocks();
+		}
+
+		/** Fires the cosmetic completion hook exactly once, and only for a player still on the server. */
+		private void finish() {
+			if (this.finished) {
+				return;
+			}
+			this.finished = true;
+			if (this.animations && this.player.isOnline()) {
+				this.context.onBreakComplete(this.player, this.blocks);
+			}
 		}
 	}
 
@@ -373,7 +609,7 @@ public final class AreaBreakPipeline {
 
 	private static boolean containsVirtual(List<Block> blocks) {
 		for (Block block : blocks) {
-			if (block.getType().isAir() && VirtualBlockProviders.hasBlockAt(block.getLocation())) {
+			if (isAirBlock(block.getType()) && VirtualBlockProviders.hasBlockAt(block.getLocation())) {
 				return true;
 			}
 		}
@@ -512,7 +748,7 @@ public final class AreaBreakPipeline {
 	private static void clearBlocks(AreaBreakContext context, Player player, List<Block> blocks, boolean providers) {
 		List<Location> virtual = providers ? new ArrayList<>() : null;
 		for (Block block : blocks) {
-			if (virtual != null && block.getType().isAir()) {
+			if (virtual != null && isAirBlock(block.getType())) {
 				virtual.add(block.getLocation());
 			} else {
 				context.removeRealBlock(player, block);
@@ -523,15 +759,21 @@ public final class AreaBreakPipeline {
 		}
 	}
 
+	/**
+	 * Resolves the mine the origin block sits in, or {@code null} when the mines module is off or the
+	 * break happened outside every mine.
+	 */
+	@Nullable
+	private static Mine mineAt(XPrisonAPI api, Block origin) {
+		XPrisonMinesAPI minesApi = optional(api::getMinesApi);
+		return minesApi == null ? null : minesApi.getMineAtLocation(origin.getLocation());
+	}
+
 	private static void countTowardMines(XPrisonAPI api, AreaBreakContext context, boolean rewardOnly, Block origin, List<Block> blocks) {
 		if (rewardOnly || !context.shouldCountTowardMines()) {
 			return;
 		}
-		XPrisonMinesAPI minesApi = optional(api::getMinesApi);
-		if (minesApi == null) {
-			return; // mines module disabled - the server has no mine to account against
-		}
-		Mine mine = minesApi.getMineAtLocation(origin.getLocation());
+		Mine mine = mineAt(api, origin);
 		if (mine != null) {
 			boolean setToAir = context.minesClearBlocks();
 			// On packet mines, when the pipeline already ran clearBlocks (shouldRemoveBlocks), the blocks

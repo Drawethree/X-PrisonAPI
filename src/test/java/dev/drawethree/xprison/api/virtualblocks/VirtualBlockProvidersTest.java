@@ -153,6 +153,53 @@ class VirtualBlockProvidersTest {
 		}
 	}
 
+	/**
+	 * The multi-tick area-break path scans once and re-opens the same capture around each slice of
+	 * work, so a capture must survive being closed and opened again, and must leave no overlay behind
+	 * while it is closed.
+	 */
+	@Test
+	void captureCanBeOpenedClosedAndReopened() {
+		Location location = at(11, 22, 33);
+		MineBlock block = stubBlock("GOLD_ORE");
+		provider.put(location, block);
+		VirtualBlockProviders.register(provider);
+
+		Block bukkitBlock = mock(Block.class);
+		when(bukkitBlock.getType()).thenReturn(Material.AIR);
+		when(bukkitBlock.getLocation()).thenReturn(location);
+
+		VirtualBlockProviders.Snapshot snapshot = VirtualBlockProviders.capture(List.of(bukkitBlock));
+		assertFalse(snapshot.isEmpty());
+		assertEquals(1, snapshot.size());
+
+		try (var ignored = snapshot.open()) {
+			VirtualBlockProviders.breakBlock(null, location);
+			assertSame(block, VirtualBlockProviders.blockAt(location));
+		}
+		assertNull(VirtualBlockProviders.blockAt(location), "a closed capture must leave no overlay behind");
+
+		try (var ignored = snapshot.open()) {
+			assertSame(block, VirtualBlockProviders.blockAt(location));
+		}
+		assertNull(VirtualBlockProviders.blockAt(location));
+	}
+
+	@Test
+	void captureOfNothingVirtualIsEmptyAndOpensToANoOp() {
+		Block realBlock = mock(Block.class);
+		when(realBlock.getType()).thenReturn(Material.STONE);
+		VirtualBlockProviders.register(provider);
+
+		VirtualBlockProviders.Snapshot snapshot = VirtualBlockProviders.capture(List.of(realBlock));
+
+		assertTrue(snapshot.isEmpty());
+		assertEquals(0, snapshot.size());
+		try (var ignored = snapshot.open()) {
+			assertNull(VirtualBlockProviders.blockAt(at(0, 0, 0)));
+		}
+	}
+
 	@Test
 	void captureAndOpenIgnoresRealBlocks() {
 		Block realBlock = mock(Block.class);
