@@ -8,6 +8,7 @@ import dev.drawethree.xprison.api.blocks.XPrisonBlocksAPI;
 import dev.drawethree.xprison.api.dailyrewards.XPrisonDailyRewardsAPI;
 import dev.drawethree.xprison.api.bombs.XPrisonBombsAPI;
 import dev.drawethree.xprison.api.currency.XPrisonCurrencyAPI;
+import dev.drawethree.xprison.api.diagnostics.XPrisonDiagnosticsAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
@@ -17,6 +18,7 @@ import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
 import dev.drawethree.xprison.api.pickaxelevels.XPrisonPickaxeLevelsAPI;
 import dev.drawethree.xprison.api.pickaxequality.XPrisonPickaxeQualityAPI;
 import dev.drawethree.xprison.api.pickaxeskins.XPrisonPickaxeSkinsAPI;
+import dev.drawethree.xprison.api.preferences.XPrisonPlayerPreferencesAPI;
 import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
@@ -205,6 +207,35 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonDailyRewardsAPI getDailyRewardsApi();
+
+    /**
+     * Gets the diagnostics API: the configuration linter, the startup warnings and the permission
+     * catalog. This is the data behind {@code /xprison lint}, {@code /xprison health} and
+     * {@code /xprison perms}.
+     *
+     * @return the Diagnostics API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.9
+     */
+    @NotNull
+    default XPrisonDiagnosticsAPI getDiagnosticsApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the diagnostics API");
+    }
+
+    /**
+     * Gets the player preferences API: the per-player on/off switches shown by {@code /toggles},
+     * including auto-rankup, auto-prestige and auto-rebirth.
+     *
+     * @return the Player Preferences API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.9
+     */
+    @NotNull
+    default XPrisonPlayerPreferencesAPI getPlayerPreferencesApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the player preferences API");
+    }
 
     /**
      * Returns all registered modules with their current enabled state.
