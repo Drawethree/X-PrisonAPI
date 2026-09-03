@@ -47,6 +47,12 @@ public interface XPrisonPickaxeLevelsAPI {
 	/**
 	 * Sets the pickaxe level on an item stack for a player.
 	 *
+	 * <p><strong>Only works on an item already in the player's inventory.</strong> Levelling
+	 * rebuilds the item rather than editing it in place, so this method writes the rebuilt stack
+	 * back into the slot it found the original in. An item that is not in the inventory yet - one
+	 * you are still assembling before giving it - has no slot to write back to, and the call is
+	 * silently lost. Use {@link #withPickaxeLevel(Player, ItemStack, PickaxeLevel)} for those.
+	 *
 	 * @param player the player owning the item
 	 * @param item the ItemStack to modify
 	 * @param level the PickaxeLevel to set
@@ -56,11 +62,54 @@ public interface XPrisonPickaxeLevelsAPI {
 	/**
 	 * Sets the pickaxe level on an item stack for a player by level number.
 	 *
+	 * <p>Carries the same inventory restriction as
+	 * {@link #setPickaxeLevel(Player, ItemStack, PickaxeLevel)}.
+	 *
 	 * @param player the player owning the item
 	 * @param item the ItemStack to modify
 	 * @param level the numeric level to set
 	 */
 	void setPickaxeLevel(Player player, ItemStack item, int level);
+
+	/**
+	 * Returns a copy of {@code item} carrying the given pickaxe level.
+	 *
+	 * <p>Prefer this over {@link #setPickaxeLevel(Player, ItemStack, PickaxeLevel)} whenever you
+	 * hold the item yourself - while building a pickaxe to give out, for example. Levelling
+	 * rebuilds the stack, so the result must be used; the argument is left untouched.
+	 *
+	 * <pre>{@code
+	 * ItemStack pickaxe = new ItemStack(Material.DIAMOND_PICKAXE);
+	 * pickaxe = api.getPickaxeLevelsApi().withPickaxeLevel(player, pickaxe, 25);
+	 * player.getInventory().addItem(pickaxe);
+	 * }</pre>
+	 *
+	 * @param player the player the pickaxe is being prepared for
+	 * @param item the ItemStack to base the result on; not modified
+	 * @param level the PickaxeLevel to apply
+	 * @return the rebuilt item, or {@code item} unchanged if the level could not be applied
+	 * @since 1.9
+	 */
+	@NotNull
+	default ItemStack withPickaxeLevel(@NotNull Player player, @NotNull ItemStack item, @NotNull PickaxeLevel level) {
+		throw new UnsupportedOperationException(
+				"This X-Prison version does not provide withPickaxeLevel");
+	}
+
+	/**
+	 * Returns a copy of {@code item} carrying the given pickaxe level, by level number.
+	 *
+	 * @param player the player the pickaxe is being prepared for
+	 * @param item the ItemStack to base the result on; not modified
+	 * @param level the numeric level to apply
+	 * @return the rebuilt item, or {@code item} unchanged if no such level exists
+	 * @since 1.9
+	 */
+	@NotNull
+	default ItemStack withPickaxeLevel(@NotNull Player player, @NotNull ItemStack item, int level) {
+		throw new UnsupportedOperationException(
+				"This X-Prison version does not provide withPickaxeLevel");
+	}
 
 	/**
 	 * Gets the progress bar string representing the player's pickaxe level progress.
