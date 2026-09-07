@@ -12,6 +12,7 @@ import dev.drawethree.xprison.api.diagnostics.XPrisonDiagnosticsAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
+import dev.drawethree.xprison.api.milestones.XPrisonMilestonesAPI;
 import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
 import dev.drawethree.xprison.api.miningstats.XPrisonMiningStatsAPI;
 import dev.drawethree.xprison.api.multipliers.XPrisonMultipliersAPI;
@@ -187,6 +188,15 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonQuestsAPI getQuestsApi();
+
+    /**
+     * Gets the Milestones module API.
+     *
+     * @return the Milestones API instance
+     * @since 1.9
+     */
+    @NotNull
+    XPrisonMilestonesAPI getMilestonesApi();
 
     /**
      * Gets the virtual (packet-only) blocks API. Packet-based private-mine plugins register their
