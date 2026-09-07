@@ -1,21 +1,20 @@
 package dev.drawethree.xprison.api.milestones;
 
-import dev.drawethree.xprison.api.milestones.model.Milestone;
-import dev.drawethree.xprison.api.milestones.model.MilestoneType;
+import dev.drawethree.xprison.api.milestones.progress.MilestoneProgress;
+import dev.drawethree.xprison.api.milestones.registry.MilestoneRegistry;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
- * API interface for the Milestones module.
+ * API entry point for the Milestones module.
  * <p>
  * Milestones are long ladders of goals across independent tracks - prestige, rebirth, blocks
- * broken, playtime and so on. Each rung pays out the first time a player reaches it and never
- * again, which is tracked as a per-track high-water mark that survives a prestige or rebirth
- * reset.
+ * broken, playtime and whatever else a plugin registers. Each rung pays out the first time a
+ * player reaches it and never again, which is tracked as a per-track high-water mark that survives
+ * a prestige or rebirth reset.
+ * <p>
+ * The two halves are separate: {@link #getRegistry()} is what exists, {@link #getProgress()} is
+ * where a player stands. Depend on the half you need rather than on this interface.
  *
  * @since 1.9
  */
@@ -30,109 +29,28 @@ public interface XPrisonMilestonesAPI {
 	boolean isEnabled();
 
 	/**
-	 * Gets every track that has at least one milestone configured, in the order the ladders were
-	 * read from the config.
+	 * Gets the ladders and the track registry - what milestones exist, and how to add a track of
+	 * your own.
 	 *
-	 * @return the configured tracks, possibly empty
+	 * @return the milestone registry
 	 */
 	@NotNull
-	List<MilestoneType> getTracks();
+	MilestoneRegistry getRegistry();
 
 	/**
-	 * Gets every configured milestone across all tracks.
+	 * Gets a player's standing on the ladders, and the high-water marks behind it.
 	 *
-	 * @return an unmodifiable list of milestones, possibly empty
+	 * @return the progress view
 	 */
 	@NotNull
-	List<Milestone> getMilestones();
-
-	/**
-	 * Gets the ladder of one track, ordered from the lowest threshold upwards.
-	 *
-	 * @param type the track to read
-	 * @return the track's milestones, possibly empty
-	 */
-	@NotNull
-	List<Milestone> getMilestones(@NotNull MilestoneType type);
-
-	/**
-	 * Looks a milestone up by its config key.
-	 *
-	 * @param milestoneId the milestone id
-	 * @return the milestone, or {@code null} if no milestone has that id
-	 */
-	@Nullable
-	Milestone getMilestone(@NotNull String milestoneId);
-
-	/**
-	 * Gets the player's live value on a track - their prestige id, broken-block total, minutes
-	 * played and so on.
-	 *
-	 * @param player the player to read
-	 * @param type   the track to read
-	 * @return the current value, or {@code 0} if the track's module is unavailable
-	 */
-	long getCurrentValue(@NotNull Player player, @NotNull MilestoneType type);
-
-	/**
-	 * Gets how many milestones of a track the player has reached, counting from the highest value
-	 * they have ever held rather than their current one.
-	 *
-	 * @param player the player to read
-	 * @param type   the track to read
-	 * @return the number of milestones reached on that track
-	 */
-	int getLevel(@NotNull Player player, @NotNull MilestoneType type);
-
-	/**
-	 * Gets the next milestone the player has not reached yet on a track.
-	 *
-	 * @param player the player to read
-	 * @param type   the track to read
-	 * @return the next milestone, or {@code null} if the whole ladder is finished
-	 */
-	@Nullable
-	Milestone getNextMilestone(@NotNull Player player, @NotNull MilestoneType type);
-
-	/**
-	 * Gets the highest value the player has ever recorded on a track. This is the mark that stops
-	 * a milestone paying out twice, and it is not lowered by a prestige or rebirth reset. Works
-	 * for offline players.
-	 *
-	 * @param playerUuid the player's unique id
-	 * @param type       the track to read
-	 * @return the recorded high-water mark, or {@code 0} if the player has none
-	 */
-	long getHighestProgress(@NotNull UUID playerUuid, @NotNull MilestoneType type);
-
-	// ---------------------------------------------------------------------
-	// Administration (config + offline-capable player data)
-	// ---------------------------------------------------------------------
+	MilestoneProgress getProgress();
 
 	/**
 	 * Reloads the Milestones configuration from {@code milestones.yml}, ladders and menu alike.
-	 * Use after editing the config externally (e.g. from the web dashboard).
+	 * Registered tracks survive the reload. Use after editing the config externally (e.g. from
+	 * the web dashboard).
 	 */
 	void reloadConfig();
-
-	/**
-	 * Sets a player's high-water mark on a track (clamped to {@code >= 0}), which decides what
-	 * they may still be paid for. Lowering it lets already-reached milestones pay out again.
-	 * Works for offline players.
-	 *
-	 * @param playerUuid the player's unique id
-	 * @param type       the track to write
-	 * @param value      the high-water mark to store
-	 */
-	void setHighestProgress(@NotNull UUID playerUuid, @NotNull MilestoneType type, long value);
-
-	/**
-	 * Clears a player's recorded progress on every track, so the whole ladder can be earned
-	 * again. Works for offline players.
-	 *
-	 * @param playerUuid the player's unique id
-	 */
-	void resetPlayer(@NotNull UUID playerUuid);
 
 	/**
 	 * Awards a milestone to an online player right now, whether or not they have reached it and

@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
+import java.math.BigDecimal;
+
 /**
  * Event fired when a player is about to be paid out for reaching a milestone.
  * <p>
@@ -30,7 +32,7 @@ public final class PlayerMilestoneReachedEvent extends XPrisonPlayerEvent implem
 	 * The value of the tracked statistic that reached the milestone. This is at least the
 	 * milestone's threshold and may be higher when a single jump crossed it.
 	 */
-	private final long value;
+	private final BigDecimal value;
 
 	/**
 	 * Constructs a new {@link PlayerMilestoneReachedEvent}.
@@ -39,7 +41,7 @@ public final class PlayerMilestoneReachedEvent extends XPrisonPlayerEvent implem
 	 * @param milestone the milestone that was reached
 	 * @param value     the value of the tracked statistic that reached it
 	 */
-	public PlayerMilestoneReachedEvent(Player player, Milestone milestone, long value) {
+	public PlayerMilestoneReachedEvent(Player player, Milestone milestone, BigDecimal value) {
 		super(player);
 		this.milestone = milestone;
 		this.value = value;

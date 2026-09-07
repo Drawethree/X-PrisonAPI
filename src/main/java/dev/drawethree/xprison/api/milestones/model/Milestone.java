@@ -2,10 +2,11 @@ package dev.drawethree.xprison.api.milestones.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * A single rung of a milestone ladder: a threshold on one {@link MilestoneType} together with
+ * A single rung of a milestone ladder: a threshold on one {@link MilestoneTrack} together with
  * everything that happens when a player reaches it.
  * <p>
  * Milestones are defined in {@code milestones.yml} and are read-only through the API. A milestone
@@ -26,17 +27,18 @@ public interface Milestone {
 	/**
 	 * Gets the ladder this milestone belongs to.
 	 *
-	 * @return the milestone type
+	 * @return the track this milestone is measured on
 	 */
 	@NotNull
-	MilestoneType getType();
+	MilestoneTrack getTrack();
 
 	/**
 	 * Gets the value of the tracked statistic at which this milestone is reached.
 	 *
 	 * @return the threshold, or a negative value if the milestone is misconfigured
 	 */
-	long getThreshold();
+	@NotNull
+	BigDecimal getThreshold();
 
 	/**
 	 * Checks whether this milestone only matches an exact value.
