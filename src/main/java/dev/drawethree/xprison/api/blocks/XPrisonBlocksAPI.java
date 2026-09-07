@@ -74,7 +74,13 @@ public interface XPrisonBlocksAPI {
 	 *
 	 * @return {@code true} when at least one configured lucky block suppresses its own item
 	 * @since 1.9
+	 * @deprecated The core {@code lucky-blocks} feature is deprecated in favour of the X-Prison
+	 * Lucky Blocks addon and will be removed in a future release. The addon is a different
+	 * mechanic — mining drops a collectible item that opens after further mining — so it is not a
+	 * drop-in replacement for keying rewards off a block type, and it has no equivalent of
+	 * {@code give-block: false}. This method keeps working for as long as the core feature does.
 	 */
+	@Deprecated
 	default boolean hasItemSuppressingLuckyBlocks() {
 		return false;
 	}
@@ -93,7 +99,12 @@ public interface XPrisonBlocksAPI {
 	 *              block at its location
 	 * @return {@code true} when the block's item and sell value must be discarded
 	 * @since 1.9
+	 * @deprecated The core {@code lucky-blocks} feature is deprecated in favour of the X-Prison
+	 * Lucky Blocks addon and will be removed in a future release. See
+	 * {@link #hasItemSuppressingLuckyBlocks()} for why the addon is not a drop-in replacement.
+	 * This method keeps working for as long as the core feature does.
 	 */
+	@Deprecated
 	default boolean isBlockItemSuppressed(Block block) {
 		return false;
 	}

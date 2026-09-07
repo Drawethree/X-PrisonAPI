@@ -94,6 +94,25 @@ public interface XPrisonCurrency {
     boolean isTrimZeros();
 
     /**
+     * Returns {@code true} if players may move this currency to each other.
+     *
+     * <p>A non-transferable currency is bound to the player who earned it: it cannot be paid to
+     * another player, and it cannot be withdrawn into a physical note (which would be a transfer by
+     * another route). Currencies that gate progression - a prestige-point style currency, or the
+     * money a rank ladder is priced in - are usually bound, so the ladder cannot be bought by a
+     * richer friend.
+     *
+     * <p>Defaults to {@code true} for implementations that do not model it, so existing behaviour
+     * is unchanged.
+     *
+     * @return whether players may transfer this currency between themselves
+     * @since 1.9
+     */
+    default boolean isTransferable() {
+        return true;
+    }
+
+    /**
      * Exact-precision variant of {@link #getMaxAmount()}. Implementations that store the cap as a
      * {@link BigDecimal} override this so OP-scale caps stay exact.
      *

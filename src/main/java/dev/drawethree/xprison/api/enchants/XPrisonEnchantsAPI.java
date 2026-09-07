@@ -251,9 +251,13 @@ public interface XPrisonEnchantsAPI {
 	}
 
 	/**
-	 * Whether the player wants this enchant's proc message on the given pickaxe — the per-pickaxe
-	 * "Enchant Notifications" toggle. An enchant that reports {@link XPrisonEnchantment#hasProcNotification()}
-	 * should call this before sending its proc message so a player can silence it.
+	 * Whether the player wants this enchant's proc message on the given pickaxe. An enchant that reports
+	 * {@link XPrisonEnchantment#hasProcNotification()} should call this before sending its proc message
+	 * so a player can silence it.
+	 * <p>
+	 * Two per-pickaxe settings feed this answer: the "Enchant Proc Messages" master switch in the Pickaxe
+	 * Settings menu, and this enchant's own entry in the "Enchant Notifications" menu. While the master is
+	 * off this returns {@code false} for every enchant, whatever the per-enchant entry says.
 	 * <p>
 	 * The default implementation returns {@code true} (never silenced), so an enchant behaves
 	 * unchanged unless the running plugin resolves a per-pickaxe flag.

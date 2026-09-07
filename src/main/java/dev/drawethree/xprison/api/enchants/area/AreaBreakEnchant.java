@@ -170,8 +170,9 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	}
 
 	/**
-	 * Honours the per-pickaxe notification toggle for this enchant's proc message. The pipeline calls
-	 * this before sending {@link AreaBreakSettings#message()}, so an addon author gets it for free.
+	 * Honours the per-pickaxe notification toggles for this enchant's proc message — both the "Enchant
+	 * Proc Messages" master switch and this enchant's own "Enchant Notifications" entry. The pipeline
+	 * calls this before sending {@link AreaBreakSettings#message()}, so an addon author gets it for free.
 	 */
 	@Override
 	public boolean shouldSendProcMessage(@NotNull Player player, @Nullable ItemStack pickaxe) {
