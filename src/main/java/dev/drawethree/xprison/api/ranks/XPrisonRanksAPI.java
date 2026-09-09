@@ -4,6 +4,7 @@ import dev.drawethree.xprison.api.ranks.model.Rank;
 import dev.drawethree.xprison.api.shared.Pagination;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +46,37 @@ public interface XPrisonRanksAPI {
 	 * @return double between 0.0 and 100.0 representing the percentage of rankup progress
 	 */
 	double getRankupProgress(Player player);
+
+	/**
+	 * Gets the cost a specific player must pay to buy the given rank.
+	 *
+	 * <p>{@link Rank#getCostExact()} returns the rank's base cost as written in {@code ranks.yml}.
+	 * This method applies the server's rank cost scaling on top of it, so the returned value is what
+	 * the player is actually charged at their current prestige and rebirth. When cost scaling is
+	 * disabled the two are identical.
+	 *
+	 * @param player the player the cost is resolved for
+	 * @param rank   the rank whose cost is requested
+	 * @return the exact cost this player pays for the rank, never {@code null}
+	 * @since 1.9
+	 */
+	default BigDecimal getRankCostFor(Player player, Rank rank) {
+		return rank.getCostExact();
+	}
+
+	/**
+	 * Gets the multiplier currently applied to every rank cost for this player.
+	 *
+	 * <p>Derived from the player's prestige and rebirth by the {@code cost-scaling} section of
+	 * {@code ranks.yml}. Returns {@link BigDecimal#ONE} when cost scaling is disabled.
+	 *
+	 * @param player the player the multiplier is resolved for
+	 * @return the rank cost multiplier, never {@code null} and never below {@link BigDecimal#ONE}
+	 * @since 1.9
+	 */
+	default BigDecimal getRankCostMultiplier(Player player) {
+		return BigDecimal.ONE;
+	}
 
 	/**
 	 * Sets a player's rank to the specified Rank.
