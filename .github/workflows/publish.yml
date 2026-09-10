@@ -1,0 +1,211 @@
+name: Publish
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Two runs of THIS repo uploading at once would race on maven-metadata.xml, and the
+# loser would publish a version list missing the winner's entry. Queue instead of
+# cancelling: a cancelled run has already half-uploaded a tree. Other repos publishing
+# at the same time are fine - they touch different artifact paths and a different slug.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  GROUP_PATH: dev/drawethree/xprison
+  ARTIFACT: X-PrisonAPI
+  SLUG: x-prison
+  REPO_BASE_URL: https://repo.drawethree.dev
+  CI_BASE_URL: https://ci.drawethree.dev
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Work out version and channel
+        id: meta
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            CHANNEL=releases
+            # The tag is the source of truth for a release; stamp it into the pom so the
+            # deployed artifact and the tag can never disagree.
+            mvn -B -q org.codehaus.mojo:versions-maven-plugin:2.18.0:set \
+              -DnewVersion="$VERSION" -DgenerateBackupPoms=false
+          else
+            VERSION="$(mvn -B -q -DforceStdout help:evaluate -Dexpression=project.version)"
+            CHANNEL=snapshots
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "channel=$CHANNEL" >> "$GITHUB_OUTPUT"
+          echo "Publishing $VERSION to $CHANNEL"
+
+      - name: Build and test
+        run: mvn -B clean verify
+
+      - name: Seed the existing repository metadata
+        # A file:// deploy merges into whatever metadata is already at the target. Pull the
+        # live copies down first, or every publish would overwrite the version list with a
+        # list of exactly one version.
+        run: |
+          set -euo pipefail
+          DIR="staging/$GROUP_PATH/$ARTIFACT"
+          mkdir -p "$DIR/${{ steps.meta.outputs.version }}"
+          URL="$REPO_BASE_URL/${{ steps.meta.outputs.channel }}/$GROUP_PATH/$ARTIFACT"
+          # 404 on the first ever publish is expected, hence the || true.
+          curl -fsS "$URL/maven-metadata.xml" -o "$DIR/maven-metadata.xml" || true
+          curl -fsS "$URL/${{ steps.meta.outputs.version }}/maven-metadata.xml" \
+               -o "$DIR/${{ steps.meta.outputs.version }}/maven-metadata.xml" || true
+
+      - name: Deploy into the staging tree
+        run: |
+          mvn -B deploy -DskipTests \
+            -DaltDeploymentRepository="drawethree::file://$GITHUB_WORKSPACE/staging"
+
+      - name: Assemble the build listing
+        id: site
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.meta.outputs.version }}"
+          # finalName is free to contain spaces and in some of these poms it does, so glob
+          # every jar and filter by classifier suffix rather than matching the artifact id.
+          # No `| head -1` either: under pipefail a closed pipe surfaces as a failed step.
+          shopt -s nullglob
+          SRC=""
+          for f in target/*.jar; do
+            case "$f" in *-sources.jar|*-javadoc.jar) continue ;; esac
+            SRC="$f"
+            break
+          done
+          [ -n "$SRC" ] || { echo "no main jar in target/"; exit 1; }
+
+          # Republish it under the coordinate name whatever finalName said. A space in a
+          # download URL is a papercut for everyone who ever links to it.
+          JAR="$ARTIFACT-$VERSION.jar"
+          BUILD="${{ github.run_number }}"
+          mkdir -p "site/$SLUG/builds/$BUILD"
+          cp "$SRC" "site/$SLUG/builds/$BUILD/$JAR"
+          cp ci/index.html "site/$SLUG/index.html"
+
+          # The build list lives on the host, not in git - fetch, prepend, put back. It is
+          # per project, so three repos publishing at once cannot clobber each other.
+          curl -fsS "$CI_BASE_URL/$SLUG/builds.json" -o old.json || echo '[]' > old.json
+          jq -e 'type == "array"' old.json >/dev/null 2>&1 || echo '[]' > old.json
+
+          jq -n \
+            --argjson number "$BUILD" \
+            --arg version "$VERSION" \
+            --arg channel "${{ steps.meta.outputs.channel }}" \
+            --arg commit "$GITHUB_SHA" \
+            --arg short "$(git rev-parse --short HEAD)" \
+            --arg message "$(git log -1 --pretty=%s)" \
+            --arg author "$(git log -1 --pretty=%an)" \
+            --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg file "$JAR" \
+            '{number:$number, version:$version, channel:$channel, commit:$commit,
+              short:$short, message:$message, author:$author, date:$date, file:$file}' > entry.json
+
+          # Cap the listing so the page stays quick. Older jars stay on disk, just unlinked.
+          jq -s '(.[0:1] + .[1]) | .[0:100]' entry.json old.json > "site/$SLUG/builds.json"
+          echo "jar=$JAR" >> "$GITHUB_OUTPUT"
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Upload to repo.drawethree.dev
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE: ${{ vars.FTP_REPO_PATH || '/subdoms/repo' }}
+          CHANNEL: ${{ steps.meta.outputs.channel }}
+        run: |
+          set -euo pipefail
+          # A secret pasted into the GitHub UI often carries a trailing newline. FTP sends
+          # it as part of the password and the server answers 530, which is indistinguishable
+          # from a wrong password. Control characters are never part of a real credential.
+          FTP_USERNAME="$(printf '%s' "$FTP_USERNAME" | tr -d '[:cntrl:]')"
+          FTP_PASSWORD="$(printf '%s' "$FTP_PASSWORD" | tr -d '[:cntrl:]')"
+          FTP_HOST="$(printf '%s' "$FTP_HOST" | tr -d '[:cntrl:]')"
+          # staging/ starts at the group path, so the channel segment has to come from here.
+          # -R mirrors upward. No --delete: this tree is additive, and a bad local state
+          # must never be able to wipe published versions.
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set ftp:passive-mode true;
+            set ftp:prefer-epsv false;
+            set net:max-retries 3;
+            set net:timeout 30;
+            set net:reconnect-interval-base 5;
+            set mirror:parallel-transfer-count 1;
+            put -O ${REMOTE}/ hosting/repo.htaccess -o .htaccess;
+            mirror -R --no-symlinks --verbose staging/ ${REMOTE}/${CHANNEL}/;
+            bye"
+
+      - name: Upload to ci.drawethree.dev
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          REMOTE: ${{ vars.FTP_CI_PATH || '/subdoms/ci' }}
+        run: |
+          set -euo pipefail
+          FTP_USERNAME="$(printf '%s' "$FTP_USERNAME" | tr -d '[:cntrl:]')"
+          FTP_PASSWORD="$(printf '%s' "$FTP_PASSWORD" | tr -d '[:cntrl:]')"
+          FTP_HOST="$(printf '%s' "$FTP_HOST" | tr -d '[:cntrl:]')"
+          # site/ already contains the project directory, so this mirrors into ci's root
+          # and still only ever writes under site/$SLUG.
+          lftp -u "$FTP_USERNAME","$FTP_PASSWORD" "ftp://$FTP_HOST" -e "
+            set ftp:ssl-force true;
+            set ftp:ssl-protect-data true;
+            set ssl:verify-certificate true;
+            set ftp:passive-mode true;
+            set ftp:prefer-epsv false;
+            set net:max-retries 3;
+            set net:timeout 30;
+            set net:reconnect-interval-base 5;
+            set mirror:parallel-transfer-count 1;
+            put -O ${REMOTE}/ hosting/ci.htaccess -o .htaccess;
+            mirror -R --no-symlinks --verbose site/ ${REMOTE}/;
+            bye"
+
+      - name: Smoke test the published artifact
+        run: |
+          set -euo pipefail
+          URL="$REPO_BASE_URL/${{ steps.meta.outputs.channel }}/$GROUP_PATH/$ARTIFACT/maven-metadata.xml"
+          # A shared host that 403s Maven's User-Agent, or serves a 404 page with a 200,
+          # both look fine until somebody tries to depend on this. Catch it here.
+          curl -fsSL -A "Apache-Maven/3.9.9" "$URL" -o published-metadata.xml
+          grep -q "<artifactId>$ARTIFACT</artifactId>" published-metadata.xml
+          echo "$URL resolves"
+          # And that the build page got its jar, which is a different server path entirely.
+          curl -fsSI "$CI_BASE_URL/$SLUG/builds/${{ github.run_number }}/${{ steps.site.outputs.jar }}" > /dev/null
+          echo "$CI_BASE_URL/$SLUG/ updated"
+
+      - name: GitHub release
+        if: steps.meta.outputs.channel == 'releases'
+        uses: softprops/action-gh-release@v2
+        with:
+          # target/*.jar rather than a name pattern: finalName may not match the artifact id.
+          files: |
+            target/*.jar
+          generate_release_notes: true

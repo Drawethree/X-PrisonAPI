@@ -7,37 +7,51 @@ Official API for X-Prison plugin.
 - [Wiki (Documentation)](https://github.com/Drawethree/X-Prison/wiki)
 - [Javadocs](https://www.drawethree.dev/plugins/x-prison/javadoc/index.html)
 
-## Dependency [![](https://jitpack.io/v/drawethree/X-PrisonAPI.svg)](https://jitpack.io/#drawethree/X-PrisonAPI)
+## Dependency
 
-### Gradle
-```groovy
-repositories {
-    maven { url 'https://jitpack.io' }
-}
-
-dependencies {
-    compileOnly 'com.github.drawethree:X-PrisonAPI:LATEST'
-}
-```
+Artifacts are published to [repo.drawethree.dev](https://repo.drawethree.dev). Every build,
+including per-commit snapshots, is listed at
+[ci.drawethree.dev/x-prison](https://ci.drawethree.dev/x-prison/).
 
 ### Maven
 ```xml
 <repositories>
     <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
+        <id>drawethree</id>
+        <url>https://repo.drawethree.dev/releases</url>
     </repository>
 </repositories>
 
 <dependencies>
     <dependency>
-        <groupId>com.github.drawethree</groupId>
+        <groupId>dev.drawethree.xprison</groupId>
         <artifactId>X-PrisonAPI</artifactId>
-        <version>LATEST</version>
+        <version>1.9</version>
         <scope>provided</scope>
     </dependency>
 </dependencies>
 ```
+
+### Gradle
+```groovy
+repositories {
+    maven { url 'https://repo.drawethree.dev/releases' }
+}
+
+dependencies {
+    compileOnly 'dev.drawethree.xprison:X-PrisonAPI:1.9'
+}
+```
+
+Pin a real version. Maven 3 dropped `LATEST` and `RELEASE` for dependency resolution, so a build
+that asks for one resolves differently depending on who runs it, or not at all. The development
+head is published to `https://repo.drawethree.dev/snapshots` as `1.9-SNAPSHOT` if you want it.
+
+Sources and javadoc jars are published alongside each release, so your IDE shows the contract and
+its comments rather than decompiled bytecode.
+
+Always `provided` / `compileOnly` — X-Prison supplies these classes at runtime, and shading them
+into your own jar puts a second copy on the server.
 
 ### plugin.yml
 Add X-Prison as a dependency so your plugin loads after it:
