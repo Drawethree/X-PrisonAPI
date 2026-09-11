@@ -7,6 +7,7 @@ server to maintain — `.github/workflows/publish.yml` is the whole of it.
 |---|---|
 | `repo.drawethree.dev` | Maven repository — `/releases` and `/snapshots` |
 | `ci.drawethree.dev/x-prison` | Build listing and jar downloads |
+| `javadocs.drawethree.dev/x-prison` | Browsable API docs, tagged releases only |
 
 **The full runbook lives in [X-WardenAPI/docs/PUBLISHING.md](https://github.com/Drawethree/X-WardenAPI/blob/master/docs/PUBLISHING.md)** — hosting layout,
 DNS, the FTP geo-restriction, why the metadata is seeded before deploying, and troubleshooting.
@@ -42,6 +43,20 @@ with the jars attached, and marks the build green on the listing page.
 
 Bump the pom to the next `-SNAPSHOT` afterwards so master snapshots stop colliding with the
 version you just shipped.
+
+## Javadoc
+
+Published to `javadocs.drawethree.dev/x-prison/` on **tagged releases only** — never on snapshot
+pushes. A javadoc site is hundreds of files and therefore hundreds of FTP round trips; that is
+fine a few times a year and pointless on every commit, since IDE users already get the
+`-javadoc.jar` from the Maven repository on every publish.
+
+Each version keeps its own directory, so `/x-prison/1.9/` still resolves after 2.0 ships and wiki
+links do not rot. The project root is a small redirect to the newest release. Old versions prune
+to the newest five.
+
+The landing page at `javadocs.drawethree.dev/` lives in X-WardenAPI as `javadocs/root-index.html`,
+the same way the ci one does.
 
 ## Secrets
 
