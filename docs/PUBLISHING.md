@@ -27,7 +27,7 @@ This file only records what is specific to X-PrisonAPI.
 
 ## Publishing
 
-**A snapshot** — push to `master`. Deploys `1.9-SNAPSHOT` to `/snapshots` and adds a row to the
+**A snapshot** — push to `master`. Deploys `1.10-SNAPSHOT` to `/snapshots` and adds a row to the
 build listing.
 
 **A release** — tag it:
