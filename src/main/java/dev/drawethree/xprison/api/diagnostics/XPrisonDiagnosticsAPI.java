@@ -52,7 +52,8 @@ public interface XPrisonDiagnosticsAPI {
      *
      * <p>Keys are group names such as {@code "Mines"} or {@code "Enchants"}; each list is sorted by
      * node. The map is generated from the plugin's permission constants, so it is always complete
-     * for the running version.
+     * for the running version. Since 1.10 each entry also carries the
+     * {@link PermissionEntry#defaultValue() default} X-Prison registered the node with.
      *
      * @return permission entries grouped by area, never empty
      */
