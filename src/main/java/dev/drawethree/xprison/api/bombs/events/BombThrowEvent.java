@@ -9,10 +9,15 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 
 /**
- * Event fired when a player throws a bomb, before its explosion timer starts.
+ * Event fired when a player throws a bomb, before the bomb is taken from their inventory
+ * and before its fuse starts.
  * <p>
- * This event is {@link Cancellable}; cancelling it prevents the thrown bomb from arming
- * (the {@link BombExplodeEvent} will not fire).
+ * The impact point is resolved at throw time: it is the block the player clicked, or - when
+ * the player clicked the air or dropped the bomb - the spot a short throw would land on.
+ * Virtual (packet-only) mine blocks count as solid for that resolution.
+ * <p>
+ * This event is {@link Cancellable}; cancelling it leaves the bomb in the player's inventory,
+ * starts no cooldown and the {@link BombExplodeEvent} will not fire.
  */
 @Getter
 public final class BombThrowEvent extends XPrisonPlayerEvent implements Cancellable {
@@ -30,7 +35,7 @@ public final class BombThrowEvent extends XPrisonPlayerEvent implements Cancella
 	 *
 	 * @param player   the player throwing the bomb
 	 * @param bomb     the bomb being thrown
-	 * @param location the location the bomb was thrown at
+	 * @param location the impact point the bomb will land on and explode at
 	 */
 	public BombThrowEvent(Player player, Bomb bomb, Location location) {
 		super(player);

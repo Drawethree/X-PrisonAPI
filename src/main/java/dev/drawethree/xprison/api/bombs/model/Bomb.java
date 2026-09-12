@@ -45,9 +45,11 @@ public interface Bomb {
     Sound getExplodeSound();
 
     /**
-     * Gets the delay before the bomb explodes after being placed or dropped, in ticks.
+     * Gets the fuse of the bomb: how long it sits blinking at its impact point before it
+     * explodes, in seconds. The flight from the player's hand to the impact point is not
+     * part of the fuse. A value of {@code 0} explodes the bomb the moment it lands.
      *
-     * @return the explosion delay in server ticks (1 tick = 1/20th of a second)
+     * @return the explosion delay in seconds
      */
     int getExplosionDelay();
 }
