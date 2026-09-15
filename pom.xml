@@ -140,7 +140,7 @@
         <dependency>
             <groupId>com.nexomc</groupId>
             <artifactId>nexo</artifactId>
-            <version>1.25.0</version>
+            <version>1.28.0</version>
             <scope>provided</scope>
             <!-- Compile only against Nexo's own API classes; exclude its transitive runtime tree
                  (e.g. triumph-gui:3.2.0-SNAPSHOT, hosted only on the TriumphTeam snapshot repo). -->
@@ -154,7 +154,7 @@
         <dependency>
             <groupId>io.th0rgal</groupId>
             <artifactId>oraxen</artifactId>
-            <version>1.217.0</version>
+            <version>1.219.0</version>
             <scope>provided</scope>
             <!-- Compile only against Oraxen's own API classes; exclude its large transitive runtime tree. -->
             <exclusions>
