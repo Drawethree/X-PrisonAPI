@@ -44,4 +44,24 @@ public interface XPrisonAddon {
      * </p>
      */
     void onDisable();
+
+    /**
+     * Called when X-Prison is reloaded via {@code /xprison reload} (for every enabled addon),
+     * {@code /xprison reload <addon>}, the Addons Manager GUI or
+     * {@link dev.drawethree.xprison.api.XPrisonAPI#reloadAddon(String)}.
+     * <p>
+     * Re-read configuration and message files here. The addon stays enabled throughout:
+     * {@link #onDisable()} and {@link #onEnable(XPrisonAddonContext)} are <b>not</b> called,
+     * so registered listeners, commands and runtime state survive the reload. Core modules
+     * are reloaded before addons, so module configuration is already fresh when this runs.
+     * </p>
+     * <p>
+     * The default implementation does nothing, which keeps addons built against older
+     * API versions loading unchanged.
+     * </p>
+     *
+     * @since 1.10
+     */
+    default void onReload() {
+    }
 }

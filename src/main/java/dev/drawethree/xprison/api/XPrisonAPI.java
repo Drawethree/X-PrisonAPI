@@ -292,6 +292,20 @@ public interface XPrisonAPI {
     void disableAddon(@NotNull String name);
 
     /**
+     * Reloads a loaded, enabled addon by display name by invoking its
+     * {@link dev.drawethree.xprison.api.addons.XPrisonAddon#onReload()} hook.
+     * Addons that do not override the hook are reported as reloaded without any effect.
+     *
+     * @param name the addon's display name (case-insensitive)
+     * @return {@code true} if the addon was found, is enabled and its reload hook completed without throwing
+     * @since 1.10
+     */
+    default boolean reloadAddon(@NotNull String name) {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not support reloading addons");
+    }
+
+    /**
      * Loads an addon JAR from the X-Prison addons folder at runtime.
      * The addon's {@code onEnable()} is called immediately if loading succeeds.
      *
