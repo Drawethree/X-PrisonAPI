@@ -24,6 +24,7 @@ import dev.drawethree.xprison.api.prestiges.XPrisonPrestigesAPI;
 import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.text.XPrisonTextAPI;
+import dev.drawethree.xprison.api.time.XPrisonTimeAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPIImpl;
@@ -341,6 +342,18 @@ public interface XPrisonAPI {
      */
     @NotNull
     XPrisonTextAPI getTextApi();
+
+    /**
+     * Gets the server-wide time API.
+     *
+     * <p>Use this to render countdowns, timestamps and time-unit names with the zone, pattern and
+     * labels the server owner configured in {@code config.yml}, so addon text matches the core.
+     *
+     * @return the time API instance
+     * @since 1.10
+     */
+    @NotNull
+    XPrisonTimeAPI getTimeApi();
 
     /**
      * Returns the current version string of the X-Prison plugin.
