@@ -11,7 +11,8 @@ import java.util.Optional;
  * API for managing pickaxe skins in XPrison.
  * <p>
  * This interface allows external plugins to retrieve, apply, or manipulate
- * cosmetic pickaxe skins which may provide gameplay multipliers (money, tokens, gems).
+ * cosmetic pickaxe skins which may provide gameplay multipliers (currencies, enchant proc
+ * chance, pickaxe experience and Battle Pass XP).
  */
 public interface XPrisonPickaxeSkinsAPI {
 

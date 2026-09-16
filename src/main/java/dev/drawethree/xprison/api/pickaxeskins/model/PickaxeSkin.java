@@ -5,7 +5,8 @@ import java.util.Map;
 /**
  * Represents a customizable pickaxe skin used within the XPrison system.
  * Each skin has a unique ID, display name, custom model data (for resource packs),
- * and a set of currency multipliers that affect gameplay (e.g., tokens, money, gems).
+ * and a set of multipliers that affect gameplay: currency multipliers (e.g., tokens, money, gems),
+ * an enchant proc chance multiplier, a pickaxe experience multiplier and a Battle Pass XP multiplier.
  *
  * This interface provides access to all properties of a skin,
  * and allows multiplier lookups by currency name.
@@ -62,4 +63,38 @@ public interface PickaxeSkin {
      * @return the multiplier for the currency, or 0.0 if not defined
      */
     double getMultiplier(String currencyName);
+
+    /**
+     * Gets the multiplier this skin applies to the proc chance of every chance-based enchant
+     * on the pickaxe (block-break enchants and reward multipliers alike). The boosted chance is
+     * capped at 100%.
+     *
+     * @return the proc chance multiplier, {@code 1.0} when the skin does not boost enchant procs
+     * @since 1.10
+     */
+    default double getEnchantProcMultiplier() {
+        return 1.0D;
+    }
+
+    /**
+     * Gets the multiplier this skin applies to pickaxe experience earned from mining
+     * (manual swings, area enchants, auto miner and any addon-registered source). Experience
+     * granted through the API or admin commands is never scaled.
+     *
+     * @return the pickaxe experience multiplier, {@code 1.0} when the skin does not boost it
+     * @since 1.10
+     */
+    default double getPickaxeExpMultiplier() {
+        return 1.0D;
+    }
+
+    /**
+     * Gets the multiplier this skin applies to Battle Pass XP earned from mining.
+     *
+     * @return the Battle Pass XP multiplier, {@code 1.0} when the skin does not boost it
+     * @since 1.10
+     */
+    default double getBattlePassXpMultiplier() {
+        return 1.0D;
+    }
 }
