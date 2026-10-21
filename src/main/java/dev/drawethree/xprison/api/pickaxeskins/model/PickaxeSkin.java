@@ -42,6 +42,30 @@ public interface PickaxeSkin {
     int getCustomModelData();
 
     /**
+     * Gets the item model applied to the skinned pickaxe, as a namespaced key such as {@code nexo:ruby_pickaxe}.
+     * <p>
+     * Only applied on servers that support the {@code item_model} item component (1.21.3+).
+     *
+     * @return the item model key, or {@code null} if none is configured
+     * @since 1.10
+     */
+    default String getItemModel() {
+        return null;
+    }
+
+    /**
+     * Gets the tooltip style applied to the skinned pickaxe, as a namespaced key such as {@code nexo:legendary}.
+     * <p>
+     * Only applied on servers that support the {@code tooltip_style} item component (1.21.3+).
+     *
+     * @return the tooltip style key, or {@code null} if none is configured
+     * @since 1.10
+     */
+    default String getTooltipStyle() {
+        return null;
+    }
+
+    /**
      * Gets the map of multipliers applied by this skin.
      * Each entry maps a currency (e.g., "tokens") to a multiplier value.
      *

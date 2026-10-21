@@ -47,4 +47,28 @@ public interface MilestoneDisplay {
 	 * @return the custom model data, or {@code 0} if none is configured
 	 */
 	int getCustomModelData();
+
+	/**
+	 * Gets the item model applied to the milestone icon, as a namespaced key such as {@code nexo:ruby_pickaxe}.
+	 * <p>
+	 * Only applied on servers that support the {@code item_model} item component (1.21.3+).
+	 *
+	 * @return the item model key, or {@code null} if none is configured
+	 * @since 1.10
+	 */
+	default String getItemModel() {
+		return null;
+	}
+
+	/**
+	 * Gets the tooltip style applied to the milestone icon, as a namespaced key such as {@code nexo:legendary}.
+	 * <p>
+	 * Only applied on servers that support the {@code tooltip_style} item component (1.21.3+).
+	 *
+	 * @return the tooltip style key, or {@code null} if none is configured
+	 * @since 1.10
+	 */
+	default String getTooltipStyle() {
+		return null;
+	}
 }
