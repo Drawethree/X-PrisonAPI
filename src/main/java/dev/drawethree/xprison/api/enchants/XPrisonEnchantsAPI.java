@@ -289,4 +289,40 @@ public interface XPrisonEnchantsAPI {
 	default boolean isEnchantAnimationEnabled(Player player, ItemStack pickaxe) {
 		return true;
 	}
+
+	/**
+	 * Whether enchant proc sounds are enabled for the given pickaxe — a per-pickaxe player setting.
+	 * An enchant that plays a sound when it procs should check this first and stay silent when it
+	 * returns {@code false}. The enchant keeps working; only the sound is skipped.
+	 * <p>
+	 * The default implementation returns {@code true}, so sounds play unless the running plugin
+	 * resolves a per-pickaxe flag.
+	 *
+	 * @param player  the mining player
+	 * @param pickaxe the pickaxe that caused the proc, or {@code null} to resolve the pickaxe the
+	 *                player is holding
+	 * @return {@code true} to play enchant proc sounds
+	 * @since 1.10
+	 */
+	default boolean isEnchantSoundEnabled(Player player, ItemStack pickaxe) {
+		return true;
+	}
+
+	/**
+	 * Whether the player wants the pickaxe drop key (Q) to reset their mine — a per-pickaxe player
+	 * setting. Plugins that offer a drop-key mine reset (such as X-PrivateMines) should check this
+	 * before resetting and let the drop behave normally when it returns {@code false}. Any
+	 * server-wide switch, permission or cooldown of that plugin still applies on top.
+	 * <p>
+	 * The default implementation returns {@code true}, so the hotkey behaves as the server configures
+	 * it unless the running plugin resolves a per-pickaxe flag.
+	 *
+	 * @param player  the player pressing the drop key
+	 * @param pickaxe the pickaxe being dropped
+	 * @return {@code true} to allow the drop key to reset the mine
+	 * @since 1.10
+	 */
+	default boolean isMineResetHotkeyEnabled(Player player, ItemStack pickaxe) {
+		return true;
+	}
 }
