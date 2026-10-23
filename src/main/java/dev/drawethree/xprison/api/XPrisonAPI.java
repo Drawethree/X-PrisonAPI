@@ -7,6 +7,7 @@ import dev.drawethree.xprison.api.battlepass.XPrisonBattlePassAPI;
 import dev.drawethree.xprison.api.blocks.XPrisonBlocksAPI;
 import dev.drawethree.xprison.api.dailyrewards.XPrisonDailyRewardsAPI;
 import dev.drawethree.xprison.api.bombs.XPrisonBombsAPI;
+import dev.drawethree.xprison.api.boosters.XPrisonBoostersAPI;
 import dev.drawethree.xprison.api.currency.XPrisonCurrencyAPI;
 import dev.drawethree.xprison.api.diagnostics.XPrisonDiagnosticsAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
@@ -233,6 +234,20 @@ public interface XPrisonAPI {
     default XPrisonDiagnosticsAPI getDiagnosticsApi() {
         throw new UnsupportedOperationException(
                 "This X-Prison version does not provide the diagnostics API");
+    }
+
+    /**
+     * Gets the Boosters module API: personal, queued, time-limited multipliers for currency income
+     * and Battle Pass XP.
+     *
+     * @return the Boosters API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.10
+     */
+    @NotNull
+    default XPrisonBoostersAPI getBoostersApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the boosters API");
     }
 
     /**
