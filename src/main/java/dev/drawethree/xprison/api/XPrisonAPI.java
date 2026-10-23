@@ -12,6 +12,7 @@ import dev.drawethree.xprison.api.diagnostics.XPrisonDiagnosticsAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
+import dev.drawethree.xprison.api.leaderboards.XPrisonLeaderboardsAPI;
 import dev.drawethree.xprison.api.milestones.XPrisonMilestonesAPI;
 import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
 import dev.drawethree.xprison.api.miningstats.XPrisonMiningStatsAPI;
@@ -232,6 +233,20 @@ public interface XPrisonAPI {
     default XPrisonDiagnosticsAPI getDiagnosticsApi() {
         throw new UnsupportedOperationException(
                 "This X-Prison version does not provide the diagnostics API");
+    }
+
+    /**
+     * Gets the Leaderboards module API: register your own boards and read the cached tops behind
+     * {@code /top}, the leaderboard holograms and the {@code %xprison_lb_...%} placeholders.
+     *
+     * @return the Leaderboards API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.10
+     */
+    @NotNull
+    default XPrisonLeaderboardsAPI getLeaderboardsApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the leaderboards API");
     }
 
     /**
