@@ -28,6 +28,7 @@ import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.text.XPrisonTextAPI;
 import dev.drawethree.xprison.api.time.XPrisonTimeAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
+import dev.drawethree.xprison.api.season.XPrisonSeasonAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPIImpl;
 import org.jetbrains.annotations.NotNull;
@@ -234,6 +235,20 @@ public interface XPrisonAPI {
     default XPrisonDiagnosticsAPI getDiagnosticsApi() {
         throw new UnsupportedOperationException(
                 "This X-Prison version does not provide the diagnostics API");
+    }
+
+    /**
+     * Gets the season reset API: register the data your plugin or addon wants wiped when the server
+     * starts a new season.
+     *
+     * @return the Season API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.10
+     */
+    @NotNull
+    default XPrisonSeasonAPI getSeasonApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the season API");
     }
 
     /**
