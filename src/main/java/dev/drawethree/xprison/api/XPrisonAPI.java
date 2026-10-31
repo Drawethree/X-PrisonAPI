@@ -13,6 +13,7 @@ import dev.drawethree.xprison.api.diagnostics.XPrisonDiagnosticsAPI;
 import dev.drawethree.xprison.api.enchants.XPrisonEnchantsAPI;
 import dev.drawethree.xprison.api.gangs.XPrisonGangsAPI;
 import dev.drawethree.xprison.api.history.XPrisonHistoryAPI;
+import dev.drawethree.xprison.api.language.XPrisonLanguageAPI;
 import dev.drawethree.xprison.api.leaderboards.XPrisonLeaderboardsAPI;
 import dev.drawethree.xprison.api.milestones.XPrisonMilestonesAPI;
 import dev.drawethree.xprison.api.mines.XPrisonMinesAPI;
@@ -291,6 +292,20 @@ public interface XPrisonAPI {
     default XPrisonPlayerPreferencesAPI getPlayerPreferencesApi() {
         throw new UnsupportedOperationException(
                 "This X-Prison version does not provide the player preferences API");
+    }
+
+    /**
+     * Gets the language API: the server language and the language each player picked with
+     * {@code /language}.
+     *
+     * @return the Language API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.10
+     */
+    @NotNull
+    default XPrisonLanguageAPI getLanguageApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the language API");
     }
 
     /**

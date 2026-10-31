@@ -818,9 +818,7 @@ public final class AreaBreakPipeline {
 		String message = settings.message();
 		if (message != null && !message.isEmpty() && credited.signum() > 0 && context.shouldSendProcMessage(player, pickaxe)) {
 			// Reports the credited amount, which a currency balance cap may have clamped.
-			api.getTextApi().sendMessage(player, message
-					.replace("%amount%", currency.format(credited))
-					.replace("%currency%", currency.getDisplayName()));
+			api.getTextApi().sendMessage(player, context.procMessage(player, currency, currency.format(credited)));
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package dev.drawethree.xprison.api.enchants.area;
 
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -135,6 +136,27 @@ public interface AreaBreakContext {
 	 */
 	default boolean shouldSendProcMessage(Player player, ItemStack pickaxe) {
 		return true;
+	}
+
+	/**
+	 * Builds the proc message sent to the player after a break paid out. Only called when
+	 * {@link AreaBreakSettings#message()} is not empty and
+	 * {@link #shouldSendProcMessage(Player, ItemStack)} allowed it.
+	 *
+	 * <p>The default fills {@code %amount%} and {@code %currency%} into
+	 * {@link AreaBreakSettings#message()}. Override it to send a different text per player, for
+	 * example in the language the player picked.
+	 *
+	 * @param player          the mining player who receives the message
+	 * @param currency        the currency the break paid out in
+	 * @param formattedAmount the credited amount, already formatted by {@code currency}
+	 * @return the message to send
+	 * @since 1.10
+	 */
+	default String procMessage(Player player, XPrisonCurrency currency, String formattedAmount) {
+		return areaSettings().message()
+				.replace("%amount%", formattedAmount)
+				.replace("%currency%", currency.getDisplayName());
 	}
 
 	/** @return whether the mines module should clear the blocks too (the pipeline already did) */
