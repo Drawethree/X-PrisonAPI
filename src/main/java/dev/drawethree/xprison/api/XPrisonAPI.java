@@ -296,7 +296,7 @@ public interface XPrisonAPI {
 
     /**
      * Gets the language API: the server language and the language each player picked with
-     * {@code /language}.
+     * {@code /xprison language}.
      *
      * @return the Language API instance
      * @throws UnsupportedOperationException if the running X-Prison predates this API

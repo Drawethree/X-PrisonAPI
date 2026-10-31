@@ -11,13 +11,14 @@ import java.util.UUID;
  * The language each player reads X-Prison in.
  *
  * <p>The server owner sets a default with {@code language:} in {@code config.yml}. Every player
- * starts on that default and may pick their own with {@code /language}; the choice is stored in
+ * starts on that default and may pick their own with {@code /xprison language}; the choice is stored in
  * the database. A player who picks "Server default" in that menu - or who never opens it - keeps
  * following {@code config.yml}, including when the owner changes it later. A player who picks a
  * concrete language keeps it.
  *
  * <p>Languages are identified by their code as it appears in {@code config.yml}: {@code en},
- * {@code de}, {@code es}, {@code fr}, {@code pt_br}. Codes are lower case with an underscore;
+ * {@code de}, {@code es}, {@code fr}, {@code pt_br}, plus any code the server owner added. Codes are
+ * lower case with an underscore;
  * {@link #setLanguage(UUID, String)} also accepts {@code pt-BR}.
  *
  * <p>This only covers X-Prison's own text. Console output, holograms and admin tools stay in the
@@ -43,7 +44,9 @@ public interface XPrisonLanguageAPI {
     String getServerLanguage();
 
     /**
-     * Gets every language a player can pick, English first.
+     * Gets every language a player can pick, English first: the bundled languages and any the owner
+     * added in {@code plugins/X-Prison/lang/languages.yml}, limited to {@code enabled-languages} in
+     * {@code config.yml} when that list is set. The server language is always included.
      *
      * @return an immutable, ordered map from language code to its display name, e.g.
      *         {@code de -> Deutsch}

@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList;
 import java.util.UUID;
 
 /**
- * Fired after a player's language choice changes, through {@code /language} or
+ * Fired after a player's language choice changes, through {@code /xprison language} or
  * {@link dev.drawethree.xprison.api.language.XPrisonLanguageAPI#setLanguage(UUID, String)}.
  *
  * <p>This is an informational event and is not cancellable. It always fires on the main thread.
