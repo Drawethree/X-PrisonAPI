@@ -35,6 +35,19 @@ public interface XPrisonCurrency {
     String getDisplayName();
 
     /**
+     * Gets the display name of the currency in one language, for text a player reads. Pass the
+     * code from {@link dev.drawethree.xprison.api.language.XPrisonLanguageAPI#getLanguage(java.util.UUID)}.
+     *
+     * @param languageCode a language code such as {@code de}; an unknown code, or a currency without
+     *                     translations, returns {@link #getDisplayName()}
+     * @return the display name in that language
+     * @since 1.10
+     */
+    default String getDisplayName(String languageCode) {
+        return getDisplayName();
+    }
+
+    /**
      * Gets the prefix of the currency (e.g., "$").
      *
      * @return The friendly display name of the currency.

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import dev.drawethree.xprison.api.XPrisonAPI;
+import dev.drawethree.xprison.api.language.AddonResources;
 import dev.drawethree.xprison.api.language.LocalizedJson;
 import dev.drawethree.xprison.api.utils.BigNumbers;
 import dev.drawethree.xprison.api.utils.JsonUtils;
@@ -91,7 +92,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
         File folder = configFile.getParentFile();
         try {
             return XPrisonAPI.getInstance().getLanguageApi().localizeJson(folder == null ? "" : folder.getName(),
-                    configFile.getName(), config, getClass().getClassLoader()::getResourceAsStream);
+                    configFile.getName(), config, AddonResources.of(getClass()));
         } catch (RuntimeException languagesUnavailable) {
             return null;
         }

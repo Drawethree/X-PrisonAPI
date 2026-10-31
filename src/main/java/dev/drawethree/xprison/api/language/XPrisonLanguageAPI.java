@@ -105,7 +105,7 @@ public interface XPrisonLanguageAPI {
      * <pre>{@code
      * YamlConfiguration raw = YamlConfiguration.loadConfiguration(file);
      * LocalizedConfig messages = XPrisonAPI.getInstance().getLanguageApi()
-     *         .localize("Shop", "shop-messages.yml", raw, MyAddon.class.getClassLoader()::getResourceAsStream);
+     *         .localize("Shop", "shop-messages.yml", raw, AddonResources.of(MyAddon.class));
      * String text = messages.get(player).getString("messages.bought");
      * }</pre>
      *
@@ -118,9 +118,8 @@ public interface XPrisonLanguageAPI {
      * @param fileName         the config's path relative to your data folder, e.g.
      *                         {@code messages.yml} or {@code shops/blocks.yml}
      * @param config           the config as you loaded it; it is copied and never changed
-     * @param bundledResources reads a resource from your jar by path (for example
-     *                         {@code YourAddon.class.getClassLoader()::getResourceAsStream}), returning
-     *                         {@code null} when it does not exist
+     * @param bundledResources reads a resource from your jar by path, returning {@code null} when it
+     *                         does not exist; use {@link AddonResources#of(Class)}
      * @return the per-language views of {@code config}
      */
     @NotNull
@@ -140,7 +139,8 @@ public interface XPrisonLanguageAPI {
      * @param fileName         the JSON file's name relative to your data folder, e.g. {@code petfinder.json}
      * @param config           the JSON as you loaded it; it is copied and never changed
      * @param bundledResources reads a resource from your jar by path, returning {@code null} when it
-     *                         does not exist; the English default is read from {@code fileName}
+     *                         does not exist; use {@link AddonResources#of(Class)}. The English
+     *                         default is read from {@code fileName}
      * @return the per-language views of {@code config}
      */
     @NotNull

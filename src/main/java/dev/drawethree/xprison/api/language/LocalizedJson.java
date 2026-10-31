@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * {@code plugins/X-Prison/lang/addons/<addon>/<language>/<file>.yml} always wins, a translation
  * shipped in the addon jar at {@code lang/<language>/<file>.yml} applies while the owner's line is
  * still the bundled English default, and everything else reads as in the owner's file. Only text
- * values (strings and lists of strings) are ever replaced.
+ * values (strings and lists of strings) are ever replaced. Reads are thread-safe.
  *
  * @since 1.10
  */
@@ -20,7 +20,7 @@ public interface LocalizedJson {
     /**
      * Gets the config in the server language.
      *
-     * @return a copy in the server language; changes to it are not kept
+     * @return the server-language view; never modify it
      */
     @NotNull
     JsonObject get();
@@ -30,7 +30,7 @@ public interface LocalizedJson {
      *
      * @param languageCode a language code such as {@code de}; an unknown or disabled code reads the
      *                     server language
-     * @return a copy in that language; changes to it are not kept
+     * @return the view in that language; never modify it
      */
     @NotNull
     JsonObject get(@NotNull String languageCode);
