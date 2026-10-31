@@ -1,11 +1,15 @@
 package dev.drawethree.xprison.api.language;
 
+import com.google.gson.JsonObject;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * The language each player reads X-Prison in.
@@ -91,4 +95,55 @@ public interface XPrisonLanguageAPI {
      *         nothing changes; {@code true} otherwise
      */
     boolean setLanguage(@NotNull UUID playerUuid, @Nullable String languageCode);
+
+    /**
+     * Makes a config file an addon loaded itself readable in each player's language.
+     *
+     * <p>Load and merge your config the way you always do, then pass it here and read player-facing
+     * text through the returned {@link LocalizedConfig}:
+     *
+     * <pre>{@code
+     * YamlConfiguration raw = YamlConfiguration.loadConfiguration(file);
+     * LocalizedConfig messages = XPrisonAPI.getInstance().getLanguageApi()
+     *         .localize("Shop", "shop-messages.yml", raw, MyAddon.class.getClassLoader()::getResourceAsStream);
+     * String text = messages.get(player).getString("messages.bought");
+     * }</pre>
+     *
+     * <p>Ship translations in your jar as {@code lang/<language>/<fileName>} containing only the
+     * translated lines, under the same keys. The English default your translations were made for
+     * is read from {@code <fileName>} in your jar. Server owners can add or override any line in
+     * {@code plugins/X-Prison/lang/addons/<addonName>/<language>/<fileName>}.
+     *
+     * @param addonName        your addon's name, used for the owner override folder
+     * @param fileName         the config's path relative to your data folder, e.g.
+     *                         {@code messages.yml} or {@code shops/blocks.yml}
+     * @param config           the config as you loaded it; it is copied and never changed
+     * @param bundledResources reads a resource from your jar by path (for example
+     *                         {@code YourAddon.class.getClassLoader()::getResourceAsStream}), returning
+     *                         {@code null} when it does not exist
+     * @return the per-language views of {@code config}
+     */
+    @NotNull
+    LocalizedConfig localize(@NotNull String addonName, @NotNull String fileName, @NotNull YamlConfiguration config,
+                             @NotNull Function<String, InputStream> bundledResources);
+
+    /**
+     * Same as {@link #localize(String, String, YamlConfiguration, Function)} for a JSON config, such
+     * as an enchant file. Translations are YAML files named after the JSON file:
+     * {@code lang/<language>/<name>.yml} in your jar for {@code <name>.json}, and
+     * {@code plugins/X-Prison/lang/addons/<addonName>/<language>/<name>.yml} for the owner.
+     *
+     * <p>Enchants extending {@link dev.drawethree.xprison.api.enchants.model.XPrisonEnchantmentBase}
+     * get this automatically for their name, menu name, menu description and proc message.
+     *
+     * @param addonName        your addon's name, used for the owner override folder
+     * @param fileName         the JSON file's name relative to your data folder, e.g. {@code petfinder.json}
+     * @param config           the JSON as you loaded it; it is copied and never changed
+     * @param bundledResources reads a resource from your jar by path, returning {@code null} when it
+     *                         does not exist; the English default is read from {@code fileName}
+     * @return the per-language views of {@code config}
+     */
+    @NotNull
+    LocalizedJson localizeJson(@NotNull String addonName, @NotNull String fileName, @NotNull JsonObject config,
+                               @NotNull Function<String, InputStream> bundledResources);
 }

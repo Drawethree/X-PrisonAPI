@@ -2,6 +2,7 @@ package dev.drawethree.xprison.api.enchants.area;
 
 import com.google.gson.JsonObject;
 import dev.drawethree.xprison.api.XPrisonAPI;
+import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 import dev.drawethree.xprison.api.enchants.model.BlockBreakEnchant;
 import dev.drawethree.xprison.api.enchants.model.ChanceBasedEnchant;
 import dev.drawethree.xprison.api.enchants.model.XPrisonEnchantmentBase;
@@ -157,6 +158,37 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	@NotNull
 	public final AreaBreakSettings areaSettings() {
 		return this.areaSettings;
+	}
+
+	/**
+	 * Builds the proc message in the mining player's language: the {@code message} line of this
+	 * enchant's config as translated for them (see {@link #getLocalizedConfig(String)}), falling back
+	 * to {@link AreaBreakSettings#message()}.
+	 *
+	 * @param player          the mining player who receives the message
+	 * @param currency        the currency the break paid out in
+	 * @param formattedAmount the credited amount, already formatted by {@code currency}
+	 * @return the message to send
+	 * @since 1.10
+	 */
+	@Override
+	public String procMessage(Player player, XPrisonCurrency currency, String formattedAmount) {
+		String message = this.areaSettings.message();
+		JsonObject localized = getLocalizedConfig(languageOf(player));
+		if (localized != null) {
+			message = JsonUtils.getOptionalString(localized, "message", message);
+		}
+		return message
+				.replace("%amount%", formattedAmount)
+				.replace("%currency%", currency.getDisplayName());
+	}
+
+	private static String languageOf(Player player) {
+		try {
+			return XPrisonAPI.getInstance().getLanguageApi().getLanguage(player.getUniqueId());
+		} catch (RuntimeException languagesUnavailable) {
+			return "";
+		}
 	}
 
 	/**

@@ -4,6 +4,8 @@ import dev.drawethree.xprison.api.XPrisonAPI;
 import dev.drawethree.xprison.api.currency.model.XPrisonCurrency;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a custom enchantment in the XPrison system.
@@ -45,6 +47,44 @@ public interface XPrisonEnchantment {
      * @return The GUI properties of the enchantment.
      */
     XPrisonEnchantmentGuiProperties getGuiProperties();
+
+    /**
+     * Gets the display name in a language, for text a player in that language reads.
+     *
+     * <p>The default returns {@link #getName()}. Enchants extending
+     * {@link XPrisonEnchantmentBase} return their translated name.
+     *
+     * @param languageCode a language code such as {@code de}, see
+     *                     {@link dev.drawethree.xprison.api.language.XPrisonLanguageAPI}
+     * @return the display name in that language
+     * @since 1.10
+     */
+    default String getName(String languageCode) {
+        return getName();
+    }
+
+    /**
+     * Gets the name shown on this enchant's menu item, in a language.
+     *
+     * @param languageCode a language code such as {@code de}
+     * @return the menu name in that language; the default is the name from {@link #getGuiProperties()}
+     * @since 1.10
+     */
+    default String getGuiName(String languageCode) {
+        return getGuiProperties().getGuiName();
+    }
+
+    /**
+     * Gets the description lines shown on this enchant's menu item, in a language.
+     *
+     * @param languageCode a language code such as {@code de}
+     * @return the description in that language; the default is the description from
+     *         {@link #getGuiProperties()}
+     * @since 1.10
+     */
+    default List<String> getGuiDescription(String languageCode) {
+        return new ArrayList<>(getGuiProperties().getGuiDescription());
+    }
 
     /**
      * Gets the name of the developer or plugin author who created this enchantment.

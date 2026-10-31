@@ -4,6 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import dev.drawethree.xprison.api.XPrisonAPI;
+import dev.drawethree.xprison.api.language.LocalizedJson;
 import dev.drawethree.xprison.api.utils.BigNumbers;
 import dev.drawethree.xprison.api.utils.JsonUtils;
 import lombok.Getter;
@@ -17,7 +19,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for all XPrison enchantments.
@@ -51,6 +55,7 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
     protected int refundGuiSlot;
     protected int refundGuiPage;
     protected double refundPercentage;
+    private LocalizedJson localizedConfig;
 
     /**
      * Constructs a new enchantment with the given config file.
@@ -75,10 +80,64 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
             this.loadBaseProperties(config);
             this.loadGuiProperties(config);
             this.loadCustomProperties(config);
+            this.localizedConfig = localize(config);
 
         } catch (IOException | RuntimeException e) {
             throw new RuntimeException("Failed to load enchant config: " + configFile.getName(), e);
         }
+    }
+
+    private LocalizedJson localize(JsonObject config) {
+        File folder = configFile.getParentFile();
+        try {
+            return XPrisonAPI.getInstance().getLanguageApi().localizeJson(folder == null ? "" : folder.getName(),
+                    configFile.getName(), config, getClass().getClassLoader()::getResourceAsStream);
+        } catch (RuntimeException languagesUnavailable) {
+            return null;
+        }
+    }
+
+    /**
+     * Gets this enchant's JSON config in a language, for subclasses that send their own text (for
+     * example a proc message). Translations come from {@code lang/<language>/<file>.yml} in the
+     * addon jar and from the server owner's {@code plugins/X-Prison/lang/addons/<addon>/<language>/}.
+     *
+     * @param languageCode a language code such as {@code de}
+     * @return the config in that language, or {@code null} when the running X-Prison has no
+     *         per-player languages
+     * @since 1.10
+     */
+    protected JsonObject getLocalizedConfig(String languageCode) {
+        return this.localizedConfig == null ? null : this.localizedConfig.get(languageCode);
+    }
+
+    @Override
+    public String getName(String languageCode) {
+        JsonObject config = getLocalizedConfig(languageCode);
+        return config == null ? getName() : ChatColor.translateAlternateColorCodes('&', JsonUtils.getOptionalString(config, "name", getName()));
+    }
+
+    @Override
+    public String getGuiName(String languageCode) {
+        JsonObject gui = localizedGui(languageCode);
+        return gui == null ? guiProperties.getGuiName()
+                : ChatColor.translateAlternateColorCodes('&', JsonUtils.getOptionalString(gui, "name", guiProperties.getGuiName()));
+    }
+
+    @Override
+    public List<String> getGuiDescription(String languageCode) {
+        JsonObject gui = localizedGui(languageCode);
+        if (gui == null || !gui.has("description")) {
+            return new ArrayList<>(guiProperties.getGuiDescription());
+        }
+        return JsonUtils.getRequiredStringList(gui, "description").stream()
+                .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private JsonObject localizedGui(String languageCode) {
+        JsonObject config = getLocalizedConfig(languageCode);
+        return config == null || !config.has("gui") ? null : config.getAsJsonObject("gui");
     }
 
     private void loadBaseProperties(JsonObject config) {
