@@ -97,6 +97,8 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	protected AreaBreakSettings areaSettings =
 			new AreaBreakSettings(false, BreakEventStrategy.PER_BLOCK, "money", "", 0, true);
 
+	private String loadedMessage = "";
+
 	/**
 	 * @param configFile the JSON file describing this enchantment
 	 */
@@ -120,7 +122,25 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	public final void loadCustomProperties(JsonObject config) {
 		this.chance = JsonUtils.getOptionalDouble(config, "chance", 0.0D);
 		this.areaSettings = AreaBreakSettings.fromJson(config, defaultEventStrategy());
+		this.loadedMessage = this.areaSettings.message();
 		loadAreaProperties(config);
+	}
+
+	/**
+	 * Gets the key of this enchant's JSON config that holds the proc message the pipeline sends,
+	 * so it can be translated for each player. Defaults to {@code message}.
+	 * <p>
+	 * An enchant that replaces the message in {@link #loadAreaProperties(JsonObject)} with
+	 * {@link AreaBreakSettings#withMessage(String)} - for example to send an {@code earningsMessage}
+	 * instead - overrides this to return the key it read the new message from. Until it does, the
+	 * replaced message is sent exactly as configured, untranslated, rather than as the translation
+	 * of the {@code message} line it no longer uses.
+	 *
+	 * @return the JSON key of the proc message
+	 * @since 1.10
+	 */
+	protected String getProcMessageKey() {
+		return "message";
 	}
 
 	/**
@@ -161,9 +181,9 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	}
 
 	/**
-	 * Builds the proc message in the mining player's language: the {@code message} line of this
-	 * enchant's config as translated for them (see {@link #getLocalizedConfig(String)}), falling back
-	 * to {@link AreaBreakSettings#message()}.
+	 * Builds the proc message in the mining player's language: the {@link #getProcMessageKey()} line
+	 * of this enchant's config as translated for them (see {@link #getLocalizedString(Player, String,
+	 * String)}), falling back to {@link AreaBreakSettings#message()}.
 	 *
 	 * @param player          the mining player who receives the message
 	 * @param currency        the currency the break paid out in
@@ -174,21 +194,14 @@ public abstract class AreaBreakEnchant extends XPrisonEnchantmentBase
 	@Override
 	public String procMessage(Player player, XPrisonCurrency currency, String formattedAmount) {
 		String message = this.areaSettings.message();
-		JsonObject localized = getLocalizedConfig(languageOf(player));
-		if (localized != null) {
-			message = JsonUtils.getOptionalString(localized, "message", message);
+		String key = getProcMessageKey();
+		boolean replacedWithoutKey = "message".equals(key) && !message.equals(this.loadedMessage);
+		if (!replacedWithoutKey) {
+			message = getLocalizedString(player, key, message);
 		}
 		return message
 				.replace("%amount%", formattedAmount)
 				.replace("%currency%", currency.getDisplayName());
-	}
-
-	private static String languageOf(Player player) {
-		try {
-			return XPrisonAPI.getInstance().getLanguageApi().getLanguage(player.getUniqueId());
-		} catch (RuntimeException languagesUnavailable) {
-			return "";
-		}
 	}
 
 	/**

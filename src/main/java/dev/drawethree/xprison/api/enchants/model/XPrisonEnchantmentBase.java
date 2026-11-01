@@ -15,6 +15,7 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.FileReader;
@@ -130,6 +131,31 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
      */
     protected JsonObject getLocalizedConfig(String languageCode) {
         return this.localizedConfig == null ? null : this.localizedConfig.get(languageCode);
+    }
+
+    /**
+     * Gets one line of this enchant's JSON config in a player's language - for example the
+     * {@code message} an enchant sends when it procs.
+     *
+     * @param player   the player who will read the line
+     * @param key      the top-level key of the line in the JSON config
+     * @param fallback the line to use when no translation applies, normally the value loaded from
+     *                 the config
+     * @return the translated line, or {@code fallback} when the running X-Prison has no per-player
+     *         languages or the key is not a string
+     * @since 1.10
+     */
+    protected String getLocalizedString(Player player, String key, String fallback) {
+        JsonObject config = player == null ? null : getLocalizedConfig(languageOf(player));
+        return config == null ? fallback : JsonUtils.getOptionalString(config, key, fallback);
+    }
+
+    private static String languageOf(Player player) {
+        try {
+            return XPrisonAPI.getInstance().getLanguageApi().getLanguage(player.getUniqueId());
+        } catch (RuntimeException languagesUnavailable) {
+            return "";
+        }
     }
 
     @Override
