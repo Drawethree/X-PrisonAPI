@@ -19,9 +19,11 @@ import org.bukkit.Material;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -90,12 +92,30 @@ public abstract class XPrisonEnchantmentBase implements XPrisonEnchantment, Refu
 
     private LocalizedJson localize(JsonObject config) {
         File folder = configFile.getParentFile();
+        Function<String, InputStream> jar = AddonResources.of(getClass());
+        String bundledFolder = getBundledFolder();
         try {
             return XPrisonAPI.getInstance().getLanguageApi().localizeJson(folder == null ? "" : folder.getName(),
-                    configFile.getName(), config, AddonResources.of(getClass()));
+                    configFile.getName(), config, path -> jar.apply(bundledFolder + path));
         } catch (RuntimeException languagesUnavailable) {
             return null;
         }
+    }
+
+    /**
+     * Gets the folder inside the addon jar that holds this enchant's bundled JSON, relative to the
+     * jar root. The English default is read from {@code <folder><file>.json} and translations from
+     * {@code <folder>lang/<language>/<file>.yml}.
+     *
+     * <p>Override this when the JSON is not at the root of the jar - for example, return
+     * {@code "enchants/"} for a jar that bundles {@code enchants/meteor.json}. Without it the
+     * English default cannot be found, and the jar's translations are never applied.
+     *
+     * @return the folder, ending in {@code /}, or an empty string for the jar root (the default)
+     * @since 1.10
+     */
+    protected String getBundledFolder() {
+        return "";
     }
 
     /**
