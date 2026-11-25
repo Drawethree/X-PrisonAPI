@@ -28,6 +28,7 @@ import dev.drawethree.xprison.api.quests.XPrisonQuestsAPI;
 import dev.drawethree.xprison.api.ranks.XPrisonRanksAPI;
 import dev.drawethree.xprison.api.text.XPrisonTextAPI;
 import dev.drawethree.xprison.api.time.XPrisonTimeAPI;
+import dev.drawethree.xprison.api.lostitems.XPrisonLostItemsAPI;
 import dev.drawethree.xprison.api.rebirth.XPrisonRebirthAPI;
 import dev.drawethree.xprison.api.season.XPrisonSeasonAPI;
 import dev.drawethree.xprison.api.virtualblocks.XPrisonVirtualBlocksAPI;
@@ -278,6 +279,21 @@ public interface XPrisonAPI {
     default XPrisonLeaderboardsAPI getLeaderboardsApi() {
         throw new UnsupportedOperationException(
                 "This X-Prison version does not provide the leaderboards API");
+    }
+
+    /**
+     * Gets the Lost Items API: give items safely, keeping whatever does not fit in the player's
+     * inventory, and deliver items to offline players. Available even when the Lost Items module is
+     * turned off - see {@link XPrisonLostItemsAPI}.
+     *
+     * @return the Lost Items API instance
+     * @throws UnsupportedOperationException if the running X-Prison predates this API
+     * @since 1.10
+     */
+    @NotNull
+    default XPrisonLostItemsAPI getLostItemsApi() {
+        throw new UnsupportedOperationException(
+                "This X-Prison version does not provide the lost items API");
     }
 
     /**
